@@ -1,0 +1,65 @@
+<form class="{{cssClass}} flexcol" autocomplete="off" autocapitalize="off">
+
+    {!-- Sheet Header --}}
+    <header class="sheet-header">
+        {{!-- header --}}
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+        <div class="header-fields">
+            <h1 class="char-name"><input name="name" type="text" value="{{actor.name}}" placeholder="Name" data-dtype="String"></h1>
+            <div class="resources grid grid-2col">
+                {{!-- resources here --}}
+                <div class="resource flex-group-center">
+                    <label class="resource-label" for="data.age">Age</label>
+                    <div class="resource-content flexrow flex-center flex-between">
+                        <input type="text" name="data.age" value="{{data.age}}" data-dtype="Number">
+                    </div>
+                </div>
+                <div class="resource flex-group-center">
+                    <label class="resource-label" for="data.race">Race</label>
+                    <div class="resource-content flexrow flex-center flex-between">
+                        <input type="text" name="data.race" value="{{data.race}}" data-dtype="String">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="characteristics">Characteristics</a>
+        <a class="item" data-tab="abilities">Abilities</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab attributes active" data-group="primary" data-tab="attributes">
+            <div class="attributes grid">
+                <div class="ability flexrow flex-group-center">
+                    <label for="data.attributes.{{key}}.orig" class="resource-label">Attributes</label>
+                    <span>Orig.</span>
+                    <span>Temp.</span>
+                </div>
+                {{#each data.attributes as  |attribute key|}}
+                    <div class="ability flexrow flex-group-center">
+                        <label for="data.attributes.{{key}}.orig" class="resource-label">{{key}}</label>
+                        <input type="text" name="data.attributes.{{key}}.orig" value="{{attributes.orig}}" data-dtype="Number"/>
+                        <span> / </span>
+
+                        <input type="text" name="data.attributes.{{key}}.temp" value="{{attributes.temp}}" data-dtype="Number"/>
+                        <span> — </span>
+
+                        <input type="checkbox" name="data.attributes.{{key}}.used" value="{{attributes.used}}" data-dtype="Boolean"/>
+                    </div>
+                {{/each}}
+            </div>
+        </div>
+        <div class="tab characteristics active" data-group="primary" data-tab="characteristics">
+
+        </div>
+        <div class="tab attributes abilities" data-group="primary" data-tab="abilities">
+
+        </div>
+    </section>
+
+</form>

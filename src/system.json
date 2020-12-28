@@ -1,0 +1,26 @@
+{
+  "name": "maelstrom",
+  "title": "Maelstrom",
+  "description": "Simple support for Maelstrom Domesday / Gothic / Rome",
+  "version": "0.1.0",
+  "author": "snorith",
+  "scripts": [],
+  "esmodules": [
+    "maelstrom.js"
+  ],
+  "styles": [
+    "maelstrom.css"
+  ],
+  "packs": [],
+  "languages": [],
+  "gridDistance": 1,
+  "gridUnits": "",
+  "minimumCoreVersion": "0.6.6",
+  "compatibleCoreVersion": "0.7.0",
+  "manifest": "",
+  "download": "",
+  "license": "",
+  "readme": "",
+  "bugs": "",
+  "changelog": ""
+}

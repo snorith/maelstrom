@@ -1,0 +1,75 @@
+{
+  "Actor": {
+    "types": [
+      "character"
+    ],
+    "templates": [],
+    "character": {
+      "version": 0,
+      "biography": "",
+      "age": 0,
+      "race": "",
+      "sex": "",
+      "social": "",
+      "imbalance": "",
+      "favour": "",
+      "patron": "",
+      "attributes": {
+        "attack": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "missile": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "defence": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "knowledge": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "will": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "endurance": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "persuasion": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "perception": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "speed": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        },
+        "agility": {
+          "orig": 0,
+          "temp": 0,
+          "used": false
+        }
+      }
+    }
+  },
+  "Item": {
+    "types": [],
+    "templates": []
+  }
+}
