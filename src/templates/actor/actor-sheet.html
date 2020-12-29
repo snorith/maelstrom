@@ -6,33 +6,28 @@
         <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
         <div class="header-fields">
             <h1 class="char-name"><input name="name" type="text" value="{{actor.name}}" placeholder="Name" data-dtype="String"></h1>
-            <div class="resources grid grid-3col">
-                {{!-- resources here --}}
-                <div class="resource flex-group-left">
+            <div class="grid grid-2col">
+                <div class="info-grid-form">
                     <label class="resource-label" for="data.age">Age</label>
                     <input type="text" name="data.age" value="{{data.age}}" data-dtype="Number">
-                </div>
-                <div class="resource flex-group-left">
+
                     <label class="resource-label" for="data.race">Race</label>
                     <input type="text" name="data.race" value="{{data.race}}" data-dtype="String">
-                </div>
-                <div class="resource flex-group-left">
+
                     <label class="resource-label" for="data.sex">Sex</label>
                     <input type="text" name="data.sex" value="{{data.sex}}" data-dtype="String">
-                </div>
-                <div class="resource flex-group-left">
+
                     <label class="resource-label" for="data.social">Social</label>
                     <input type="text" name="data.social" value="{{data.social}}" data-dtype="String">
                 </div>
-                <div class="resource flex-group-left">
+
+                <div class="info-grid-form">
                     <label class="resource-label" for="data.imbalance">Imbalance</label>
                     <input type="text" name="data.imbalance" value="{{data.imbalance}}" data-dtype="String">
-                </div>
-                <div class="resource flex-group-left">
+
                     <label class="resource-label" for="data.favour">Favour</label>
                     <input type="text" name="data.favour" value="{{data.favour}}" data-dtype="String">
-                </div>
-                <div class="resource flex-group-left">
+
                     <label class="resource-label" for="data.patron">Patron</label>
                     <input type="text" name="data.patron" value="{{data.patron}}" data-dtype="String">
                 </div>
@@ -42,7 +37,7 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="attributes active">Attributes/Abilities</a>
+        <a class="item" data-tab="attributes">Attributes/Abilities</a>
         <a class="item" data-tab="equipment">Equip/Events</a>
         <a class="item" data-tab="description">Description</a>
     </nav>
@@ -98,14 +93,19 @@
                     </table>
 
                     <table class="abilties">
+                        <colgroup>
+                            <col class="abilties-firstcolumn">
+                            <col>
+                            <col class="abilties-thirdcolumn">
+                        </colgroup>
                         <thead>
                         <tr>
                             <td colspan="3">Abilities</td>
                         </tr>
                         <tr>
-                            <td width="35%">Ability</td>
+                            <td>Ability</td>
                             <td>Rank</td>
-                            <td width="40%">Benefit</td>
+                            <td>Benefit</td>
                         </tr>
                         </thead>
                         <tbody>

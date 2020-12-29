@@ -58,6 +58,14 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
+.flex-group {
+  justify-content: left;
+  align-items: normal;
+  text-align: left;
+  padding: 5px;
+  border: 1px solid #999;
+}
+
 .flex-group-center,
 .flex-group-left,
 .flex-group-right {
@@ -76,4 +84,35 @@
 .flex-group-right {
   justify-content: flex-end;
   text-align: right;
+}
+
+/* flexrow and flexcol (ahem) "borrowed" from the D&D 5e LESS files, many thanks to atropos */
+.flexrow {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+
+.flexcol {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.info-grid-form {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  column-gap: 10px;
+  row-gap: 5px;
+
+  label {
+    text-align: right;
+    margin-top: 3px;
+    grid-column: 1 / 2;
+  }
+
+  input,
+  select,
+  button {
+    grid-column: 2 / 3;
+  }
 }
