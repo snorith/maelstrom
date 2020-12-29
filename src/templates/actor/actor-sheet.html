@@ -1,6 +1,6 @@
 <form class="{{cssClass}} flexcol" autocomplete="off" autocapitalize="off">
 
-    {!-- Sheet Header --}}
+    {{!-- Sheet Header --}}
     <header class="sheet-header">
         {{!-- header --}}
         <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
@@ -29,6 +29,7 @@
         <a class="item" data-tab="attributes">Attributes</a>
         <a class="item" data-tab="characteristics">Characteristics</a>
         <a class="item" data-tab="abilities">Abilities</a>
+        <a class="item" data-tab="description">Description</a>
     </nav>
 
     {{!-- Sheet Body --}}
@@ -54,11 +55,20 @@
                 {{/each}}
             </div>
         </div>
-        <div class="tab characteristics active" data-group="primary" data-tab="characteristics">
+
+        {{!-- Characteristics --}}
+        <div class="tab characteristics" data-group="primary" data-tab="characteristics">
 
         </div>
-        <div class="tab attributes abilities" data-group="primary" data-tab="abilities">
 
+        {{!-- Abilities --}}
+        <div class="tab abilities" data-group="primary" data-tab="abilities">
+
+        </div>
+
+        {{!-- Biography Tab --}}
+        <div class="tab biography" data-group="primary" data-tab="description">
+            {{editor content=data.biography target="data.biography" button=true owner=owner editable=editable}}
         </div>
     </section>
 
