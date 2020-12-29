@@ -6,19 +6,35 @@
         <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
         <div class="header-fields">
             <h1 class="char-name"><input name="name" type="text" value="{{actor.name}}" placeholder="Name" data-dtype="String"></h1>
-            <div class="resources grid grid-2col">
+            <div class="resources grid grid-3col">
                 {{!-- resources here --}}
-                <div class="resource flex-group-center">
+                <div class="resource flex-group-left">
                     <label class="resource-label" for="data.age">Age</label>
-                    <div class="resource-content flexrow flex-center flex-between">
-                        <input type="text" name="data.age" value="{{data.age}}" data-dtype="Number">
-                    </div>
+                    <input type="text" name="data.age" value="{{data.age}}" data-dtype="Number">
                 </div>
-                <div class="resource flex-group-center">
+                <div class="resource flex-group-left">
                     <label class="resource-label" for="data.race">Race</label>
-                    <div class="resource-content flexrow flex-center flex-between">
-                        <input type="text" name="data.race" value="{{data.race}}" data-dtype="String">
-                    </div>
+                    <input type="text" name="data.race" value="{{data.race}}" data-dtype="String">
+                </div>
+                <div class="resource flex-group-left">
+                    <label class="resource-label" for="data.sex">Sex</label>
+                    <input type="text" name="data.sex" value="{{data.sex}}" data-dtype="String">
+                </div>
+                <div class="resource flex-group-left">
+                    <label class="resource-label" for="data.social">Social</label>
+                    <input type="text" name="data.social" value="{{data.social}}" data-dtype="String">
+                </div>
+                <div class="resource flex-group-left">
+                    <label class="resource-label" for="data.imbalance">Imbalance</label>
+                    <input type="text" name="data.imbalance" value="{{data.imbalance}}" data-dtype="String">
+                </div>
+                <div class="resource flex-group-left">
+                    <label class="resource-label" for="data.favour">Favour</label>
+                    <input type="text" name="data.favour" value="{{data.favour}}" data-dtype="String">
+                </div>
+                <div class="resource flex-group-left">
+                    <label class="resource-label" for="data.patron">Patron</label>
+                    <input type="text" name="data.patron" value="{{data.patron}}" data-dtype="String">
                 </div>
             </div>
         </div>
@@ -26,43 +42,88 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="attributes">Attributes</a>
-        <a class="item" data-tab="characteristics">Characteristics</a>
-        <a class="item" data-tab="abilities">Abilities</a>
+        <a class="item" data-tab="attributes active">Attributes/Abilities</a>
+        <a class="item" data-tab="equipment">Equip/Events</a>
         <a class="item" data-tab="description">Description</a>
     </nav>
 
     {{!-- Sheet Body --}}
     <section class="sheet-body">
+        {{!-- Main sheet tab --}}
         <div class="tab attributes active" data-group="primary" data-tab="attributes">
-            <div class="attributes grid">
-                <div class="ability flexrow flex-group-center">
-                    <label for="data.attributes.{{key}}.orig" class="resource-label">Attributes</label>
-                    <span>Orig.</span>
-                    <span>Temp.</span>
+            <div class="resources grid grid-2col">
+                <div class="resource flex-group-center">
+                    <table class="attributes">
+                        <thead>
+                        <tr>
+                            <td colspan="4">Attributes</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Orig.</td>
+                            <td>Temp.</td>
+                            <td>Used</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each data.attributes as |attribute key|}}
+                            <tr>
+                                <td><label for="data.attributes.{{key}}.temp" class="resource-label">{{key}}</label></td>
+                                <td><input type="text" name="data.attributes.{{key}}.orig" value="{{attribute.orig}}" data-dtype="Number"/></td>
+                                <td><input type="text" name="data.attributes.{{key}}.temp" value="{{attribute.temp}}" data-dtype="Number"/></td>
+                                <td><input type="checkbox" name="data.attributes.{{key}}.used" {{checked attribute.used}} data-dtype="Boolean"/></td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
                 </div>
-                {{#each data.attributes as  |attribute key|}}
-                    <div class="ability flexrow flex-group-center">
-                        <label for="data.attributes.{{key}}.orig" class="resource-label">{{key}}</label>
-                        <input type="text" name="data.attributes.{{key}}.orig" value="{{attributes.orig}}" data-dtype="Number"/>
-                        <span> / </span>
+                <div class="resource flex-group-center">
+                    <table class="characteristics">
+                        <thead>
+                        <tr>
+                            <td>Characteristics</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type="text" name="data.characteristics.characteristic1" value="{{data.characteristics.characteristic1}}" data-dtype="String"/></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" name="data.characteristics.characteristic2" value="{{data.characteristics.characteristic2}}" data-dtype="String"/></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" name="data.characteristics.characteristic3" value="{{data.characteristics.characteristic3}}" data-dtype="String"/></td>
+                        </tr>
+                        </tbody>
+                    </table>
 
-                        <input type="text" name="data.attributes.{{key}}.temp" value="{{attributes.temp}}" data-dtype="Number"/>
-                        <span> — </span>
-
-                        <input type="checkbox" name="data.attributes.{{key}}.used" value="{{attributes.used}}" data-dtype="Boolean"/>
-                    </div>
-                {{/each}}
+                    <table class="abilties">
+                        <thead>
+                        <tr>
+                            <td colspan="3">Abilities</td>
+                        </tr>
+                        <tr>
+                            <td width="35%">Ability</td>
+                            <td>Rank</td>
+                            <td width="40%">Benefit</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each data.abilities as |ability key|}}
+                            <tr>
+                                <td><input type="text" name="data.abilities.{{key}}.ability" value="{{ability.ability}}" data-dtype="String"/></td>
+                                <td><input type="text" name="data.abilities.{{key}}.rank" value="{{ability.rank}}" data-dtype="String"/></td>
+                                <td><input type="text" name="data.abilities.{{key}}.benefit" value="{{ability.benefit}}" data-dtype="String"/></td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        {{!-- Characteristics --}}
-        <div class="tab characteristics" data-group="primary" data-tab="characteristics">
-
-        </div>
-
-        {{!-- Abilities --}}
-        <div class="tab abilities" data-group="primary" data-tab="abilities">
+        {{!-- equipment / events / supernatural / languages tab --}}
+        <div class="tab equipment" data-group="primary" data-tab="equipment">
 
         </div>
 

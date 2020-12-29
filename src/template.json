@@ -69,6 +69,12 @@
           "temp": 0,
           "used": false
         }
+      },
+      "abilities": [],
+      "characteristics": {
+        "characteristic1": "",
+        "characteristic2": "",
+        "characteristic3": ""
       }
     }
   },
