@@ -13,6 +13,8 @@
 // Import TypeScript modules
 import { registerSettings } from './module/settings.js';
 import { preloadTemplates } from './module/preloadTemplates.js';
+import { MaelstromActor } from  './module/actor/actor'
+import { MaelstromActorSheet } from "./module/actor/actorsheet"
 
 /* ------------------------------------ */
 /* Initialize system					*/
@@ -21,7 +23,16 @@ Hooks.once('init', async function() {
 	console.log('maelstrom | Initializing maelstrom');
 
 	// Assign custom classes and constants here
-	
+	game.maelstrom = {
+		MaelstromActor
+	}
+
+	// define custom entity classes
+	CONFIG.Actor.entityClass = MaelstromActor
+
+	Actors.unregisterSheet("core", ActorSheet)
+	Actors.registerSheet('maelstrom', MaelstromActorSheet, { makeDefault: true })
+
 	// Register custom system settings
 	registerSettings();
 	
@@ -48,13 +59,4 @@ Hooks.once('ready', function() {
 
 // Add any additional hooks if necessary
 
-// Adds a simple Handlebars "for loop" block helper
-Handlebars.registerHelper('for', function (times: number, block: any) {
-	var accum = '';
-	for (let i = 0; i < times; i++) {
-		block.data.index = i;
-		block.data.num = i + 1;
-		accum += block.fn(i);
-	}
-	return accum;
-});
+

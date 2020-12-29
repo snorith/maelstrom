@@ -3,9 +3,13 @@
     "types": [
       "character"
     ],
-    "templates": [],
+    "templates": {
+      "base": {
+        "version": 0
+      }
+    },
     "character": {
-      "version": 0,
+      "templates": ["base"],
       "biography": "",
       "age": 0,
       "race": "",
