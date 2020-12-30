@@ -8,8 +8,10 @@ export class MaelstromAbilityItemSheet extends ItemSheet {
      */
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
+            classes: ["boilerplate", "sheet", "item"],
             width: 550,
-            height: 620
+            height: 620,
+            tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributes" }]
         });
     }
 
@@ -30,14 +32,14 @@ export class MaelstromAbilityItemSheet extends ItemSheet {
     }
 
     /** @override */
-    // setPosition(options = {}) {
-    //     const position = super.setPosition(options);
-    //     // @ts-ignore
-    //     const sheetBody = this.element.find(".sheet-body")
-    //     const bodyHeight = position.height - 192
-    //     sheetBody?.css("height", bodyHeight)
-    //     return position
-    // }
+    setPosition(options = {}) {
+        const position = super.setPosition(options);
+        // @ts-ignore
+        const sheetBody = this.element.find(".sheet-body")
+        const bodyHeight = position.height - 192
+        sheetBody?.css("height", bodyHeight)
+        return position
+    }
 
     /** @override */
     activateListeners(html) {

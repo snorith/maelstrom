@@ -1,24 +1,38 @@
-<form class="{{cssClass}} maelstrom item" autocomplete="off">
-    <h1 class="charname"><input type="text" name="name" value="{{data.name}}" data-dtype="String" /></h1>
-    <div class="flexrow item">
-        <div class="img">
-            <img class="profile-img" src="{{item.img}}" title="{{item.name}}" data-edit="img" />
+<form class="{{cssClass}} maelstrom item" autocomplete="off" autocapitalize="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" data-dtype="String"/></h1>
         </div>
-        <div class="ability">
-            <label>{{localize "MAELSTROM.item.ability.rank"}}
-                <input type="text" name="data.rank" value="{{data.rank}}" class="rank" data-dtype="String" />
-            </label>
-            <label>{{localize "MAELSTROM.item.ability.benefit"}}
-                <input type="text" name="data.benefit" value="{{data.benefit}}" class="benefit" data-dtype="String" />
-            </label>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary-tabs">
+        <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="description">Description</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary-tabs" data-tab="attributes">
+            <div class="grid grid-2col">
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.ability.rank"}}
+                        <input type="text" name="data.rank" value="{{data.rank}}" class="rank" data-dtype="String" />
+                    </label>
+                </div>
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.ability.benefit"}}
+                        <input type="text" name="data.benefit" value="{{data.benefit}}" class="benefit" data-dtype="String" />
+                    </label>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="item-notes">
-        <h2>{{localize "MAELSTROM.item.ability.description"}}</h2>
-        {{editor content=data.effect target="data.notes" button=true editable=editable}}
-        <button type="submit" id="save-item-notes">
-            <i class="fas fa-feather-alt"></i>
-            {{localize "MAELSTROM.saveChanges"}}
-        </button>
-    </div>
+
+        {{!-- Description Tab --}}
+        <div class="tab description" data-group="primary-tabs" data-tab="description">
+            {{editor content=data.notes target="data.notes" button=true owner=owner editable=editable}}
+        </div>
+    </section>
 </form>
