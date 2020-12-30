@@ -1,0 +1,24 @@
+<form class="{{cssClass}} maelstrom item" autocomplete="off">
+    <h1 class="charname"><input type="text" name="name" value="{{data.name}}" data-dtype="String" /></h1>
+    <div class="flexrow item">
+        <div class="img">
+            <img class="profile-img" src="{{item.img}}" title="{{item.name}}" data-edit="img" />
+        </div>
+        <div class="ability">
+            <label>{{localize "MAELSTROM.item.ability.rank"}}
+                <input type="text" name="data.rank" value="{{data.rank}}" class="rank" data-dtype="String" />
+            </label>
+            <label>{{localize "MAELSTROM.item.ability.benefit"}}
+                <input type="text" name="data.benefit" value="{{data.benefit}}" class="benefit" data-dtype="String" />
+            </label>
+        </div>
+    </div>
+    <div class="item-notes">
+        <h2>{{localize "MAELSTROM.item.ability.description"}}</h2>
+        {{editor content=data.effect target="data.notes" button=true editable=editable}}
+        <button type="submit" id="save-item-notes">
+            <i class="fas fa-feather-alt"></i>
+            {{localize "MAELSTROM.saveChanges"}}
+        </button>
+    </div>
+</form>

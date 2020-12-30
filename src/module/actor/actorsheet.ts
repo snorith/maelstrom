@@ -1,3 +1,52 @@
+
+import {MaelstromAbilityItem} from "../item/MaelstromAbilityItem"
+import {systemBasePath, systemName} from "../settings"
+
+/**
+ * Higher order function that generates an item creation handler.
+ *
+ * @param {String} itemType The type of the Item (eg. 'ability', 'weapon', etc.)
+ * @param {*} itemClass
+ * @param {*} [callback=null]
+ * @returns
+ */
+function onItemCreate(itemType, itemClass, callback = null) {
+    return async function(event = null) {
+        if (event)
+            event.preventDefault();
+
+        const newName = game.i18n.localize(`MAELSTROM.item.${itemType}.new${itemType.capitalize()}`);
+
+        const itemData = {
+            name: newName,
+            type: itemType,
+            data: new itemClass({}),
+        };
+
+        const newItem = await this.actor.createOwnedItem(itemData);
+        if (callback)
+            callback(newItem);
+
+        return newItem;
+    }
+}
+
+//Sort function for order
+const sortFunction = (a, b) => a.data.order < b.data.order ? -1 : a.data.order > b.data.order ? 1 : 0;
+
+// Stolen from https://stackoverflow.com/a/34064434/20043
+function htmlDecode(input) {
+    const doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+}
+
+//Function to remove any HTML markup from eg. item descriptions
+function removeHtmlTags(str) {
+    // Replace any HTML tag ('<...>') by an empty string
+    // and then un-escape any HTML escape codes (eg. &lt;)
+    return htmlDecode(str.replace(/<.+?>/gi, ""));
+}
+
 /**
  * Extend the basic ActorSheet with some very simple modifications
  * @extends {ActorSheet}
@@ -8,86 +57,80 @@ export class MaelstromActorSheet extends ActorSheet {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ["boilerplate", "sheet", "actor"],
-            template: "systems/maelstrom/templates/actor/actor-sheet.html",
-            width: 600,
-            height: 600,
+            width: 925,
+            height: 1000,
             tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
         });
+    }
+
+    /**
+     * Get the correct HTML template path to use for rendering this particular sheet
+     * @type {String}
+     */
+    get template() {
+        // 1: Domesday
+        // 2: Gothic
+        // 3: Rome
+        switch (game.settings.get(systemName, "characterSheet"))
+        {
+            case 1:
+            case 2:
+            case 3:
+                return `${systemBasePath}/templates/actor/actorSheet.html`;
+            default:
+                throw new Error("Invalid setting for actorSheet template")
+        }
     }
 
     /* -------------------------------------------- */
 
     /** @override */
     getData() {
-        const data = super.getData();
+        const sheetData = super.getData();
         // @ts-ignore
-        data.dtypes = ["String", "Number", "Boolean"];
+        sheetData.dtypes = ["String", "Number", "Boolean"];
         // @ts-ignore
-        for (let attr of Object.values(data.data.attributes)) {
+        for (let attr of Object.values(sheetData.data.attributes)) {
             // @ts-ignore
             attr.isCheckbox = attr.dtype === "Boolean";
         }
 
         // Prepare items.
         if (this.actor.data.type == 'character') {
-            this._prepareCharacterItems(data);
+            this._prepareCharacterItems(sheetData);
         }
 
-        return data;
+        return sheetData;
     }
 
     /**
      * Organize and classify Items for Character sheets.
      *
-     * @param {Object} actorData The actor to prepare.
-     *
+     * @param sheetData
      * @return {undefined}
      */
-    _prepareCharacterItems(sheetData) {
-        const actorData = sheetData.actor;
+    _prepareCharacterItems(sheetData: ActorSheetData) {
+        // @ts-ignore
+        sheetData.data.items = sheetData.actor.items || {};
 
-        // Initialize containers.
-        const gear = [];
-        const features = [];
-        const spells = {
-            0: [],
-            1: [],
-            2: [],
-            3: [],
-            4: [],
-            5: [],
-            6: [],
-            7: [],
-            8: [],
-            9: []
-        };
+        // @ts-ignore
+        const items = sheetData.data.items;
 
-        // Iterate through items, allocating to containers
-        // let totalWeight = 0;
-        for (let i of sheetData.items) {
-            let item = i.data;
+        Object.entries({
+            abilities: MaelstromAbilityItem.type
+        }).forEach(([val, type]) => {
             // @ts-ignore
-            i.img = i.img || DEFAULT_TOKEN;
-            // Append to gear.
-            if (i.type === 'item') {
-                gear.push(i);
-            }
-            // Append to features.
-            else if (i.type === 'feature') {
-                features.push(i);
-            }
-            // Append to spells.
-            else if (i.type === 'spell') {
-                if (i.data.spellLevel != undefined) {
-                    spells[i.data.spellLevel].push(i);
+            if (!sheetData.data.items[val])
+                { // @ts-ignore
+                    sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortFunction)
                 }
-            }
-        }
+        });
 
-        // Assign and return
-        // actorData.gear = gear;
-        // actorData.features = features;
-        // actorData.spells = spells;
+        // @ts-ignore
+        sheetData.data.items.abilities = sheetData.data.items.abilities.map(ability => {
+            ability.data.notes = removeHtmlTags(ability.data.notes);
+            return ability;
+        });
     }
 
     /* -------------------------------------------- */

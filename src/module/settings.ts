@@ -1,7 +1,10 @@
+export const systemName = "maelstrom"
+export const systemBasePath = `systems/${systemName}`
+
 export const registerSettings = function() {
 	// Register any custom system settings here
 
-    game.settings.register("maelstrom", "characterSheet", {
+    game.settings.register(systemName, "characterSheet", {
         name: "Character Sheet",
         hint: "Select the PC character sheet to use.",
         scope: "world",

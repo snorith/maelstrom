@@ -79,7 +79,36 @@
     }
   },
   "Item": {
-    "types": [],
-    "templates": []
+    "types": ["ability", "weapon", "equipment"],
+
+    "templates": {
+      "common": {
+        "notes": "",
+        "order": -1,
+        "version": 1
+      },
+      "sellable": {
+        "price": "0"
+      },
+      "carriable": {
+        "carriable": true
+      }
+    },
+    "ability": {
+      "templates": ["common"],
+      "rank": "",
+      "benefit": ""
+    },
+    "weapon": {
+      "templates": ["common", "carriable", "sellable"],
+      "as": "",
+      "ds": "",
+      "damage": "",
+      "range": ""
+    },
+    "equipment": {
+      "templates": ["common", "carriable", "sellable"],
+      "description": ""
+    }
   }
 }
