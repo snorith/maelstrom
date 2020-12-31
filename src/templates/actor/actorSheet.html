@@ -63,7 +63,7 @@
                         <tbody>
                         {{#each data.attributes as |attribute key|}}
                             <tr>
-                                <td><label for="data.attributes.{{key}}.temp" class="resource-label">{{key}}</label></td>
+                                <td><label for="data.attributes.{{key}}.temp" class="resource-label" title="{{localize (concat "MAELSTROM.attribute.detail." key)}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</label></td>
                                 <td><input type="text" name="data.attributes.{{key}}.orig" value="{{attribute.orig}}" data-dtype="Number"/></td>
                                 <td><input type="text" name="data.attributes.{{key}}.temp" value="{{attribute.temp}}" data-dtype="Number"/></td>
                                 <td><input type="checkbox" name="data.attributes.{{key}}.used" {{checked attribute.used}} data-dtype="Boolean"/></td>
