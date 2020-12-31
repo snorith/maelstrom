@@ -31,8 +31,9 @@ function onItemCreate(itemType, itemClass, callback = null) {
     }
 }
 
-//Sort function for order
-const sortFunction = (a, b) => a.data.order < b.data.order ? -1 : a.data.order > b.data.order ? 1 : 0;
+//Sort functions
+const sortByOrderFunction = (a, b) => a.data.order < b.data.order ? -1 : a.data.order > b.data.order ? 1 : 0;
+const sortByNameFunction = (a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
 
 // Stolen from https://stackoverflow.com/a/34064434/20043
 function htmlDecode(input) {
@@ -122,10 +123,11 @@ export class MaelstromActorSheet extends ActorSheet {
             // @ts-ignore
             if (!sheetData.data.items[val])
                 { // @ts-ignore
-                    sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortFunction)
+                    sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByNameFunction)
                 }
         });
 
+        // remove HTML from notes fields
         // @ts-ignore
         // sheetData.data.items.abilities = sheetData.data.items.abilities.map(ability => {
         //     ability.data.notes = removeHtmlTags(ability.data.notes);
