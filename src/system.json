@@ -4,12 +4,15 @@
   "description": "Simple support for Maelstrom Domesday / Gothic / Rome",
   "version": "0.1.0",
   "author": "snorith",
-  "scripts": [],
+  "scripts": [
+    "lib/tooltipster/tooltipster.bundle.min.js"
+  ],
   "esmodules": [
     "maelstrom.js"
   ],
   "styles": [
-    "maelstrom.css"
+    "maelstrom.css",
+    "lib/tooltipster/tooltipster.bundle.min.css"
   ],
   "packs": [],
   "languages": [

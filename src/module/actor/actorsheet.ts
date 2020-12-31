@@ -127,16 +127,16 @@ export class MaelstromActorSheet extends ActorSheet {
         });
 
         // @ts-ignore
-        sheetData.data.items.abilities = sheetData.data.items.abilities.map(ability => {
-            ability.data.notes = removeHtmlTags(ability.data.notes);
-            return ability;
-        });
+        // sheetData.data.items.abilities = sheetData.data.items.abilities.map(ability => {
+        //     ability.data.notes = removeHtmlTags(ability.data.notes);
+        //     return ability;
+        // });
     }
 
     /* -------------------------------------------- */
 
     /** @override */
-/*    activateListeners(html) {
+    activateListeners(html) {
         super.activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
@@ -147,38 +147,43 @@ export class MaelstromActorSheet extends ActorSheet {
 
         // Update Inventory Item
         html.find('.item-edit').click(ev => {
-            const li = $(ev.currentTarget).parents(".item");
-            const item = this.actor.getOwnedItem(li.data("itemId"));
+            const td = $(ev.currentTarget).parents(".item");
+            const item = this.actor.getOwnedItem(td.data("itemId"));
             item.sheet.render(true);
         });
 
         // Delete Inventory Item
         html.find('.item-delete').click(ev => {
-            const li = $(ev.currentTarget).parents(".item");
-            this.actor.deleteOwnedItem(li.data("itemId"));
-            li.slideUp(200, () => this.render(false));
+            if (window.confirm('Delete the item?')) {
+                const td = $(ev.currentTarget).parents(".item");
+                this.actor.deleteOwnedItem(td.data("itemId"));
+                td.slideUp(200, () => this.render(false));
+            }
         });
 
-        // Rollable abilities.
-        html.find('.rollable').click(this._onRoll.bind(this));
+        // Tooltips
+        html.find('.tooltip').tooltipster()
 
-        // Drag events for macros.
-        if (this.actor.owner) {
-            let handler = ev => this._onDragItemStart(ev);
-            html.find('li.item').each((i, li) => {
-                if (li.classList.contains("inventory-header")) return;
-                li.setAttribute("draggable", true);
-                li.addEventListener("dragstart", handler, false);
-            });
-        }
+        // // Rollable abilities.
+        // html.find('.rollable').click(this._onRoll.bind(this));
+        //
+        // // Drag events for macros.
+        // if (this.actor.owner) {
+        //     let handler = ev => this._onDragItemStart(ev);
+        //     html.find('li.item').each((i, li) => {
+        //         if (li.classList.contains("inventory-header")) return;
+        //         li.setAttribute("draggable", true);
+        //         li.addEventListener("dragstart", handler, false);
+        //     });
+        // }
     }
-*/
+
     /**
      * Handle creating a new Owned Item for the actor using initial data defined in the HTML dataset
      * @param {Event} event   The originating click event
      * @private
      */
-/*    _onItemCreate(event) {
+    _onItemCreate(event) {
         event.preventDefault();
         const header = event.currentTarget;
         // Get the type of item to create.
@@ -199,13 +204,13 @@ export class MaelstromActorSheet extends ActorSheet {
         // Finally, create the item!
         return this.actor.createOwnedItem(itemData);
     }
-*/
+
     /**
      * Handle clickable rolls.
      * @param {Event} event   The originating click event
      * @private
      */
-/*    _onRoll(event) {
+    _onRoll(event) {
         event.preventDefault();
         const element = event.currentTarget;
         const dataset = element.dataset;
@@ -219,5 +224,4 @@ export class MaelstromActorSheet extends ActorSheet {
             });
         }
     }
-*/
 }

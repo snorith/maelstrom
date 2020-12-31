@@ -1,13 +1,15 @@
 /**
- * This is your TypeScript entry file for Foundry VTT.
- * Register custom settings, sheets, and constants using the Foundry API.
- * Change this heading to be more descriptive to your system, or remove it.
+ * Maelstrom Domesday / Gothic / Rome RPG system
+ *
  * Author: Stephen Smith
- * Content License: [copyright and-or license] If using an existing system
- * 					you may want to put a (link to a) license or copyright
- * 					notice here (e.g. the OGL).
- * Software License: [your license] Put your desired license here, which
- * 					 determines how others may use and modify your system
+ * Content License:
+ *		The Maelstrom RPG is © Alexander Scott all rights reserved.
+ *		The Maelstrom RPG is a trademark of Alexander Scott and is used under license.
+ *		This edition is printed and distributed, under license, by Arion Games
+ *		For further information about other Arion Games products check  out  our  website  and  forums  at http://www.arion-games.com
+ *		Content on this site or associated files derived from Arion Games publications is used under agreement with the license holder and should not be construed as a challenge to those trademarks or copyrights.
+ *		The contents of this site are for personal, non-commercial use only. Arion Games is not responsible for this site or any of the content.
+ * Software License: The MIT License (MIT)
  */
 
 // Import TypeScript modules

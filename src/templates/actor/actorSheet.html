@@ -94,30 +94,58 @@
 
                     <table class="abilties">
                         <colgroup>
+                            <col>
                             <col class="abilties-firstcolumn">
                             <col>
                             <col class="abilties-thirdcolumn">
+                            <col>
                         </colgroup>
                         <thead>
                         <tr>
-                            <td colspan="3">Abilities</td>
+                            <td colspan="5">Abilities</td>
                         </tr>
                         <tr>
+                            <td></td>
                             <td>Ability</td>
                             <td>Rank</td>
                             <td>Benefit</td>
+                            <td>
+                                <div class="item-controls">
+                                    <a class="item-control item-create" title="Create ability" data-type="ability"><i class="fas fa-plus"></i></a>
+                                </div>
+                            </td>
                         </tr>
                         </thead>
                         <tbody>
-                        {{#each data.abilities as |ability key|}}
-                            <tr>
-                                <td><input type="text" name="data.abilities.{{key}}.ability" value="{{ability.ability}}" data-dtype="String"/></td>
-                                <td><input type="text" name="data.abilities.{{key}}.rank" value="{{ability.rank}}" data-dtype="String"/></td>
-                                <td><input type="text" name="data.abilities.{{key}}.benefit" value="{{ability.benefit}}" data-dtype="String"/></td>
+                        {{#each data.items.abilities as |ability key|}}
+                            <tr class="item" data-item-id="{{ability._id}}">
+                                <td>{{#ifEmptyOrWhitespace ability.data.notes}}
+                                        <i class="fas fa-info-circle disabled"></i>
+                                    {{else}}
+                                        <span class="tooltip" data-tooltip-content="#tooltip_content_{{ability._id}}"><i class="fas fa-info-circle"></i></span>
+                                {{/ifEmptyOrWhitespace}}</td>
+                                <td>{{ability.name}}</td>
+                                <td>{{ability.data.rank}}</td>
+                                <td>{{ability.data.benefit}}</td>
+                                <td>
+                                    <div class="item-controls">
+                                        <a class="item-control item-edit" title="Edit ability"><i class="fas fa-edit"></i></a>
+                                        <a class="item-control item-delete" title="Delete ability"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                </td>
                             </tr>
                         {{/each}}
                         </tbody>
                     </table>
+
+                    <div class="tooltip_templates">
+                        {{#each data.items.abilities as |ability key|}}
+                        <div id="tooltip_content_{{ability._id}}">
+                            {{!-- raw html output --}}
+                            {{{ability.data.notes}}}
+                        </div>
+                        {{/each}}
+                    </div>
                 </div>
             </div>
         </div>

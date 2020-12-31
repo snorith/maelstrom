@@ -10,3 +10,15 @@
 .abilties-thirdcolumn {
   width: 45%;
 }
+
+.tooltip_templates { display: none; }
+
+ // https://stackoverflow.com/questions/38781104/how-to-create-disabled-state-of-the-font-awesome-icons
+.fas.disabled,
+.fas[disabled],
+.disabled > .fas,
+[disabled] > .fas {
+  opacity: 0.3;
+  /*optional*/ cursor: not-allowed;
+  /*optional*/ pointer-events: none;
+}

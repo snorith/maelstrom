@@ -18,6 +18,20 @@ export const registerSettings = function() {
         },
     });
 
+    game.settings.register(systemName, "trademarkNotice", {
+        name: "Trademark Notice",
+        hint: "The Maelstrom RPG is © Alexander Scott all rights reserved. \n" +
+            "The Maelstrom RPG is a trademark of Alexander Scott and is used under license. \n\n" +
+            "This edition is printed and distributed, under license, by Arion Games\n" +
+            "For further information about other Arion Games products check  out  our  website  and  forums  at http://www.arion-games.com\n" +
+            "Content on this site or associated files derived from Arion Games publications is used under agreement with the license holder and should not be construed as a challenge to those trademarks or copyrights.\n" +
+            "The contents of this site are for personal, non-commercial use only. Arion Games is not responsible for this site or any of the content.",
+        scope: "world",
+        config: true,
+        type: null,
+        default: null
+    });
+
     // Register custom Handlebar helpers
 
     // Adds a simple Handlebars "for loop" block helper
@@ -46,4 +60,12 @@ export const registerSettings = function() {
     });
 
     Handlebars.registerHelper("disabled", value => value ? "disabled" : "")
+
+    // https://stackoverflow.com/questions/39766555/how-to-check-for-empty-string-null-or-white-spaces-in-handlebar
+    Handlebars.registerHelper('ifEmptyOrWhitespace', function (value, options) {
+        if (!value) { return options.fn(this); }
+        return value.replace(/\s*/g, '').length === 0
+            ? options.fn(this)
+            : options.inverse(this);
+    });
 }
