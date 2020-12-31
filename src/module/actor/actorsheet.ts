@@ -162,7 +162,9 @@ export class MaelstromActorSheet extends ActorSheet {
         });
 
         // Tooltips
-        html.find('.tooltip').tooltipster()
+        html.find('.tooltip').tooltipster({
+            interactive: true
+        })
 
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));

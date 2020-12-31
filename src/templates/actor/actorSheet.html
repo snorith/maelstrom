@@ -141,6 +141,9 @@
                     <div class="tooltip_templates">
                         {{#each data.items.abilities as |ability key|}}
                         <div id="tooltip_content_{{ability._id}}">
+                            <img src="{{ability.img}}" title="{{ability.name}}" height="50"/>
+                            <h1 style="display: inline; margin-left: 4px;">{{ability.name}}</h1>
+                            <hr>
                             {{!-- raw html output --}}
                             {{{ability.data.notes}}}
                         </div>
