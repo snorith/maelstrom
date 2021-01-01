@@ -116,3 +116,10 @@
     grid-column: 2 / 3;
   }
 }
+
+.grid-wounds {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  gap: 1px;
+  margin: 1px 0;
+}

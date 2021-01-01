@@ -5,7 +5,7 @@
     ],
     "templates": {
       "base": {
-        "version": 0
+        "version": 1
       }
     },
     "character": {
@@ -74,6 +74,18 @@
         "characteristic1": "",
         "characteristic2": "",
         "characteristic3": ""
+      },
+      "wounds": {
+        "wounds": [0,0,0,0,0,0,0,0,0,0,0],
+        "bloodloss": 0,
+        "injuries": "",
+        "bleeding": "",
+        "longterm": ""
+      },
+      "armour": {
+        "armour": "",
+        "ar": "",
+        "penalty": ""
       }
     }
   },

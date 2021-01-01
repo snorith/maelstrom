@@ -1,3 +1,11 @@
+export type MaelstromActorWoundsType = {
+    wounds: number[],
+    bloodloss: number,
+    injuries: string,
+    bleeding: string,
+    longterm: string
+}
+
 export class MaelstromActor extends Actor {
     prepareData() {
         super.prepareData();

@@ -1,3 +1,5 @@
+import {MaelstromActorWoundsType} from "./actor/MaelstromActor"
+
 export const systemName = "maelstrom"
 export const systemBasePath = `systems/${systemName}`
 
@@ -43,7 +45,7 @@ export const registerSettings = function() {
             accum += block.fn(i)
         }
         return accum
-    });
+    })
 
     Handlebars.registerHelper('concat', function() {
         let outStr = ''
@@ -53,11 +55,11 @@ export const registerSettings = function() {
             }
         }
         return outStr
-    });
+    })
 
     Handlebars.registerHelper('toLowerCase', function(str) {
         return str.toLowerCase()
-    });
+    })
 
     Handlebars.registerHelper("disabled", value => value ? "disabled" : "")
 
@@ -66,6 +68,36 @@ export const registerSettings = function() {
         if (!value) { return options.fn(this); }
         return value.replace(/\s*/g, '').length === 0
             ? options.fn(this)
-            : options.inverse(this);
-    });
+            : options.inverse(this)
+    })
+
+    Handlebars.registerHelper('isZeroThenBlank', function (value) {
+        if (Number.isFinite(value)) {
+            if (value == 0) {
+                return ''
+            }
+            return value
+        }
+        return ''
+    })
+
+    Handlebars.registerHelper('calculateTotalWounds', function (wounds: MaelstromActorWoundsType) {
+        let total = 0
+
+        if (wounds?.wounds) {
+            // array is passed in as an Object ){0: 1, 1: 1, 2: 1, 3: null}
+            const w = Object.values(wounds.wounds)
+            total += w.reduce((previousValue: number, currentValue: number) => {
+                if (currentValue && Number.isFinite(currentValue)) {
+                    return previousValue + currentValue
+                }
+                return previousValue
+            }, 0)
+        }
+
+        if (wounds.bloodloss && Number.isFinite(wounds.bloodloss))
+            total += wounds.bloodloss
+
+        return total
+    })
 }

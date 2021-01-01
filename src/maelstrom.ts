@@ -15,10 +15,11 @@
 // Import TypeScript modules
 import {registerSettings, systemName} from './module/settings.js';
 import { preloadTemplates } from './module/preloadTemplates.js';
-import { MaelstromActor } from  './module/actor/actor'
-import { MaelstromActorSheet } from "./module/actor/actorsheet"
+import { MaelstromActor } from  './module/actor/MaelstromActor'
+import { MaelstromActorSheet } from "./module/actor/MaelstromActorSheet"
 import { MaelstromAbilityItemSheet } from "./module/item/sheets/MaelstromAbilityItemSheet"
 import { MaelstromItem } from "./module/item/MaelstromItem"
+import {migrateWorld} from "./module/migrations/migrate"
 
 /* ------------------------------------ */
 /* Initialize system					*/
@@ -66,6 +67,8 @@ Hooks.once('setup', function() {
 Hooks.once('ready', function() {
 	// Do anything once the system is ready
 });
+
+Hooks.once("ready", migrateWorld);
 
 // Add any additional hooks if necessary
 

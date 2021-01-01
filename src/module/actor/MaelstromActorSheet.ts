@@ -99,9 +99,38 @@ export class MaelstromActorSheet extends ActorSheet {
         // Prepare items.
         if (this.actor.data.type == 'character') {
             this._prepareCharacterItems(sheetData);
+
+            this._cleanWoundsArray(sheetData);
         }
 
         return sheetData;
+    }
+
+    /**
+     * Wounds might be a sparse array (ie: have zeros randomly positioned in the array as some wounds healed faster than others)
+     * Compact the array so that all of the wounds are at the start and then pad it back to the correct length
+     *
+     * @param sheetData
+     */
+    _cleanWoundsArray(sheetData: ActorSheetData) {
+        // @ts-ignore
+        const wounds = sheetData.data?.wounds?.wounds
+        if (wounds) {
+            const woundsArray = Object.values(wounds)           // convert object to an array of values
+            const compacted = woundsArray.reduce<number[]>(((previousValue: number[], currentValue: number): number[] => {
+                if (currentValue && Number.isFinite(currentValue) && currentValue > 0)
+                    previousValue.push(currentValue)
+                return previousValue
+            }), [])
+            const padded = Array(woundsArray.length).fill(null).map((_, index): number => {
+                if (index < compacted.length)
+                    return compacted[index]
+                return 0
+            }) as number[]
+
+            // @ts-ignore
+            sheetData.data.wounds.wounds = {...padded}          // convert back to an object
+        }
     }
 
     /**

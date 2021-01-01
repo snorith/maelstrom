@@ -37,9 +37,9 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="attributes">Attributes/Abilities</a>
-        <a class="item" data-tab="equipment">Equip/Events</a>
-        <a class="item" data-tab="description">Description</a>
+        <a class="item" data-tab="attributes">{{localize "MAELSTROM.sheet.tabs.attributes"}}</a>
+        <a class="item" data-tab="equipment">{{localize "MAELSTROM.sheet.tabs.equip"}}</a>
+        <a class="item" data-tab="description">{{localize "MAELSTROM.sheet.tabs.description"}}</a>
     </nav>
 
     {{!-- Sheet Body --}}
@@ -51,7 +51,7 @@
                     <table class="attributes">
                         <thead>
                         <tr>
-                            <td colspan="4">Attributes</td>
+                            <td colspan="4">{{localize "MAELSTROM.attribute.title"}}</td>
                         </tr>
                         <tr>
                             <td></td>
@@ -71,7 +71,50 @@
                         {{/each}}
                         </tbody>
                     </table>
+
+                    {{!-- Wounds --}}
+                    <table class="wounds">
+                        <thead>
+                        <tr>
+                            <td colspan="2">{{localize "MAELSTROM.wounds.title"}}</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td colspan="2">
+                                <div class="grid-wounds">
+                                    <div class="flex-group-left">
+                                        {{#each data.wounds.wounds as |wound|}}
+                                            <input type="text" class="wound" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.index"}} {{@index}}"/>
+                                        {{/each}}
+                                        <input type="text" name="data.wounds.bloodloss" class="bloodloss wound" value="{{isZeroThenBlank data.wounds.bloodloss}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.bloodloss"}}"/>
+                                    </div>
+                                    <div class="flex-group-center">
+                                        <strong>Total</strong><br>
+                                        <span class="total-wounds">{{calculateTotalWounds data.wounds}}</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label for="data.wounds.injuries" class="resource-label" title="{{localize "MAELSTROM.wounds.injuries"}}">{{localize "MAELSTROM.wounds.injuries"}}</label></td>
+                            <td><textarea name="data.wounds.injuries" rows="2">{{data.wounds.injuries}}</textarea> </td>
+                        </tr>
+                        <tr>
+                            <td><label for="data.wounds.bleeding" class="resource-label" title="{{localize "MAELSTROM.wounds.bleeding"}}">{{localize "MAELSTROM.wounds.bleeding"}}</label></td>
+                            <td><textarea name="data.wounds.bleeding" rows="2">{{data.wounds.bleeding}}</textarea> </td>
+                        </tr>
+                        {{!--
+                        <tr>
+                            <td><label for="data.wounds.longterm" class="resource-label" title="{{localize "MAELSTROM.wounds.longterm.title"}}">{{localize "MAELSTROM.wounds.longterm"}}</label></td>
+                            <td><textarea name="data.wounds.longterm" rows="2">{{data.wounds.longterm}}</textarea> </td>
+                        </tr>
+                        --}}
+                        </tbody>
+                    </table>
                 </div>
+
+                {{!-- Next column --}}
                 <div class="resource flex-group-center">
                     <table class="characteristics">
                         <thead>

@@ -22,3 +22,23 @@
   /*optional*/ cursor: not-allowed;
   /*optional*/ pointer-events: none;
 }
+
+.wounds {
+  margin-top: 5px;
+
+  input.wound {
+    text-align: center;
+    width: 40px;
+  }
+
+  input.bloodloss {
+    color: white;
+    background-color: darkred;
+  }
+
+  .total-wounds {
+    color: saddlebrown;
+    font-size: 200%;
+  }
+}
+

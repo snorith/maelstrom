@@ -1,4 +1,9 @@
 {
+  "MAELSTROM.sheet.tabs.attributes": "Attributes/Abilities",
+  "MAELSTROM.sheet.tabs.equip": "Equip/Events",
+  "MAELSTROM.sheet.tabs.description": "Description",
+
+  "MAELSTROM.attribute.title": "Attributes",
   "MAELSTROM.attribute.name.attack": "Attack",
   "MAELSTROM.attribute.detail.attack": "Attack Skill (AS)",
   "MAELSTROM.attribute.name.missile": "Missile",
@@ -25,5 +30,13 @@
   "MAELSTROM.item.ability.newAbility": "New ability",
   "MAELSTROM.item.ability.description": "Description",
   "MAELSTROM.item.ability.rank": "Rank",
-  "MAELSTROM.item.ability.benefit": "Benefit"
+  "MAELSTROM.item.ability.benefit": "Benefit",
+
+  "MAELSTROM.wounds.title": "Wounds",
+  "MAELSTROM.wounds.wounds.index": "Wound",
+  "MAELSTROM.wounds.bloodloss": "Bloodloss",
+  "MAELSTROM.wounds.injuries": "Injuries",
+  "MAELSTROM.wounds.bleeding": "Bleeding",
+  "MAELSTROM.wounds.longterm": "Long Term",
+  "MAELSTROM.wounds.longterm.title": "Long Term Injuries"
 }
