@@ -3,7 +3,7 @@
     {{!-- Sheet Header --}}
     <header class="sheet-header">
         {{!-- header --}}
-        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" alt="{{actor.name}}" height="100" width="100"/>
         <div class="header-fields">
             <h1 class="char-name"><input name="name" type="text" value="{{actor.name}}" placeholder="Name" data-dtype="String"></h1>
             <div class="grid grid-2col">
@@ -76,7 +76,7 @@
                     <table class="wounds">
                         <thead>
                         <tr>
-                            <td colspan="2">{{localize "MAELSTROM.wounds.title"}}</td>
+                            <td colspan="2">{{localize "MAELSTROM.wounds.header"}}</td>
                         </tr>
                         </thead>
                         <tbody>
@@ -85,31 +85,46 @@
                                 <div class="grid-wounds">
                                     <div class="flex-group-left">
                                         {{#each data.wounds.wounds as |wound|}}
-                                            <input type="text" class="wound" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.index"}} {{@index}}"/>
+                                            {{# if @last}}
+                                                <label class="bleeding-damage" title="{{localize "MAELSTROM.wounds.wounds.bleeding.damage"}}">+ <input type="text" class="wound bleeding-damage" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.bleeding.damage"}}"/></label>
+                                            {{else}}
+                                                <input type="text" class="wound" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.index" index=@index}}"/>
+                                            {{/if}}
                                         {{/each}}
-                                        <input type="text" name="data.wounds.bloodloss" class="bloodloss wound" value="{{isZeroThenBlank data.wounds.bloodloss}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.bloodloss"}}"/>
+                                        <input type="text" name="data.wounds.bloodloss" class="bloodloss wound" value="{{isZeroThenBlank data.wounds.bloodloss}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.bleeding.title"}}"/>
                                     </div>
                                     <div class="flex-group-center">
-                                        <strong>Total</strong><br>
-                                        <span class="total-wounds">{{calculateTotalWounds data.wounds}}</span>
+                                        <strong title="{{localize "MAELSTROM.wounds.total.title"}}">{{localize "MAELSTROM.wounds.total.header"}}</strong>
+                                        {{#if (gt (calculateTotalWounds data.wounds) 0)}}
+                                            <a class="item-control item-heal-wounds" title="{{localize "MAELSTROM.wounds.heal.one"}}"><i class="fas fa-stethoscope fa-border"></i></a>
+                                        {{else}}
+                                            <i class="fas fa-stethoscope fa-border disabled"></i>
+                                        {{/if}}
+                                        <br>
+                                        {{#if (gt (calculateTotalWounds data.wounds) (currentValueOfAttribute data.attributes "endurance"))}}
+                                            {{#if (gt (calculateTotalWounds data.wounds) (add (currentValueOfAttribute data.attributes "endurance") 20))}}
+                                                <i class="fas fa-skull-crossbones total-wounds" title="{{localize "MAELSTROM.wounds.total.status.dead"}}"></i>
+                                            {{else}}
+                                                <i class="fas fa-dizzy total-wounds" title="{{localize "MAELSTROM.wounds.total.status.unconscious"}}"></i>
+                                            {{/if}}
+                                        {{/if}}
+                                        <span class="total-wounds" title="{{localize "MAELSTROM.wounds.total.title"}}">{{calculateTotalWounds data.wounds}}</span>
                                     </div>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="data.wounds.injuries" class="resource-label" title="{{localize "MAELSTROM.wounds.injuries"}}">{{localize "MAELSTROM.wounds.injuries"}}</label></td>
+                            <td><label for="data.wounds.injuries" class="resource-label" title="{{localize "MAELSTROM.wounds.injuries.title"}}">{{localize "MAELSTROM.wounds.injuries.label"}}</label></td>
                             <td><textarea name="data.wounds.injuries" rows="2">{{data.wounds.injuries}}</textarea> </td>
                         </tr>
                         <tr>
-                            <td><label for="data.wounds.bleeding" class="resource-label" title="{{localize "MAELSTROM.wounds.bleeding"}}">{{localize "MAELSTROM.wounds.bleeding"}}</label></td>
+                            <td><label for="data.wounds.bleeding" class="resource-label" title="{{localize "MAELSTROM.wounds.bleeding.title"}}">{{localize "MAELSTROM.wounds.bleeding.label"}}</label></td>
                             <td><textarea name="data.wounds.bleeding" rows="2">{{data.wounds.bleeding}}</textarea> </td>
                         </tr>
-                        {{!--
                         <tr>
-                            <td><label for="data.wounds.longterm" class="resource-label" title="{{localize "MAELSTROM.wounds.longterm.title"}}">{{localize "MAELSTROM.wounds.longterm"}}</label></td>
+                            <td><label for="data.wounds.longterm" class="resource-label" title="{{localize "MAELSTROM.wounds.longterm.title"}}">{{localize "MAELSTROM.wounds.longterm.label"}}</label></td>
                             <td><textarea name="data.wounds.longterm" rows="2">{{data.wounds.longterm}}</textarea> </td>
                         </tr>
-                        --}}
                         </tbody>
                     </table>
                 </div>
@@ -184,7 +199,7 @@
                     <div class="tooltip_templates">
                         {{#each data.items.abilities as |ability key|}}
                         <div id="tooltip_content_{{ability._id}}">
-                            <img src="{{ability.img}}" title="{{ability.name}}" height="50"/>
+                            <img src="{{ability.img}}" title="{{ability.name}}" alt="{{ability.name}}" height="50"/>
                             <h1 style="display: inline; margin-left: 4px;">{{ability.name}}</h1>
                             <hr>
                             {{!-- raw html output --}}
@@ -206,9 +221,7 @@
                         <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add item</a>
                     </div>
                 </li>
-
-
-
+            </ol>
         </div>
 
         {{!-- Biography Tab --}}

@@ -6,6 +6,13 @@ export type MaelstromActorWoundsType = {
     longterm: string
 }
 
+export type MaelstromActorAttributeType = {
+    orig: number,
+    temp: number,
+    used: boolean,
+    test: object
+}
+
 export class MaelstromActor extends Actor {
     prepareData() {
         super.prepareData();

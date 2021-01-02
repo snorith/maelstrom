@@ -168,6 +168,9 @@ export class MaelstromActorSheet extends ActorSheet {
             interactive: true
         })
 
+        // Heal all wounds by one
+        html.find('.item-heal-wounds').click(this._onItemHealByOne.bind(this))
+
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));
         //
@@ -180,6 +183,31 @@ export class MaelstromActorSheet extends ActorSheet {
         //         li.addEventListener("dragstart", handler, false);
         //     });
         // }
+    }
+
+    /**
+     * Heal all wounds by one
+     *
+     * @param event
+     */
+    _onItemHealByOne(event) {
+        event.preventDefault();
+
+        // @ts-ignore
+        const wounds = this.actor.data.data?.wounds?.wounds
+        if (wounds) {
+            const woundsArray = Object.values(wounds) as number[]           // convert object to an array of values
+            const healed = woundsArray.map(value => {
+                if (Number.isFinite(value) && value > 0) {
+                    return value - 1
+                }
+                return 0
+            })
+
+            // @ts-ignore
+            this.actor.data.data.wounds.wounds = {...healed}
+            this.render(false)
+        }
     }
 
     /**

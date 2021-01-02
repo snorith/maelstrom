@@ -23,17 +23,31 @@
   /*optional*/ pointer-events: none;
 }
 
+.fa-border {
+  border-color: saddlebrown;
+}
+
 .wounds {
   margin-top: 5px;
 
   input.wound {
     text-align: center;
     width: 40px;
+    margin-bottom: 2px;
   }
 
   input.bloodloss {
     color: white;
     background-color: darkred;
+  }
+
+  input.bleeding-damage {
+    border-color: crimson;
+    border-width: 4px;
+  }
+
+  label.bleeding-damage {
+    white-space: nowrap;
   }
 
   .total-wounds {

@@ -1,4 +1,4 @@
-import {MaelstromActorWoundsType} from "./actor/MaelstromActor"
+import {MaelstromActorAttributeType, MaelstromActorWoundsType} from "./actor/MaelstromActor"
 
 export const systemName = "maelstrom"
 export const systemBasePath = `systems/${systemName}`
@@ -81,6 +81,13 @@ export const registerSettings = function() {
         return ''
     })
 
+    Handlebars.registerHelper('add', (a, b) => {
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            return a + b
+        }
+        return ''
+    })
+
     Handlebars.registerHelper('calculateTotalWounds', function (wounds: MaelstromActorWoundsType) {
         let total = 0
 
@@ -95,9 +102,17 @@ export const registerSettings = function() {
             }, 0)
         }
 
-        if (wounds.bloodloss && Number.isFinite(wounds.bloodloss))
-            total += wounds.bloodloss
-
         return total
+    })
+
+    Handlebars.registerHelper('currentValueOfAttribute', (attributes: object, attributeName: string) => {
+        if (attributes?.hasOwnProperty(attributeName)) {
+            const attribute = attributes[attributeName] as MaelstromActorAttributeType
+            let value = Number.isFinite(attribute.orig) ? attribute.orig : 0
+            if (Number.isFinite(attribute.temp))
+                value = attribute.temp
+            return value
+        }
+        return null
     })
 }
