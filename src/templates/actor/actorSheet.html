@@ -63,7 +63,7 @@
                         <tbody>
                         {{#each data.attributes as |attribute key|}}
                             <tr>
-                                <td><label for="data.attributes.{{key}}.temp" class="resource-label" title="{{localize (concat "MAELSTROM.attribute.detail." key)}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</label></td>
+                                <td class="left-align-text"><label for="data.attributes.{{key}}.temp" class="resource-label" title="{{localize (concat "MAELSTROM.attribute.detail." key)}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</label></td>
                                 <td><input type="text" name="data.attributes.{{key}}.orig" value="{{attribute.orig}}" data-dtype="Number"/></td>
                                 <td><input type="text" name="data.attributes.{{key}}.temp" value="{{attribute.temp}}" data-dtype="Number"/></td>
                                 <td><input type="checkbox" name="data.attributes.{{key}}.used" {{checked attribute.used}} data-dtype="Boolean"/></td>
@@ -119,19 +119,53 @@
                             </td>
                         </tr>
                         <tr>
-                            <td><label for="data.wounds.injuries" class="resource-label" title="{{localize "MAELSTROM.wounds.injuries.title"}}">{{localize "MAELSTROM.wounds.injuries.label"}}</label></td>
+                            <td class="left-align-text"><label for="data.wounds.injuries" class="resource-label" title="{{localize "MAELSTROM.wounds.injuries.title"}}">{{localize "MAELSTROM.wounds.injuries.label"}}</label></td>
                             <td><textarea name="data.wounds.injuries" rows="2">{{data.wounds.injuries}}</textarea> </td>
                         </tr>
                         <tr>
-                            <td><label for="data.wounds.bleeding" class="resource-label" title="{{localize "MAELSTROM.wounds.bleeding.title"}}">{{localize "MAELSTROM.wounds.bleeding.label"}}</label></td>
+                            <td class="left-align-text"><label for="data.wounds.bleeding" class="resource-label" title="{{localize "MAELSTROM.wounds.bleeding.title"}}">{{localize "MAELSTROM.wounds.bleeding.label"}}</label></td>
                             <td><textarea name="data.wounds.bleeding" rows="2">{{data.wounds.bleeding}}</textarea> </td>
                         </tr>
                         <tr>
-                            <td><label for="data.wounds.longterm" class="resource-label" title="{{localize "MAELSTROM.wounds.longterm.title"}}">{{localize "MAELSTROM.wounds.longterm.label"}}</label></td>
+                            <td class="left-align-text"><label for="data.wounds.longterm" class="resource-label" title="{{localize "MAELSTROM.wounds.longterm.title"}}">{{localize "MAELSTROM.wounds.longterm.label"}}</label></td>
                             <td><textarea name="data.wounds.longterm" rows="2">{{data.wounds.longterm}}</textarea> </td>
                         </tr>
                         </tbody>
                     </table>
+
+                    {{!-- Armour --}}
+                    <table class="armour">
+                        <thead>
+                        <tr>
+                            <td colspan="4">{{localize "MAELSTROM.armour.header"}}</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td colspan="1" class="left-align-text">
+                                <label for="data.armour.armour" class="resource-label" title="{{localize "MAELSTROM.armour.armour.title"}}">{{localize "MAELSTROM.armour.armour.label"}}</label>
+                            </td>
+                            <td colspan="3">
+                                <input type="text" name="data.armour.armour" value="{{data.armour.armour}}" data-dtype="String" title="{{localize "MAELSTROM.armour.armour.title"}}">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="left-align-text">
+                                <label for="data.armour.ar" class="resource-label" title="{{localize "MAELSTROM.armour.ar.title"}}">{{localize "MAELSTROM.armour.ar.label"}}</label>
+                            </td>
+                            <td>
+                                <input type="text" name="data.armour.ar" value="{{isZeroThenBlank data.armour.ar}}" data-dtype="Number" title="{{localize "MAELSTROM.armour.ar.title"}}">
+                            </td>
+                            <td class="left-align-text">
+                                <label for="data.armour.penalty" class="resource-label" title="{{localize "MAELSTROM.armour.penalty.title"}}">{{localize "MAELSTROM.armour.penalty.label"}}</label>
+                            </td>
+                            <td>
+                                <input type="text" name="data.armour.penalty" value="{{isZeroThenBlank data.armour.penalty}}" data-dtype="Number" title="{{localize "MAELSTROM.armour.penalty.title"}}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
                 </div>
 
                 {{!-- Next column --}}

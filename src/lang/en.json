@@ -49,5 +49,13 @@
   "MAELSTROM.wounds.longterm.label": "Long Term",
   "MAELSTROM.wounds.longterm.title": "Long Term Injuries",
 
+  "MAELSTROM.armour.header": "Armour",
+  "MAELSTROM.armour.armour.label": "Armour",
+  "MAELSTROM.armour.armour.title": "Armour worn",
+  "MAELSTROM.armour.ar.label": "AR",
+  "MAELSTROM.armour.ar.title": "Damage reduction due to armour (Armor Rating)",
+  "MAELSTROM.armour.penalty.label": "Penalty",
+  "MAELSTROM.armour.penalty.title": "Armour wearing penalty to all physical actions including attacking and defending",
+
   "MAELSTROM.characteristics.header": "Characteristics"
 }

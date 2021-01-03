@@ -27,7 +27,11 @@
   border-color: saddlebrown;
 }
 
-.wounds {
+table.attributes {
+
+}
+
+table.wounds {
   margin-top: 5px;
 
   input.wound {
@@ -46,13 +50,19 @@
     border-width: 4px;
   }
 
-  label.bleeding-damage {
-    white-space: nowrap;
-  }
-
   .total-wounds {
     color: saddlebrown;
     font-size: 200%;
   }
 }
 
+table.armour {
+  label {
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+}
+
+.left-align-text {
+  text-align: left;
+}
