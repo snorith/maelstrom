@@ -171,6 +171,9 @@ export class MaelstromActorSheet extends ActorSheet {
         // Heal all wounds by one
         html.find('.item-heal-wounds').click(this._onItemHealByOne.bind(this))
 
+        // suffer bleeding damage
+        html.find('.item-add-bleeding-damage').click(this._onSufferBleedingDamage.bind(this))
+
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));
         //
@@ -183,6 +186,36 @@ export class MaelstromActorSheet extends ActorSheet {
         //         li.addEventListener("dragstart", handler, false);
         //     });
         // }
+    }
+
+    /**
+     * Each round, the character suffers bloodloss damage equal to the number of bleeding wound that they
+     * currently have, this is added to the bloodloss damage wound
+     *
+     * @param event
+     */
+    _onSufferBleedingDamage(event) {
+        event.preventDefault();
+
+        // @ts-ignore
+        const wounds = this.actor.data.data?.wounds?.wounds
+        if (wounds) {
+            const bleedingWounds = this.actor.data.data?.wounds?.bloodloss as number
+            if (Number.isFinite(bleedingWounds) && bleedingWounds > 0) {
+                const woundsArray = Object.values(wounds) as number[]           // convert object to an array of values
+                if (woundsArray.length < 1)
+                    return
+
+                let bloodlossDamage = woundsArray[woundsArray.length - 1]     // get the last entry in the wounds array which is bloodloss damage
+                bloodlossDamage = (Number.isFinite(bloodlossDamage)) ? bloodlossDamage + bleedingWounds : bleedingWounds
+
+                woundsArray[woundsArray.length - 1] = bloodlossDamage
+
+                // @ts-ignore
+                this.actor.data.data.wounds.wounds = {...woundsArray}
+                this.render(false)
+            }
+        }
     }
 
     /**

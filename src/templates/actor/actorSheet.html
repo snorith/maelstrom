@@ -86,7 +86,12 @@
                                     <div class="flex-group-left">
                                         {{#each data.wounds.wounds as |wound|}}
                                             {{# if @last}}
-                                                <label class="bleeding-damage" title="{{localize "MAELSTROM.wounds.wounds.bleeding.damage"}}">+ <input type="text" class="wound bleeding-damage" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.bleeding.damage"}}"/></label>
+                                                {{#if (isZero ../data.wounds.bloodloss)}}
+                                                    <i class="fas fa-plus fa-border disabled"></i>
+                                                {{else}}
+                                                    <a class="item-control item-add-bleeding-damage" title="{{localize "MAELSTROM.wounds.wounds.bleeding.damage.one.round"}}"><i class="fas fa-plus fa-border"></i></a>
+                                                {{/if}}
+                                                <input type="text" class="wound bleeding-damage" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.bloodloss.damage"}}"/></label>
                                             {{else}}
                                                 <input type="text" class="wound" name="data.wounds.wounds.[{{@index}}]" value="{{isZeroThenBlank wound}}" data-dtype="Number" title="{{localize "MAELSTROM.wounds.wounds.index" index=@index}}"/>
                                             {{/if}}

@@ -81,6 +81,13 @@ export const registerSettings = function() {
         return ''
     })
 
+    Handlebars.registerHelper('isZero', (value) => {
+        if (Number.isFinite(value)) {
+            return value == 0;
+        }
+        return true
+    })
+
     Handlebars.registerHelper('add', (a, b) => {
         if (Number.isFinite(a) && Number.isFinite(b)) {
             return a + b
