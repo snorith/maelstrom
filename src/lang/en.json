@@ -46,5 +46,7 @@
   "MAELSTROM.wounds.bleeding.label": "Bleeding",
   "MAELSTROM.wounds.bleeding.title": "Bleeding",
   "MAELSTROM.wounds.longterm.label": "Long Term",
-  "MAELSTROM.wounds.longterm.title": "Long Term Injuries"
+  "MAELSTROM.wounds.longterm.title": "Long Term Injuries",
+
+  "MAELSTROM.characteristics.header": "Characteristics"
 }
