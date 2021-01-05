@@ -20,6 +20,10 @@ import { MaelstromActorSheet } from "./module/actor/MaelstromActorSheet"
 import { MaelstromAbilityItemSheet } from "./module/item/sheets/MaelstromAbilityItemSheet"
 import { MaelstromItem } from "./module/item/MaelstromItem"
 import {migrateWorld} from "./module/migrations/migrate"
+import {MAELSTROM} from "./module/config"
+import {MaelstromAbilityItem} from "./module/item/MaelstromAbilityItem"
+import {MaelstromWeaponItem} from "./module/item/MaelstromWeaponItem"
+import {MaelstromWeaponItemSheet} from "./module/item/sheets/MaelstromWeaponItemSheet"
 
 /* ------------------------------------ */
 /* Initialize system					*/
@@ -30,8 +34,9 @@ Hooks.once('init', async function() {
 	// Assign custom classes and constants here
 	game.maelstrom = {
 		MaelstromActor,
-
 	}
+
+	game.MAELSTROM = MAELSTROM
 
 	// define custom entity classes
 	CONFIG.Actor.entityClass = MaelstromActor
@@ -42,7 +47,8 @@ Hooks.once('init', async function() {
 	Actors.registerSheet(systemName, MaelstromActorSheet, { makeDefault: true })
 
 	Items.unregisterSheet("core", ItemSheet);
-	Items.registerSheet(systemName, MaelstromAbilityItemSheet, { types: ["ability"], makeDefault: true });
+	Items.registerSheet(systemName, MaelstromAbilityItemSheet, { types: [MaelstromAbilityItem.type], makeDefault: true });
+	Items.registerSheet(systemName, MaelstromWeaponItemSheet, { types: [MaelstromWeaponItem.type], makeDefault: true });
 
 	// Register custom system settings
 	registerSettings();

@@ -1,0 +1,83 @@
+<form class="{{cssClass}} maelstrom item" autocomplete="off" autocapitalize="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" data-dtype="String"/></h1>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary-tabs">
+        <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="description">Description</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary-tabs" data-tab="attributes">
+            <div class="grid grid-2col">
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.weapon.as"}}
+                        <input type="text" name="data.as" value="{{data.as}}" class="as" data-dtype="Number" />
+                    </label>
+                </div>
+
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.weapon.ds"}}
+                        <input type="text" name="data.ds" value="{{data.ds}}" class="ds" data-dtype="Number" />
+                    </label>
+                </div>
+
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.weapon.damage"}}
+                        <input type="text" name="data.damage" value="{{data.damage}}" class="damage" data-dtype="String" />
+                    </label>
+                </div>
+
+                <div class="resource">
+                </div>
+
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.weapon.range"}}
+                        <input type="text" name="data.range" value="{{data.range}}" class="range" data-dtype="String" />
+                    </label>
+                </div>
+
+                <div class="resource">
+                </div>
+
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.weapon.attributes.attack"}}
+                        <select name="data.attributes.attack" class="attack" title="{{localize "MAELSTROM.item.weapon.attributes.attack"}}" data-dtype="String">
+                            {{#select data.attributes.attack}}
+                            {{#each attributesList as |key|}}
+                                <option value="{{key}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</option>
+                            {{/each}}
+                            {{/select}}
+                        </select>
+                        {{!-- {{#if (eq data.attributes.attack key)}}selected{{/if}} --}}
+                    </label>
+                </div>
+
+                <div class="resource">
+                    <label>{{localize "MAELSTROM.item.weapon.attributes.defence"}}
+                        <select name="data.attributes.defence" class="defence" title="{{localize "MAELSTROM.item.weapon.attributes.defence"}}" data-dtype="String">
+                            {{#select data.attributes.defence}}
+                            {{#each attributesList as |key|}}
+                                <option value="{{key}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</option>
+                            {{/each}}
+                            {{/select}}
+                        </select>
+                        {{!-- {{#if (eq data.attributes.defence key)}}selected{{/if}} --}}
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Description Tab --}}
+        <div class="tab description" data-group="primary-tabs" data-tab="description">
+            {{editor content=data.notes target="data.notes" button=true owner=owner editable=editable}}
+        </div>
+    </section>
+</form>

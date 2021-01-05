@@ -1,6 +1,7 @@
 
 import {MaelstromAbilityItem} from "../item/MaelstromAbilityItem"
 import {systemBasePath, systemName} from "../settings"
+import {MaelstromWeaponItem} from "../item/MaelstromWeaponItem"
 
 /**
  * Higher order function that generates an item creation handler.
@@ -122,9 +123,19 @@ export class MaelstromActorSheet extends ActorSheet {
         }).forEach(([val, type]) => {
             // @ts-ignore
             if (!sheetData.data.items[val])
-                { // @ts-ignore
-                    sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByNameFunction)
-                }
+            { // @ts-ignore
+                sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByNameFunction)
+            }
+        });
+
+        Object.entries({
+            weapons: MaelstromWeaponItem.type
+        }).forEach(([val, type]) => {
+            // @ts-ignore
+            if (!sheetData.data.items[val])
+            { // @ts-ignore
+                sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByNameFunction)
+            }
         });
 
         // remove HTML from notes fields
@@ -250,11 +261,12 @@ export class MaelstromActorSheet extends ActorSheet {
      */
     _onItemCreate(event) {
         event.preventDefault();
-        const header = event.currentTarget;
+
+        const element = event.currentTarget;
         // Get the type of item to create.
-        const type = header.dataset.type;
+        const type = element.dataset.type;
         // Grab any data associated with this control.
-        const data = duplicate(header.dataset);
+        const data = duplicate(element.dataset);
         // Initialize a default name.
         const name = `New ${type.capitalize()}`;
         // Prepare the item object.
@@ -277,6 +289,7 @@ export class MaelstromActorSheet extends ActorSheet {
      */
     _onRoll(event) {
         event.preventDefault();
+
         const element = event.currentTarget;
         const dataset = element.dataset;
 

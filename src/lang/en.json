@@ -32,6 +32,14 @@
   "MAELSTROM.item.ability.rank": "Rank",
   "MAELSTROM.item.ability.benefit": "Benefit",
 
+  "MAELSTROM.item.weapon.newWeapon": "New weapon",
+  "MAELSTROM.item.weapon.as": "AS",
+  "MAELSTROM.item.weapon.ds": "DS",
+  "MAELSTROM.item.weapon.damage": "Damage",
+  "MAELSTROM.item.weapon.range": "Range",
+  "MAELSTROM.item.weapon.attributes.attack": "Attack attribute",
+  "MAELSTROM.item.weapon.attributes.defence": "Defence attribute",
+
   "MAELSTROM.wounds.header": "Wounds",
   "MAELSTROM.wounds.total.header": "Total",
   "MAELSTROM.wounds.total.title": "Total wounds damage",
@@ -57,5 +65,23 @@
   "MAELSTROM.armour.penalty.label": "Penalty",
   "MAELSTROM.armour.penalty.title": "Armour wearing penalty to all physical actions including attacking and defending",
 
-  "MAELSTROM.characteristics.header": "Characteristics"
+  "MAELSTROM.characteristics.header": "Characteristics",
+
+  "MAELSTROM.abilities.header": "Abilities",
+  "MAELSTROM.abilities.column.ability.title": "Ability",
+  "MAELSTROM.abilities.column.rank.title": "Rank",
+  "MAELSTROM.abilities.column.benefit.title": "Benefit",
+  "MAELSTROM.abilities.controls.add": "Add ability",
+  "MAELSTROM.abilities.controls.edit": "Edit ability",
+  "MAELSTROM.abilities.controls.delete": "Delete ability",
+
+  "MAELSTROM.weapons.header": "Weapons & Shields",
+  "MAELSTROM.weapons.column.weapon.title": "Weapon",
+  "MAELSTROM.weapons.column.as.title": "AS",
+  "MAELSTROM.weapons.column.ds.title": "DS",
+  "MAELSTROM.weapons.column.damage.title": "Damage",
+  "MAELSTROM.weapons.column.range.title": "Range",
+  "MAELSTROM.weapons.controls.add": "Add weapon",
+  "MAELSTROM.weapons.controls.edit": "Edit weapon",
+  "MAELSTROM.weapons.controls.delete": "Delete weapon"
 }

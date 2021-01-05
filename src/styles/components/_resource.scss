@@ -3,16 +3,6 @@
   text-transform: uppercase;
 }
 
-.abilties-firstcolumn {
-  width: 40%;
-}
-
-.abilties-thirdcolumn {
-  width: 45%;
-}
-
-.tooltip_templates { display: none; }
-
  // https://stackoverflow.com/questions/38781104/how-to-create-disabled-state-of-the-font-awesome-icons
 .fas.disabled,
 .fas[disabled],
@@ -27,8 +17,30 @@
   border-color: saddlebrown;
 }
 
-table.attributes {
+.tooltip_templates { display: none; }
 
+table.attributes {
+}
+
+table.abilties {
+  .abilties-firstcolumn {
+    width: 40%;
+  }
+
+  .abilties-thirdcolumn {
+    width: 45%;
+  }
+}
+
+table.weapons {
+  .weapon-name-column {
+    width: 30%;
+  }
+  .weapon-damage-column {
+  }
+  .weapon-range-column {
+    width: 30%;
+  }
 }
 
 table.wounds {

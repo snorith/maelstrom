@@ -170,6 +170,7 @@
 
                 {{!-- Next column --}}
                 <div class="resource flex-group-center">
+                    {{!-- Characteristics --}}
                     <table class="characteristics">
                         <thead>
                         <tr>
@@ -189,6 +190,7 @@
                         </tbody>
                     </table>
 
+                    {{!-- Abilities table --}}
                     <table class="abilties">
                         <colgroup>
                             <col>
@@ -199,16 +201,16 @@
                         </colgroup>
                         <thead>
                         <tr>
-                            <td colspan="5">Abilities</td>
+                            <td colspan="5">{{localize "MAELSTROM.abilities.header"}}</td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td>Ability</td>
-                            <td>Rank</td>
-                            <td>Benefit</td>
+                            <td>{{localize "MAELSTROM.abilities.column.ability.title"}}</td>
+                            <td>{{localize "MAELSTROM.abilities.column.rank.title"}}</td>
+                            <td>{{localize "MAELSTROM.abilities.column.benefit.title"}}</td>
                             <td>
                                 <div class="item-controls">
-                                    <a class="item-control item-create" title="Create ability" data-type="ability"><i class="fas fa-plus"></i></a>
+                                    <a class="item-control item-create" title="{{localize "MAELSTROM.abilities.controls.add"}}" data-type="ability"><i class="fas fa-plus"></i></a>
                                 </div>
                             </td>
                         </tr>
@@ -226,8 +228,8 @@
                                 <td>{{ability.data.benefit}}</td>
                                 <td>
                                     <div class="item-controls">
-                                        <a class="item-control item-edit" title="Edit ability"><i class="fas fa-edit"></i></a>
-                                        <a class="item-control item-delete" title="Delete ability"><i class="fas fa-trash"></i></a>
+                                        <a class="item-control item-edit" title="{{localize "MAELSTROM.abilities.controls.edit"}}"><i class="fas fa-edit"></i></a>
+                                        <a class="item-control item-delete" title="{{localize "MAELSTROM.abilities.controls.delete"}}"><i class="fas fa-trash"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -235,15 +237,120 @@
                         </tbody>
                     </table>
 
+                    {{!-- Weapons/Swords/Stored Rolls --}}
+                    <table class="weapons">
+                        <colgroup>
+                            <col>
+                            <col class="weapon-name-column">
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col>
+                            <col class="weapon-damage-column">
+                            <col class="weapon-range-column">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <td colspan="10">{{localize "MAELSTROM.weapons.header"}}</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>{{localize "MAELSTROM.weapons.column.weapon.title"}}</td>
+                            <td></td>
+                            <td>{{localize "MAELSTROM.weapons.column.as.title"}}</td>
+                            <td></td>
+                            <td>{{localize "MAELSTROM.weapons.column.ds.title"}}</td>
+                            <td></td>
+                            <td>{{localize "MAELSTROM.weapons.column.damage.title"}}</td>
+                            <td>{{localize "MAELSTROM.weapons.column.range.title"}}</td>
+                            <td>
+                                <div class="item-controls">
+                                    <a class="item-control item-create" title="{{localize "MAELSTROM.weapons.controls.add"}}" data-type="weapon"><i class="fas fa-plus"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{#each data.items.weapons as |weapon key|}}
+                            <tr class="item" data-item-id="{{weapon._id}}">
+                                <td>{{#ifEmptyOrWhitespace weapon.data.notes}}
+                                    <i class="fas fa-info-circle disabled"></i>
+                                {{else}}
+                                    <span class="tooltip" data-tooltip-content="#tooltip_content_{{weapon._id}}"><i class="fas fa-info-circle"></i></span>
+                                {{/ifEmptyOrWhitespace}}</td>
+                                <td>{{weapon.name}}</td>
+                                <td><i class="fas fa-dice disabled"></i></td>
+                                <td>{{weapon.data.as}}</td>
+                                <td><i class="fas fa-dice disabled"></i></td>
+                                <td>{{weapon.data.ds}}</td>
+                                <td><i class="fas fa-dice-d20 disabled"></i></td>
+                                <td>{{weapon.data.damage}}</td>
+                                <td>{{weapon.data.range}}</td>
+                                <td>
+                                    <div class="item-controls">
+                                        <a class="item-control item-edit" title="{{localize "MAELSTROM.weapons.controls.add"}}"><i class="fas fa-edit"></i></a>
+                                        <a class="item-control item-delete" title="{{localize "MAELSTROM.weapons.controls.delete"}}"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+
+                    {{!-- Hidden tooltip HTML content --}}
                     <div class="tooltip_templates">
                         {{#each data.items.abilities as |ability key|}}
                         <div id="tooltip_content_{{ability._id}}">
                             <img src="{{ability.img}}" title="{{ability.name}}" alt="{{ability.name}}" height="50"/>
                             <h1 style="display: inline; margin-left: 4px;">{{ability.name}}</h1>
+                            <table>
+                                <tbody>
+                                <tr>
+                                    <td>{{localize "MAELSTROM.abilities.column.rank.title"}}</td>
+                                    <td>{{ability.data.rank}}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{localize "MAELSTROM.abilities.column.benefit.title"}}</td>
+                                    <td>{{ability.benefit.rank}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
                             <hr>
                             {{!-- raw html output --}}
                             {{{ability.data.notes}}}
                         </div>
+                        {{/each}}
+
+                        {{#each data.items.weapons as |weapon key|}}
+                            <div id="tooltip_content_{{weapon._id}}">
+                                <img src="{{weapon.img}}" title="{{weapon.name}}" alt="{{weapon.name}}" height="50"/>
+                                <h1 style="display: inline; margin-left: 4px;">{{weapon.name}}</h1>
+                                <table>
+                                    <tbody>
+                                    <tr>
+                                        <td>{{localize "MAELSTROM.weapons.column.as.title"}}</td>
+                                        <td>{{weapon.data.as}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{localize "MAELSTROM.weapons.column.ds.title"}}</td>
+                                        <td>{{weapon.data.ds}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{localize "MAELSTROM.weapons.column.damage.title"}}</td>
+                                        <td>{{weapon.data.damage}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{localize "MAELSTROM.weapons.column.range.title"}}</td>
+                                        <td>{{weapon.data.range}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <hr>
+                                {{!-- raw html output --}}
+                                {{{weapon.data.notes}}}
+                            </div>
                         {{/each}}
                     </div>
                 </div>
@@ -257,7 +364,7 @@
                     <div class="item-image"></div>
                     <div class="item-name">Name</div>
                     <div class="item-controls">
-                        <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add item</a>
+                        <a class="item-control item-create" title="Create item" data-type="equipment"><i class="fas fa-plus"></i> Add item</a>
                     </div>
                 </li>
             </ol>

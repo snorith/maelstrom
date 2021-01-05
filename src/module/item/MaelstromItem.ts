@@ -13,18 +13,21 @@
  * @extends {Item}
  */
 import {MaelstromAbilityItem} from "./MaelstromAbilityItem"
+import {MaelstromWeaponItem} from "./MaelstromWeaponItem"
 
 export const MaelstromItem = new Proxy(function () {}, {
 
     //Calling a constructor from this proxy object
-    construct: function (target, ...args) {
-        const [data, newTarget] = args[0];
+    construct: function (target, info, ...args) {
+        const [data, newTarget] = info
 
         console.log('construct item type = ' + data.type)
 
         switch (data.type) {
             case MaelstromAbilityItem.type:
-                return new MaelstromAbilityItem(data, newTarget);
+                return new MaelstromAbilityItem(data, newTarget)
+            case MaelstromWeaponItem.type:
+                return new MaelstromWeaponItem(data, newTarget)
         }
     },
 
@@ -38,7 +41,9 @@ export const MaelstromItem = new Proxy(function () {}, {
 
                     switch (data.type) {
                         case MaelstromAbilityItem.type:
-                            return MaelstromAbilityItem.create(data, options);
+                            return MaelstromAbilityItem.create(data, options)
+                        case MaelstromWeaponItem.type:
+                            return MaelstromWeaponItem.create(data, options)
                     }
                 };
 
@@ -46,8 +51,10 @@ export const MaelstromItem = new Proxy(function () {}, {
                 //Applying the "instanceof" operator on the instance object
                 return function (instance) {
                     return (
-                        instance instanceof MaelstromAbilityItem || false
+                        instance instanceof MaelstromAbilityItem ||
+                        instance instanceof MaelstromWeaponItem ||
                         // other instanceof
+                        false
                     );
                 };
 

@@ -1,5 +1,7 @@
 import {MaelstromAbilityItemSheet} from "./MaelstromAbilityItemSheet"
 import {MaelstromAbilityItem} from "../MaelstromAbilityItem"
+import {MaelstromWeaponItem} from "../MaelstromWeaponItem"
+import {MaelstromWeaponItemSheet} from "./MaelstromWeaponItemSheet"
 
 export class MaelstromItemSheet extends ItemSheet {
     constructor(data, options) {
@@ -15,8 +17,8 @@ export class MaelstromItemSheet extends ItemSheet {
             case MaelstromAbilityItem.type:
                 object = new MaelstromAbilityItemSheet(data, options)
                 break
-            case "weapon":
-                object = null
+            case MaelstromWeaponItem.type:
+                object = new MaelstromWeaponItemSheet(data, options)
                 break
             case "equipment":
                 object = null

@@ -1,9 +1,10 @@
 import {systemBasePath} from "../../settings"
-import {MaelstromAbilityItem} from "../MaelstromAbilityItem"
+import {MaelstromWeaponItem} from "../MaelstromWeaponItem"
+import {MAELSTROM} from "../../config"
 
-export class MaelstromAbilityItemSheet extends ItemSheet {
+export class MaelstromWeaponItemSheet extends ItemSheet {
     /**
-     * Define default rendering options for the ability sheet
+     * Define default rendering options for the weapon sheet
      * @return {Object}
      */
     static get defaultOptions() {
@@ -27,8 +28,17 @@ export class MaelstromAbilityItemSheet extends ItemSheet {
         return `${systemBasePath}/templates/item/${this.type}Sheet.html`;
     }
 
+    getData() {
+        const sheetData = super.getData()
+
+        // @ts-ignore
+        sheetData.attributesList = MAELSTROM.attributes
+
+        return sheetData
+    }
+
     get type() {
-        return MaelstromAbilityItem.type;
+        return MaelstromWeaponItem.type;
     }
 
     /** @override */
