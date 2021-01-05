@@ -1,3 +1,6 @@
+import {MaelstromWeaponItem} from "../item/MaelstromWeaponItem"
+import {MaelstromAbilityItem} from "../item/MaelstromAbilityItem"
+
 export type MaelstromActorWoundsType = {
     wounds: number[],
     bloodloss: number,
@@ -35,4 +38,5 @@ export class MaelstromActor extends Actor {
             //attribute.mod = Math.floor((attribute.orig - 10) / 2)
         }
     }
+
 }

@@ -95,6 +95,13 @@ export const registerSettings = function() {
         return ''
     })
 
+    Handlebars.registerHelper('sub', (a, b) => {
+        if (Number.isFinite(a) && Number.isFinite(b)) {
+            return a - b
+        }
+        return ''
+    })
+
     Handlebars.registerHelper('calculateTotalWounds', function (wounds: MaelstromActorWoundsType) {
         let total = 0
 

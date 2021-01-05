@@ -3,6 +3,19 @@
         <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name" data-dtype="String"/></h1>
+            {{#if (gte data.order 0)}}
+                <label title="{{localize "MAELSTROM.item.weapon.order.title"}}">{{localize "MAELSTROM.item.weapon.order.label"}}
+                    <select name="data.order" title="{{localize "MAELSTROM.item.weapon.order.title"}}" data-dtype="Number">
+                        {{#select data.order}}
+                            {{#if (gt data.order 0)}}
+                                <option value="{{add data.order -6}}">{{localize "MAELSTROM.item.weapon.order.up"}}</option>
+                            {{/if}}
+                            <option value="{{data.order}}">{{localize "MAELSTROM.item.weapon.order.same"}}</option>
+                            <option value="{{add data.order 6}}">{{localize "MAELSTROM.item.weapon.order.down"}}</option>
+                        {{/select}}
+                    </select>
+                </label>
+            {{/if}}
         </div>
     </header>
 
@@ -18,29 +31,20 @@
         <div class="tab attributes" data-group="primary-tabs" data-tab="attributes">
             <div class="grid grid-2col">
                 <div class="resource">
-                    <label>{{localize "MAELSTROM.item.weapon.as"}}
-                        <input type="text" name="data.as" value="{{data.as}}" class="as" data-dtype="Number" />
+                    <label title="{{localize "MAELSTROM.item.weapon.as.title"}}">{{localize "MAELSTROM.item.weapon.as.label"}}
+                        <input type="text" name="data.as" value="{{data.as}}" class="as" data-dtype="Number" title="{{localize "MAELSTROM.item.weapon.as.title"}}"/>
                     </label>
                 </div>
 
                 <div class="resource">
-                    <label>{{localize "MAELSTROM.item.weapon.ds"}}
-                        <input type="text" name="data.ds" value="{{data.ds}}" class="ds" data-dtype="Number" />
+                    <label title="{{localize "MAELSTROM.item.weapon.ds.title"}}">{{localize "MAELSTROM.item.weapon.ds.label"}}
+                        <input type="text" name="data.ds" value="{{data.ds}}" class="ds" data-dtype="Number" title="{{localize "MAELSTROM.item.weapon.ds.title"}}"/>
                     </label>
                 </div>
 
                 <div class="resource">
-                    <label>{{localize "MAELSTROM.item.weapon.damage"}}
-                        <input type="text" name="data.damage" value="{{data.damage}}" class="damage" data-dtype="String" />
-                    </label>
-                </div>
-
-                <div class="resource">
-                </div>
-
-                <div class="resource">
-                    <label>{{localize "MAELSTROM.item.weapon.range"}}
-                        <input type="text" name="data.range" value="{{data.range}}" class="range" data-dtype="String" />
+                    <label title="{{localize "MAELSTROM.item.weapon.damage.title"}}">{{localize "MAELSTROM.item.weapon.damage.label"}}
+                        <input type="text" name="data.damage" value="{{data.damage}}" class="damage" data-dtype="String" title="{{localize "MAELSTROM.item.weapon.damage.title"}}"/>
                     </label>
                 </div>
 
@@ -48,28 +52,35 @@
                 </div>
 
                 <div class="resource">
-                    <label>{{localize "MAELSTROM.item.weapon.attributes.attack"}}
-                        <select name="data.attributes.attack" class="attack" title="{{localize "MAELSTROM.item.weapon.attributes.attack"}}" data-dtype="String">
+                    <label title="{{localize "MAELSTROM.item.weapon.range.title"}}">{{localize "MAELSTROM.item.weapon.range.label"}}
+                        <input type="text" name="data.range" value="{{data.range}}" class="range" data-dtype="String" title="{{localize "MAELSTROM.item.weapon.range.title"}}"/>
+                    </label>
+                </div>
+
+                <div class="resource">
+                </div>
+
+                <div class="resource">
+                    <label title="{{localize "MAELSTROM.item.weapon.attributes.attack.title"}}">{{localize "MAELSTROM.item.weapon.attributes.attack.label"}}
+                        <select name="data.attributes.attack" class="attack" title="{{localize "MAELSTROM.item.weapon.attributes.attack.title"}}" data-dtype="String">
                             {{#select data.attributes.attack}}
                             {{#each attributesList as |key|}}
                                 <option value="{{key}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</option>
                             {{/each}}
                             {{/select}}
                         </select>
-                        {{!-- {{#if (eq data.attributes.attack key)}}selected{{/if}} --}}
                     </label>
                 </div>
 
                 <div class="resource">
-                    <label>{{localize "MAELSTROM.item.weapon.attributes.defence"}}
-                        <select name="data.attributes.defence" class="defence" title="{{localize "MAELSTROM.item.weapon.attributes.defence"}}" data-dtype="String">
+                    <label title="{{localize "MAELSTROM.item.weapon.attributes.defence.title"}}">{{localize "MAELSTROM.item.weapon.attributes.defence.label"}}
+                        <select name="data.attributes.defence" class="defence" title="{{localize "MAELSTROM.item.weapon.attributes.defence.title"}}" data-dtype="String">
                             {{#select data.attributes.defence}}
                             {{#each attributesList as |key|}}
                                 <option value="{{key}}">{{localize (concat "MAELSTROM.attribute.name." key)}}</option>
                             {{/each}}
                             {{/select}}
                         </select>
-                        {{!-- {{#if (eq data.attributes.defence key)}}selected{{/if}} --}}
                     </label>
                 </div>
             </div>

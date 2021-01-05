@@ -118,6 +118,7 @@ export class MaelstromActorSheet extends ActorSheet {
         // @ts-ignore
         const items = sheetData.data.items;
 
+        // filter out abilities and sort them
         Object.entries({
             abilities: MaelstromAbilityItem.type
         }).forEach(([val, type]) => {
@@ -128,15 +129,20 @@ export class MaelstromActorSheet extends ActorSheet {
             }
         });
 
+        // filter out weapons and sort them
         Object.entries({
             weapons: MaelstromWeaponItem.type
         }).forEach(([val, type]) => {
             // @ts-ignore
             if (!sheetData.data.items[val])
-            { // @ts-ignore
-                sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByNameFunction)
+            {   // @ts-ignore
+                sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByOrderFunction)
             }
-        });
+        })
+
+        // build a list of updates to weapon ordering
+        // @ts-ignore
+        this._reorderItems(sheetData.data.items.weapons)
 
         // remove HTML from notes fields
         // @ts-ignore
@@ -144,6 +150,22 @@ export class MaelstromActorSheet extends ActorSheet {
         //     ability.data.notes = removeHtmlTags(ability.data.notes);
         //     return ability;
         // });
+    }
+
+    async _reorderItems(items: any[]) {
+        let currentOrder = 0
+
+        const updatedItemList = []
+        for (let i = 0; i < items.length; i++) {
+            // @ts-ignore
+            if (items[i].data.order != currentOrder) {
+                updatedItemList.push({_id: items[i]._id, 'data.order': currentOrder})
+            }
+            currentOrder += 5
+        }
+
+        if (updatedItemList.length > 0)
+            await this.actor.updateEmbeddedEntity("OwnedItem", updatedItemList);
     }
 
     /* -------------------------------------------- */
