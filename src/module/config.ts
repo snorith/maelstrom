@@ -1,15 +1,27 @@
-export const MAELSTROM = {};
+export type maelstromConfigType = {
+    attributes: string[],
+    physicalAttributes: string[]
+}
 
-// @ts-ignore
-MAELSTROM.attributes = [
-    "attack",
-    "missile",
-    "defence",
-    "knowledge",
-    "will",
-    "endurance",
-    "persuasion",
-    "perception",
-    "speed",
-    "agility"
-]
+export const MAELSTROM: maelstromConfigType = {
+    attributes: [
+        "attack",
+        "missile",
+        "defence",
+        "knowledge",
+        "will",
+        "endurance",
+        "persuasion",
+        "perception",
+        "speed",
+        "agility"
+    ],
+
+    physicalAttributes: [
+        "attack",
+        "missile",
+        "defence",
+        "speed",
+        "agility"
+    ]
+}

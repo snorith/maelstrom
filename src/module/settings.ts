@@ -130,3 +130,7 @@ export const registerSettings = function() {
         return null
     })
 }
+
+export function isEmptyOrSpaces(str: string): boolean {
+    return str === null || str.match(/^[\s\n\r\t]*$/) !== null;
+}

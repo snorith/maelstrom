@@ -3,6 +3,14 @@
   "MAELSTROM.sheet.tabs.equip": "Equip/Events",
   "MAELSTROM.sheet.tabs.description": "Description",
 
+  "MAELSTROM.roll.outcome.criticalsuccess": "Critical Success",
+  "MAELSTROM.roll.outcome.success": "Success",
+  "MAELSTROM.roll.outcome.fail": "Fail",
+  "MAELSTROM.roll.outcome.criticalfail": "Critical Fail",
+  "MAELSTROM.roll.outcome.attribute.without.item": "Rolling {attribute}",
+  "MAELSTROM.roll.outcome.attribute.with.item": "Rolling {attribute} with {item}",
+  "MAELSTROM.roll.outcome.attribute.value.modified": "Modified attribute: {value}",
+
   "MAELSTROM.attribute.title": "Attributes",
   "MAELSTROM.attribute.name.attack": "Attack",
   "MAELSTROM.attribute.detail.attack": "Attack Skill (AS)",
