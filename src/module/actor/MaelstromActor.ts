@@ -39,4 +39,27 @@ export class MaelstromActor extends Actor {
         }
     }
 
+    rollAttribute(attributeName: string) {
+        const attribute = this.data.data.attributes[attributeName]
+        const orig = attribute.orig
+        const temp = attribute.temp
+        let rating = 0
+        if (Number.isFinite(temp)) {
+            rating = temp
+        }
+        else if (Number.isFinite(orig)) {
+            rating = orig
+        }
+
+        const roll = new Roll('1d100').roll();
+        const total = roll.total
+
+        const attributeNameLocalized = game.i18n.localize("MAELSTROM.attribute.detail." + attributeName)
+
+        roll.toMessage({
+                speaker: ChatMessage.getSpeaker({ actor: this }),
+                flavor: `${attributeNameLocalized}`,
+            }, CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+    }
+
 }

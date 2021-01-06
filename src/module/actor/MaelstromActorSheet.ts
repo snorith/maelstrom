@@ -207,6 +207,9 @@ export class MaelstromActorSheet extends ActorSheet {
         // suffer bleeding damage
         html.find('.item-add-bleeding-damage').click(this._onSufferBleedingDamage.bind(this))
 
+        // roll an attibute save roll
+        html.find('.attribute-roll').click(this._onAttributeRoll.bind(this))
+
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));
         //
@@ -219,6 +222,15 @@ export class MaelstromActorSheet extends ActorSheet {
         //         li.addEventListener("dragstart", handler, false);
         //     });
         // }
+    }
+
+    _onAttributeRoll(event) {
+        event.preventDefault();
+
+        const element = event.currentTarget
+        const attribute = element.dataset.attribute
+
+        return this.actor.rollAttribute(attribute)
     }
 
     /**
