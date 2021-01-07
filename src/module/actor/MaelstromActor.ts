@@ -120,7 +120,7 @@ export class MaelstromActor extends Actor {
         if (!isEmptyOrSpaces(itemName)) {
             attributeNameLocalized = game.i18n.format("MAELSTROM.roll.outcome.attribute.with.item", {
                 attribute: attributeNameLocalized,
-                item: itemName
+                item: (itemName) ? itemName.trim() : ''
             })
         }
         else {
@@ -136,8 +136,37 @@ export class MaelstromActor extends Actor {
 
         roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: this }),
-                flavor: flavorText,
+                flavor: flavorText
             }, CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+
+        return false
+    }
+
+    rollItemDamage(name: string, damage: string = '') {
+        name = name ? name.trim() : ''
+        damage = damage ? damage.trim() : ''
+
+        const nameLocalized = game.i18n.format("MAELSTROM.roll.item.with.damage", {
+            item: name
+        })
+        let flavorText = `<h3>${Handlebars.Utils.escapeExpression(nameLocalized)}</h3>`
+
+        let roll = null
+        try {
+            roll = new Roll(damage).roll();
+            roll.toMessage({
+                speaker: ChatMessage.getSpeaker({ actor: this }),
+                flavor: flavorText
+            }, CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+        }
+        catch (e) {
+            const errorMsg = game.i18n.format("MAELSTROM.roll.item.damage.invalid", {
+                formula: damage
+            })
+            flavorText += `<span style="color: red">${errorMsg}</span>`
+
+            // todo: how to output message?
+        }
 
         return false
     }

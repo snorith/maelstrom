@@ -10,6 +10,8 @@
   "MAELSTROM.roll.outcome.attribute.without.item": "Rolling {attribute}",
   "MAELSTROM.roll.outcome.attribute.with.item": "Rolling {attribute} with {item}",
   "MAELSTROM.roll.outcome.attribute.value.modified": "Modified attribute: {value}",
+  "MAELSTROM.roll.item.with.damage": "Damage from {item}",
+  "MAELSTROM.roll.item.damage.invalid": "Invalid dice formula: '{formula}'",
 
   "MAELSTROM.attribute.title": "Attributes",
   "MAELSTROM.attribute.name.attack": "Attack",
@@ -114,5 +116,6 @@
   "MAELSTROM.weapons.controls.edit": "Edit weapon",
   "MAELSTROM.weapons.controls.delete": "Delete weapon",
   "MAELSTROM.weapons.roll.attack": "Roll attribute with AS modifier",
-  "MAELSTROM.weapons.roll.defence": "Roll attribute with DS modifier"
+  "MAELSTROM.weapons.roll.defence": "Roll attribute with DS modifier",
+  "MAELSTROM.weapons.roll.damage": "Roll damage"
 }
