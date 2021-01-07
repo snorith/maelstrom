@@ -163,9 +163,13 @@ export class MaelstromActor extends Actor {
             const errorMsg = game.i18n.format("MAELSTROM.roll.item.damage.invalid", {
                 formula: damage
             })
-            flavorText += `<span style="color: red">${errorMsg}</span>`
+            flavorText += `<span style="color: red">${Handlebars.Utils.escapeExpression(errorMsg)}</span>`
 
-            // todo: how to output message?
+            ChatMessage.create({
+                user: game.user._id,
+                speaker: ChatMessage.getSpeaker({ actor: this }),
+                content: flavorText
+            }).then((value => {}))
         }
 
         return false
