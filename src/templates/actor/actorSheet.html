@@ -283,9 +283,9 @@
                                     <span class="tooltip" data-tooltip-content="#tooltip_content_{{weapon._id}}"><i class="fas fa-info-circle"></i></span>
                                 {{/ifEmptyOrWhitespace}}</td>
                                 <td>{{weapon.name}}</td>
-                                <td><i class="fas fa-dice disabled"></i></td>
+                                <td><a class="item-control weapon-roll" data-attribute="{{weapon.data.attributes.attack}}" data-name="{{weapon.name}}" data-modifier="{{weapon.data.as}}" title="{{localize "MAELSTROM.weapons.roll.attack"}}"><i class="fas fa-dice"></i></a></td>
                                 <td>{{weapon.data.as}}</td>
-                                <td><i class="fas fa-dice disabled"></i></td>
+                                <td><a class="item-control weapon-roll" data-attribute="{{weapon.data.attributes.defence}}" data-name="{{weapon.name}}" data-modifier="{{weapon.data.ds}}" title="{{localize "MAELSTROM.weapons.roll.defence"}}"><i class="fas fa-dice"></i></a></td>
                                 <td>{{weapon.data.ds}}</td>
                                 <td><i class="fas fa-dice-d20 disabled"></i></td>
                                 <td>{{weapon.data.damage}}</td>

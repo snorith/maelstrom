@@ -207,8 +207,11 @@ export class MaelstromActorSheet extends ActorSheet {
         // suffer bleeding damage
         html.find('.item-add-bleeding-damage').click(this._onSufferBleedingDamage.bind(this))
 
-        // roll an attibute save roll
+        // roll an attribute saving throw
         html.find('.attribute-roll').click(this._onAttributeRoll.bind(this))
+
+        // roll an attribute with a weapon saving throw
+        html.find('.weapon-roll').click(this._onWeaponItemRoll.bind(this))
 
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));
@@ -224,6 +227,11 @@ export class MaelstromActorSheet extends ActorSheet {
         // }
     }
 
+    /**
+     * Roll a saving throw based on an attribute
+     *
+     * @param event
+     */
     _onAttributeRoll(event) {
         event.preventDefault();
 
@@ -231,6 +239,28 @@ export class MaelstromActorSheet extends ActorSheet {
         const attribute = element.dataset.attribute
 
         return this.actor.rollAttribute(attribute)
+    }
+
+    /**
+     * Roll a saving throw based on a weapon/shield item
+     *
+     * @param event
+     */
+    _onWeaponItemRoll(event) {
+        event.preventDefault();
+
+        const element = event.currentTarget
+        const attribute = element.dataset.attribute
+        let modifier = element.dataset.modifier
+        const name = element.dataset.name
+
+        if (modifier) {
+            modifier = Number.parseInt(modifier)
+            if (isNaN(modifier))
+                modifier = ''
+        }
+
+        return this.actor.rollAttribute(attribute, [modifier], name)
     }
 
     /**
