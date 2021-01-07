@@ -86,6 +86,52 @@
         "armour": "",
         "ar": "",
         "penalty": ""
+      },
+      "notes": "",
+      "equipment": "",
+      "languages:": {
+        "lang1": "",
+        "lang2": "",
+        "lang3": "",
+        "lang4": ""
+      },
+      "events": {
+        "supernatural": '',
+        "careers": {
+          "c1": {
+            "living": "",
+            "years": "",
+            "event": ""
+          },
+          "c2": {
+            "living": "",
+            "years": "",
+            "event": ""
+          },
+          "c3": {
+            "living": "",
+            "years": "",
+            "event": ""
+          },
+          "c4": {
+            "living": "",
+            "years": "",
+            "event": ""
+          },
+          "c5": {
+            "living": "",
+            "years": "",
+            "event": ""
+          },
+          "c6": {
+            "living": "",
+            "years": "",
+            "event": ""
+          }
+        }
+      },
+      "money": {
+        "amount": ""
       }
     }
   },

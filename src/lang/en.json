@@ -3,6 +3,15 @@
   "MAELSTROM.sheet.tabs.equip": "Equip/Events",
   "MAELSTROM.sheet.tabs.description": "Description",
 
+  "MAELSTROM.character.age.label": "Age",
+  "MAELSTROM.character.race.label": "Race",
+  "MAELSTROM.character.sex.label": "Gender",
+  "MAELSTROM.character.social.label": "Social",
+  "MAELSTROM.character.imbalance.label": "Imbalance",
+  "MAELSTROM.character.favour.label": "Favour",
+  "MAELSTROM.character.patron.label": "Patron",
+  "MAELSTROM.character.money.label": "Money",
+
   "MAELSTROM.roll.outcome.criticalsuccess": "Critical Success",
   "MAELSTROM.roll.outcome.success": "Success",
   "MAELSTROM.roll.outcome.fail": "Fail",
@@ -64,6 +73,7 @@
   "MAELSTROM.item.weapon.ds.title": "Modifier applied to the attribute when defending with this item (Defence Skill)",
   "MAELSTROM.item.weapon.damage.label": "Damage",
   "MAELSTROM.item.weapon.damage.title": "A valid dice roll formula to determine attacking damage done with this item",
+  "MAELSTROM.item.weapon.damage.note": "(A valid dice formula. e.g. 2d6 + 2)",
   "MAELSTROM.item.weapon.range.label": "Range",
   "MAELSTROM.item.weapon.range.title": "The range of this distance item",
   "MAELSTROM.item.weapon.attributes.attack.label": "Attack attribute",
@@ -117,5 +127,18 @@
   "MAELSTROM.weapons.controls.delete": "Delete weapon",
   "MAELSTROM.weapons.roll.attack": "Roll attribute with AS modifier",
   "MAELSTROM.weapons.roll.defence": "Roll attribute with DS modifier",
-  "MAELSTROM.weapons.roll.damage": "Roll damage"
+  "MAELSTROM.weapons.roll.damage": "Roll damage",
+
+  "MAELSTROM.notes.header": "Notes",
+
+  "MAELSTROM.equipment.header": "Equipment",
+
+  "MAELSTROM.events.supernatural.header": "Supernatural Event",
+
+  "MAELSTROM.events.header": "Events",
+  "MAELSTROM.events.column.living.header": "Living",
+  "MAELSTROM.events.column.years.header": "Years",
+  "MAELSTROM.events.column.event.header": "Living",
+
+  "MAELSTROM.languages.header": "Languages"
 }

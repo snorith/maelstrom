@@ -75,6 +75,13 @@ table.armour {
   }
 }
 
+table.events {
+  col.event {
+    width: 50%;
+  }
+}
+
 .left-align-text {
   text-align: left;
+  padding-left: 4px;
 }
