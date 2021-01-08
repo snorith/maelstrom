@@ -1,5 +1,3 @@
-import {MaelstromWeaponItem} from "../item/MaelstromWeaponItem"
-import {MaelstromAbilityItem} from "../item/MaelstromAbilityItem"
 import {MAELSTROM} from "../config"
 import {isEmptyOrSpaces} from "../settings"
 
@@ -14,6 +12,7 @@ export type MaelstromActorWoundsType = {
 export type MaelstromActorAttributeType = {
     orig: number,
     temp: number,
+    current: number,
     used: boolean,
     test: object
 }
@@ -30,14 +29,47 @@ export class MaelstromActor extends Actor {
             this._prepareCharacterData(actorData)
     }
 
+    // getInitiativeFormula() {
+    //     const speed = this._getAttributeValue(MAELSTROM.initiativeAttribute)
+    //     const baseInitiativeForumala = "2d10"
+    //
+    //     let formula = `${baseInitiativeForumala} + ${speed}`
+    //
+    //     let modifier = this._getInitiativeModifer()
+    //     if (modifier != 0) {
+    //         formula = `${formula} + ${modifier}`
+    //     }
+    //
+    //     return formula
+    // }
+
+    /**
+     * Calculate derived values
+     *
+     * @param actorData
+     */
     _prepareCharacterData(actorData: ActorData<any>) {
         const data = actorData.data
 
-        // Make modifications to data here ...
-
+        // calculate actual value of an attribute between temp or orig
         for (let [key, attribute] of Object.entries(data.attributes)) {
-            // calculate modifiers... d20 style
-            //attribute.mod = Math.floor((attribute.orig - 10) / 2)
+            const att = attribute as MaelstromActorAttributeType
+            if (Number.isFinite(att.temp))
+                att.current = att.temp
+            else if (Number.isFinite(att.orig))
+                att.current = att.orig
+            else
+                att.current = 0
+        }
+
+        if (!Number.isFinite(data?.initiative?.modifier)) {
+            if (!data.initiative) {
+                data.initiative = {
+                    modifier: 0
+                }
+            }
+            else
+                data.initiative.modifier = 0
         }
     }
 
@@ -54,6 +86,14 @@ export class MaelstromActor extends Actor {
             return orig
         }
 
+        return 0
+    }
+
+    _getInitiativeModifer(): number {
+        const modifier = this.data?.data?.initiative?.modifier
+        if (Number.isFinite(modifier)) {
+            return modifier
+        }
         return 0
     }
 

@@ -132,6 +132,9 @@
       },
       "money": {
         "amount": ""
+      },
+      "initiative": {
+        "modifier": 0
       }
     }
   },

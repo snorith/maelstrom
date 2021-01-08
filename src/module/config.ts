@@ -1,6 +1,7 @@
 export type maelstromConfigType = {
     attributes: string[],
-    physicalAttributes: string[]
+    physicalAttributes: string[],
+    initiativeAttribute: string
 }
 
 export const MAELSTROM: maelstromConfigType = {
@@ -23,5 +24,7 @@ export const MAELSTROM: maelstromConfigType = {
         "defence",
         "speed",
         "agility"
-    ]
+    ],
+
+    initiativeAttribute: "speed"
 }
