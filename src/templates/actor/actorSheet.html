@@ -310,11 +310,16 @@
                     </table>
 
                     <table class="initiative">
+                        <thead>
+                            <tr>
+                                <td colspan="3">{{localize "MAELSTROM.initiative.header"}}</td>
+                            </tr>
+                        </thead>
                         <tbody>
                         <tr>
-                            <label for="data.initiative.modifier" class="resource-label">{{localize "MAELSTROM.initiative.label"}}</label>
-                            <a class="item-control roll-initiative" title="{{localize "MAELSTROM.initiative.roll.title"}}"><i class="fas fa-dice-d20"></i></a>
-                            <input type="text" name="data.initiative.modifier" value="{{data.initiative.modifier}}" title="{{localize "MAELSTROM.initiative.modifier.title"}}" data-dtype="Number">
+                            <td><label for="data.initiative.modifier" class="resource-label">{{localize "MAELSTROM.initiative.label"}}</label></td>
+                            <td><a class="item-control roll-initiative" title="{{localize "MAELSTROM.initiative.roll.title"}}"><i class="fas fa-dice-d20"></i></a></td>
+                            <td><input type="text" name="data.initiative.modifier" value="{{data.initiative.modifier}}" title="{{localize "MAELSTROM.initiative.modifier.title"}}" data-dtype="Number"></td>
                         </tr>
                         </tbody>
                     </table>
