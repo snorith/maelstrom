@@ -1,5 +1,6 @@
 import {MAELSTROM} from "../config"
 import {isEmptyOrSpaces} from "../settings"
+import {INITIATIVE_FORMULA} from "../../maelstrom"
 
 export type MaelstromActorWoundsType = {
     wounds: number[],
@@ -28,20 +29,6 @@ export class MaelstromActor extends Actor {
         if (actorData.type == 'character')
             this._prepareCharacterData(actorData)
     }
-
-    // getInitiativeFormula() {
-    //     const speed = this._getAttributeValue(MAELSTROM.initiativeAttribute)
-    //     const baseInitiativeForumala = "2d10"
-    //
-    //     let formula = `${baseInitiativeForumala} + ${speed}`
-    //
-    //     let modifier = this._getInitiativeModifer()
-    //     if (modifier != 0) {
-    //         formula = `${formula} + ${modifier}`
-    //     }
-    //
-    //     return formula
-    // }
 
     /**
      * Calculate derived values
@@ -104,14 +91,6 @@ export class MaelstromActor extends Actor {
     _getAttributeValue(attributeName: string): number {
         const attribute = this.data?.data?.attributes[attributeName]
         return attribute.current
-    }
-
-    _getInitiativeModifer(): number {
-        const modifier = this.data?.data?.initiative?.modifier
-        if (Number.isFinite(modifier)) {
-            return modifier
-        }
-        return 0
     }
 
     _getArmourPenaltyValue(): number {
@@ -227,6 +206,22 @@ export class MaelstromActor extends Actor {
                 speaker: ChatMessage.getSpeaker({ actor: this }),
                 content: flavorText
             }).then((value => {}))
+        }
+
+        return false
+    }
+
+    rollActorInitiative() {
+        let roll = null
+        try {
+            roll = new Roll(INITIATIVE_FORMULA, this.data?.data).roll();
+            roll.toMessage({
+                speaker: ChatMessage.getSpeaker({ actor: this }),
+                flavor: Handlebars.Utils.escapeExpression(game.i18n.localize("MAELSTROM.initiative.roll.message.flavour"))
+            }, CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+        }
+        catch (e) {
+
         }
 
         return false

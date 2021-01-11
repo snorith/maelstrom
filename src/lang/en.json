@@ -129,6 +129,11 @@
   "MAELSTROM.weapons.roll.defence": "Roll attribute with DS modifier",
   "MAELSTROM.weapons.roll.damage": "Roll damage",
 
+  "MAELSTROM.initiative.label": "Initiative",
+  "MAELSTROM.initiative.roll.title": "Roll initiative",
+  "MAELSTROM.initiative.roll.message.flavour": "Rolling initiative",
+  "MAELSTROM.initiative.modifier.title": "Initiative modifier",
+
   "MAELSTROM.notes.header": "Notes",
 
   "MAELSTROM.equipment.header": "Equipment",

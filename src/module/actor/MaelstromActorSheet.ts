@@ -222,6 +222,9 @@ export class MaelstromActorSheet extends ActorSheet {
         // roll weapon damage
         html.find('.weapon-damage').click(this._onWeaponDamageRoll.bind(this))
 
+        // roll initiative
+        html.find('.roll-initiative').click(this._onRollInitiative.bind(this))
+
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));
         //
@@ -234,6 +237,12 @@ export class MaelstromActorSheet extends ActorSheet {
         //         li.addEventListener("dragstart", handler, false);
         //     });
         // }
+    }
+
+    _onRollInitiative(event) {
+        event.preventDefault();
+
+        return this.actor.rollActorInitiative()
     }
 
     /**

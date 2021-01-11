@@ -26,6 +26,8 @@ import {MaelstromWeaponItem} from "./module/item/MaelstromWeaponItem"
 import {MaelstromWeaponItemSheet} from "./module/item/sheets/MaelstromWeaponItemSheet"
 import {MaelstromItemSheet} from "./module/item/sheets/MaelstromItemSheet"
 
+export const INITIATIVE_FORMULA = "2d10 + @attributes.speed.current + @initiative.modifier + (@attributes.speed.current / 100)"
+
 /* ------------------------------------ */
 /* Initialize system					*/
 /* ------------------------------------ */
@@ -49,7 +51,7 @@ Hooks.once('init', async function() {
 	 * @type {String}
 	 */
 	CONFIG.Combat.initiative = {
-		formula: "2d10 + @attributes.speed.current + @initiative.modifier + (@attributes.speed.current / 100)",
+		formula: INITIATIVE_FORMULA,
 		decimals: 2,
 	};
 

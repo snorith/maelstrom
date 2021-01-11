@@ -309,6 +309,16 @@
                         </tbody>
                     </table>
 
+                    <table class="initiative">
+                        <tbody>
+                        <tr>
+                            <label for="data.initiative.modifier" class="resource-label">{{localize "MAELSTROM.initiative.label"}}</label>
+                            <a class="item-control roll-initiative" title="{{localize "MAELSTROM.initiative.roll.title"}}"><i class="fas fa-dice-d20"></i></a>
+                            <input type="text" name="data.initiative.modifier" value="{{data.initiative.modifier}}" title="{{localize "MAELSTROM.initiative.modifier.title"}}" data-dtype="Number">
+                        </tr>
+                        </tbody>
+                    </table>
+
                     {{!-- Hidden tooltip HTML content --}}
                     <div class="tooltip_templates">
                         {{#each data.items.abilities as |ability key|}}
