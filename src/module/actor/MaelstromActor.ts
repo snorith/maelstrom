@@ -71,22 +71,39 @@ export class MaelstromActor extends Actor {
             else
                 data.initiative.modifier = 0
         }
+
+        if (!data?.hp) {
+            data.hp = {
+                value: 0,
+                max: 0,
+                wounds: 0
+            }
+        }
+        data.hp.wounds = this._getTotalWounds(data)
+        data.hp.max = data.attributes.endurance.current + 20
+        data.hp.value = data.hp.max - data.hp.wounds
+    }
+
+    _getTotalWounds(data: any) {
+        let total = 0
+
+        if (data?.wounds?.wounds) {
+            // array is passed in as an Object ){0: 1, 1: 1, 2: 1, 3: null}
+            const w = Object.values(data.wounds.wounds) as number[]
+            total += w.reduce((previousValue: number, currentValue: number) => {
+                if (currentValue && Number.isFinite(currentValue)) {
+                    return previousValue + currentValue
+                }
+                return previousValue
+            }, 0)
+        }
+
+        return total
     }
 
     _getAttributeValue(attributeName: string): number {
         const attribute = this.data?.data?.attributes[attributeName]
-
-        const temp = attribute?.temp
-        if (Number.isFinite(temp)) {
-            return temp
-        }
-
-        const orig = attribute?.orig
-        if (Number.isFinite(orig)) {
-            return orig
-        }
-
-        return 0
+        return attribute.current
     }
 
     _getInitiativeModifer(): number {

@@ -31,5 +31,6 @@
   "license": "",
   "readme": "",
   "bugs": "",
-  "changelog": ""
+  "changelog": "",
+  "primaryTokenAttribute": "hp"
 }

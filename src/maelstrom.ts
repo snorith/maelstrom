@@ -48,10 +48,10 @@ Hooks.once('init', async function() {
 	 * Set an initiative formula for the system
 	 * @type {String}
 	 */
-	// CONFIG.Combat.initiative = {
-	// 	formula: "2d10 + @attributes.speed.current + @initiative.modifier",
-	// 	decimals: 1,
-	// };
+	CONFIG.Combat.initiative = {
+		formula: "2d10 + @attributes.speed.current + @initiative.modifier + (@attributes.speed.current / 100)",
+		decimals: 2,
+	};
 
 	// define custom entity classes
 	CONFIG.Actor.entityClass = MaelstromActor
