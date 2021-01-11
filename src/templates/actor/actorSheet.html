@@ -105,20 +105,20 @@
                                     </div>
                                     <div class="flex-group-center">
                                         <strong title="{{localize "MAELSTROM.wounds.total.title"}}">{{localize "MAELSTROM.wounds.total.header"}}</strong>
-                                        {{#if (gt (calculateTotalWounds data.wounds) 0)}}
+                                        {{#if (gt data.hp.wounds 0)}}
                                             <a class="item-control item-heal-wounds" title="{{localize "MAELSTROM.wounds.heal.one"}}"><i class="fas fa-stethoscope fa-border"></i></a>
                                         {{else}}
                                             <i class="fas fa-stethoscope fa-border disabled"></i>
                                         {{/if}}
                                         <br>
-                                        {{#if (gt (calculateTotalWounds data.wounds) (currentValueOfAttribute data.attributes "endurance"))}}
-                                            {{#if (gt (calculateTotalWounds data.wounds) (add (currentValueOfAttribute data.attributes "endurance") 20))}}
+                                        {{#if (gt data.hp.wounds data.attributes.endurance.current)}}
+                                            {{#if (gt data.hp.wounds data.hp.max)}}
                                                 <i class="fas fa-skull-crossbones total-wounds" title="{{localize "MAELSTROM.wounds.total.status.dead"}}"></i>
                                             {{else}}
                                                 <i class="fas fa-dizzy total-wounds" title="{{localize "MAELSTROM.wounds.total.status.unconscious"}}"></i>
                                             {{/if}}
                                         {{/if}}
-                                        <span class="total-wounds" title="{{localize "MAELSTROM.wounds.total.title"}}">{{calculateTotalWounds data.wounds}}</span>
+                                        <span class="total-wounds" title="{{localize "MAELSTROM.wounds.total.title"}}">{{data.hp.wounds}}</span>
                                     </div>
                                 </div>
                             </td>

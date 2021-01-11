@@ -101,34 +101,6 @@ export const registerSettings = function() {
         }
         return ''
     })
-
-    Handlebars.registerHelper('calculateTotalWounds', function (wounds: MaelstromActorWoundsType) {
-        let total = 0
-
-        if (wounds?.wounds) {
-            // array is passed in as an Object ){0: 1, 1: 1, 2: 1, 3: null}
-            const w = Object.values(wounds.wounds)
-            total += w.reduce((previousValue: number, currentValue: number) => {
-                if (currentValue && Number.isFinite(currentValue)) {
-                    return previousValue + currentValue
-                }
-                return previousValue
-            }, 0)
-        }
-
-        return total
-    })
-
-    Handlebars.registerHelper('currentValueOfAttribute', (attributes: object, attributeName: string) => {
-        if (attributes?.hasOwnProperty(attributeName)) {
-            const attribute = attributes[attributeName] as MaelstromActorAttributeType
-            let value = Number.isFinite(attribute.orig) ? attribute.orig : 0
-            if (Number.isFinite(attribute.temp))
-                value = attribute.temp
-            return value
-        }
-        return null
-    })
 }
 
 export function isEmptyOrSpaces(str: string): boolean {

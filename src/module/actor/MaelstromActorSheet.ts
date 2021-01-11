@@ -150,6 +150,12 @@ export class MaelstromActorSheet extends ActorSheet {
         //     ability.data.notes = removeHtmlTags(ability.data.notes);
         //     return ability;
         // });
+
+        sheetData.data.hp.wounds = this.actor._getTotalWounds(sheetData.data)
+        // @ts-ignore
+        sheetData.data.hp.max = sheetData.data.attributes.endurance.current + 20
+        // @ts-ignore
+        sheetData.data.hp.value = sheetData.data.hp.max - sheetData.data.hp.wounds
     }
 
     async _reorderItems(items: any[]) {
