@@ -25,8 +25,8 @@ export const registerSettings = function() {
         hint: "The Maelstrom RPG is © Alexander Scott all rights reserved. \n" +
             "The Maelstrom RPG is a trademark of Alexander Scott and is used under license. \n\n" +
             "This edition is printed and distributed, under license, by Arion Games\n" +
-            "For further information about other Arion Games products check  out  our  website  and  forums  at http://www.arion-games.com\n" +
-            "Content on this site or associated files derived from Arion Games publications is used under agreement with the license holder and should not be construed as a challenge to those trademarks or copyrights.\n" +
+            "For further information about other Arion Games products check out their website and forums at http://www.arion-games.com\n" +
+            "Content on this site or associated files derived from Arion Games publications is used as fan material and should not be construed as a challenge to those trademarks or copyrights.\n" +
             "The contents of this site are for personal, non-commercial use only. Arion Games is not responsible for this site or any of the content.",
         scope: "world",
         config: true,

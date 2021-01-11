@@ -6,8 +6,8 @@
  *		The Maelstrom RPG is © Alexander Scott all rights reserved.
  *		The Maelstrom RPG is a trademark of Alexander Scott and is used under license.
  *		This edition is printed and distributed, under license, by Arion Games
- *		For further information about other Arion Games products check  out  our  website  and  forums  at http://www.arion-games.com
- *		Content on this site or associated files derived from Arion Games publications is used under agreement with the license holder and should not be construed as a challenge to those trademarks or copyrights.
+ *		For further information about other Arion Games products check out their website and forums at http://www.arion-games.com
+ *		Content on this site or associated files derived from Arion Games publications is used as fan material and should not be construed as a challenge to those trademarks or copyrights.
  *		The contents of this site are for personal, non-commercial use only. Arion Games is not responsible for this site or any of the content.
  * Software License: The MIT License (MIT)
  */
@@ -24,6 +24,7 @@ import {MAELSTROM} from "./module/config"
 import {MaelstromAbilityItem} from "./module/item/MaelstromAbilityItem"
 import {MaelstromWeaponItem} from "./module/item/MaelstromWeaponItem"
 import {MaelstromWeaponItemSheet} from "./module/item/sheets/MaelstromWeaponItemSheet"
+import {MaelstromItemSheet} from "./module/item/sheets/MaelstromItemSheet"
 
 /* ------------------------------------ */
 /* Initialize system					*/
@@ -34,6 +35,11 @@ Hooks.once('init', async function() {
 	// Assign custom classes and constants here
 	game.maelstrom = {
 		MaelstromActor,
+		MaelstromActorSheet,
+		MaelstromAbilityItem,
+		MaelstromAbilityItemSheet,
+		MaelstromWeaponItem,
+		MaelstromWeaponItemSheet
 	}
 
 	game.MAELSTROM = MAELSTROM
@@ -42,10 +48,10 @@ Hooks.once('init', async function() {
 	 * Set an initiative formula for the system
 	 * @type {String}
 	 */
-	CONFIG.Combat.initiative = {
-		formula: "2d10 + @attributes.speed.current + @initiative.modifier",
-		decimals: 1,
-	};
+	// CONFIG.Combat.initiative = {
+	// 	formula: "2d10 + @attributes.speed.current + @initiative.modifier",
+	// 	decimals: 1,
+	// };
 
 	// define custom entity classes
 	CONFIG.Actor.entityClass = MaelstromActor
@@ -56,8 +62,8 @@ Hooks.once('init', async function() {
 	Actors.registerSheet(systemName, MaelstromActorSheet, { makeDefault: true })
 
 	Items.unregisterSheet("core", ItemSheet);
-	Items.registerSheet(systemName, MaelstromAbilityItemSheet, { types: [MaelstromAbilityItem.type], makeDefault: true });
-	Items.registerSheet(systemName, MaelstromWeaponItemSheet, { types: [MaelstromWeaponItem.type], makeDefault: true });
+	Items.registerSheet(systemName, MaelstromAbilityItemSheet, { types: [MaelstromAbilityItem.type], makeDefault: true, label: "Maelstrom Ability Item" });
+	Items.registerSheet(systemName, MaelstromWeaponItemSheet, { types: [MaelstromWeaponItem.type], makeDefault: true, label: "Maelstrom Weapon Item" });
 
 	// Register custom system settings
 	registerSettings();
