@@ -11,7 +11,7 @@
     "character": {
       "templates": ["base"],
       "biography": "",
-      "age": 0,
+      "age": 13,
       "race": "",
       "sex": "",
       "social": "",
@@ -20,53 +20,53 @@
       "patron": "",
       "attributes": {
         "attack": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "missile": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "defence": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "knowledge": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "will": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "endurance": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "persuasion": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "perception": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "speed": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         },
         "agility": {
-          "orig": 0,
-          "temp": 0,
+          "orig": 40,
+          "temp": "",
           "used": false
         }
       },
@@ -135,6 +135,11 @@
       },
       "initiative": {
         "modifier": 0
+      },
+      "hp": {
+        "value": 0,
+        "max": 0,
+        "wounds": 0
       }
     }
   },
