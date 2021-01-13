@@ -17,9 +17,6 @@ export class ModifierDialog extends FormApplication {
             classes: ["maelstrom"],
             title: "Modifier",
             template: `${systemBasePath}/templates/dialog/modifier.html`,
-            closeOnSubmit: false ,
-            submitOnChange: true,
-            submitOnClose: false,
             editable: true,
             width: 300,
             height: 200,
@@ -84,6 +81,8 @@ export class ModifierDialog extends FormApplication {
         //await this.close()
         this.submit({})
 
+        this.options.closeFunction()
+
         return false
     }
 
@@ -102,11 +101,5 @@ export class ModifierDialog extends FormApplication {
             resolve(false)
         }).catch(reason => {
         })
-    }
-
-    close():Promise<any> {
-        this.options.closeFunction()
-
-        return super.close();
     }
 }
