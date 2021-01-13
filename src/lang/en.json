@@ -146,5 +146,9 @@
   "MAELSTROM.events.column.years.header": "Years",
   "MAELSTROM.events.column.event.header": "Living",
 
-  "MAELSTROM.languages.header": "Languages"
+  "MAELSTROM.languages.header": "Languages",
+
+  "MAELSTROM.roll.button.continue": "Continue",
+  "MAELSTROM.roll.modifier.label": "Additional modifier",
+  "MAELSTROM.roll.modifier.title": "Additional modifier for roll"
 }

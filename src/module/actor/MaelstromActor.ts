@@ -1,6 +1,7 @@
 import {MAELSTROM} from "../config"
 import {isEmptyOrSpaces} from "../settings"
 import {INITIATIVE_FORMULA} from "../../maelstrom"
+import {ModifierDialog, WaitForModifierDialog} from "../app/ModifierDialog"
 
 export type MaelstromActorWoundsType = {
     wounds: number[],
@@ -69,6 +70,13 @@ export class MaelstromActor extends Actor {
         data.hp.wounds = this._getTotalWounds(data)
         data.hp.max = data.attributes.endurance.current + 20
         data.hp.value = data.hp.max - data.hp.wounds
+
+        if (!data?.roll) {
+            data.roll = {
+                modifier: 0
+            }
+        }
+        data.roll.modifier = 0
     }
 
     _getTotalWounds(data: any) {
@@ -128,52 +136,62 @@ export class MaelstromActor extends Actor {
             }
         }
 
-        // filter modifiers to ensure that they are numbers
-        modifiers = modifiers.filter(value => Number.isFinite(value))
-        modifiers.unshift(attributeValue)
+        // keep track of 'this'
+        const actor = this
 
-        // add all of the modifiers together
-        let stackedModifersTotaled = modifiers.reduce((previousValue, currentValue) =>
-            previousValue + currentValue, 0)
-        if (stackedModifersTotaled < 0)
-            stackedModifersTotaled = 0
-        let stackedModifiersString = modifiers.reduce((previousValue, currentValue) =>
-            previousValue.length > 0 ? `${previousValue} + ${currentValue}`: currentValue.toString(), '')
-        if (modifiers.length > 1) {
-            stackedModifiersString = `${stackedModifiersString} = ${stackedModifersTotaled}`
-        }
-        else {
-            stackedModifiersString = stackedModifersTotaled.toString()
-        }
-        stackedModifiersString = game.i18n.format("MAELSTROM.roll.outcome.attribute.value.modified", {
-            value: stackedModifiersString
-        })
+        WaitForModifierDialog(this).then((value => {
+            // have to use ._data here as .data hasn't been updated yet
+            // @ts-ignore
+            const rollModifier = actor._data?.data?.roll?.modifier
+            modifiers.push(rollModifier)
 
-        const roll = new Roll('1d100').roll();
-        const total = roll.total
+            // filter modifiers to ensure that they are numbers
+            modifiers = modifiers.filter(value => Number.isFinite(value))
+            modifiers.unshift(attributeValue)
 
-        let attributeNameLocalized = game.i18n.localize("MAELSTROM.attribute.detail." + attributeName)
-        if (!isEmptyOrSpaces(itemName)) {
-            attributeNameLocalized = game.i18n.format("MAELSTROM.roll.outcome.attribute.with.item", {
-                attribute: attributeNameLocalized,
-                item: (itemName) ? itemName.trim() : ''
+            // add all of the modifiers together
+            let stackedModifersTotaled = modifiers.reduce((previousValue, currentValue) =>
+                previousValue + currentValue, 0)
+            if (stackedModifersTotaled < 0)
+                stackedModifersTotaled = 0
+            let stackedModifiersString = modifiers.reduce((previousValue, currentValue) =>
+                previousValue.length > 0 ? `${previousValue} + ${currentValue}`: currentValue.toString(), '')
+            if (modifiers.length > 1) {
+                stackedModifiersString = `${stackedModifiersString} = ${stackedModifersTotaled}`
+            }
+            else {
+                stackedModifiersString = stackedModifersTotaled.toString()
+            }
+            stackedModifiersString = game.i18n.format("MAELSTROM.roll.outcome.attribute.value.modified", {
+                value: stackedModifiersString
             })
-        }
-        else {
-            attributeNameLocalized = game.i18n.format("MAELSTROM.roll.outcome.attribute.without.item", {
-                attribute: attributeNameLocalized
-            })
-        }
-        const rollOutcomeLocalized = game.i18n.localize("MAELSTROM.roll.outcome." + this._getRollOutcome(total, stackedModifersTotaled))
 
-        const flavorText = `<h3>${Handlebars.Utils.escapeExpression(attributeNameLocalized)}</h3>
+            const roll = new Roll('1d100').roll();
+            const total = roll.total
+
+            let attributeNameLocalized = game.i18n.localize("MAELSTROM.attribute.detail." + attributeName)
+            if (!isEmptyOrSpaces(itemName)) {
+                attributeNameLocalized = game.i18n.format("MAELSTROM.roll.outcome.attribute.with.item", {
+                    attribute: attributeNameLocalized,
+                    item: (itemName) ? itemName.trim() : ''
+                })
+            }
+            else {
+                attributeNameLocalized = game.i18n.format("MAELSTROM.roll.outcome.attribute.without.item", {
+                    attribute: attributeNameLocalized
+                })
+            }
+            const rollOutcomeLocalized = game.i18n.localize("MAELSTROM.roll.outcome." + actor._getRollOutcome(total, stackedModifersTotaled))
+
+            const flavorText = `<h3>${Handlebars.Utils.escapeExpression(attributeNameLocalized)}</h3>
             ${Handlebars.Utils.escapeExpression(stackedModifiersString)}
             <h3 style="text-align: center; font-size: 140%; font-weight: bold;">${Handlebars.Utils.escapeExpression(rollOutcomeLocalized)}</h3>`
 
-        roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: this }),
+            roll.toMessage({
+                speaker: ChatMessage.getSpeaker({ actor: actor }),
                 flavor: flavorText
             }, CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+        }))
 
         return false
     }

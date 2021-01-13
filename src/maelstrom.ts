@@ -12,7 +12,6 @@
  * Software License: The MIT License (MIT)
  */
 
-// Import TypeScript modules
 import {registerSettings, systemName} from './module/settings.js';
 import { preloadTemplates } from './module/preloadTemplates.js';
 import { MaelstromActor } from  './module/actor/MaelstromActor'
@@ -25,6 +24,7 @@ import {MaelstromAbilityItem} from "./module/item/MaelstromAbilityItem"
 import {MaelstromWeaponItem} from "./module/item/MaelstromWeaponItem"
 import {MaelstromWeaponItemSheet} from "./module/item/sheets/MaelstromWeaponItemSheet"
 import {MaelstromItemSheet} from "./module/item/sheets/MaelstromItemSheet"
+import {ModifierDialog} from "./module/app/ModifierDialog"
 
 export const INITIATIVE_FORMULA = "2d10 + @attributes.speed.current + @initiative.modifier + (@attributes.speed.current / 100)"
 
@@ -41,7 +41,10 @@ Hooks.once('init', async function() {
 		MaelstromAbilityItem,
 		MaelstromAbilityItemSheet,
 		MaelstromWeaponItem,
-		MaelstromWeaponItemSheet
+		MaelstromWeaponItemSheet,
+		applications: {
+			ModifierDialog,
+		},
 	}
 
 	game.MAELSTROM = MAELSTROM
