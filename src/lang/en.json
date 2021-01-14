@@ -148,6 +148,7 @@
 
   "MAELSTROM.languages.header": "Languages",
 
+  "MAELSTROM.roll.dialog.title": "Modifier",
   "MAELSTROM.roll.button.continue": "Continue",
   "MAELSTROM.roll.modifier.label": "Additional modifier",
   "MAELSTROM.roll.modifier.title": "Additional modifier for roll"

@@ -14,12 +14,12 @@ export class ModifierDialog extends FormApplication {
      */
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
-            classes: ["maelstrom"],
-            title: "Modifier",
+            classes: ["boilerplate", "modifier"],
+            title: game.i18n.localize("MAELSTROM.roll.dialog.title"),
             template: `${systemBasePath}/templates/dialog/modifier.html`,
             editable: true,
             width: 300,
-            height: 200,
+            height: 150,
         });
     }
 
@@ -42,7 +42,8 @@ export class ModifierDialog extends FormApplication {
         const data = super.getData();
 
         return mergeObject(data, {
-            modifier: this.object.modifier
+            modifier: this.object.modifier,
+            dialogid: this.id
         });
     }
 
@@ -52,7 +53,20 @@ export class ModifierDialog extends FormApplication {
     activateListeners(html) {
         super.activateListeners(html);
 
+        // *** Everything below here is only needed if the sheet is editable ***
+        if (!this.options.editable) {
+            return;
+        }
+
+        // wait for 'continue' button to be pressed
         html.find("#apply-modifier").click(this._accept.bind(this))
+
+        // On focus on one numeric element, select all text for better experience
+        html.find(".select-on-focus").on("focus", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            event.target.select();
+        });
     }
 
     /**
@@ -65,6 +79,56 @@ export class ModifierDialog extends FormApplication {
         event.preventDefault()
         event.stopPropagation()
 
+        console.log('*** _accept')
+
+        const field = $(`${this.id} input[name='modifier']`)
+        this._updateLocalValue(field.val())
+
+        //await this.close()
+        this.submit({})
+
+        return false
+    }
+
+    _updateObject(event, formData): Promise<any> {
+        console.log('*** _updatedObject')
+
+        const modifier = formData["modifier"]
+        this._updateLocalValue(modifier)
+
+        //Re-render the form since it's not provided for free in FormApplications
+        this.render();
+
+        return new Promise<any>((resolve, reject) => {
+            resolve(false)
+        }).catch(reason => {
+        })
+    }
+
+    close(): Promise<void> {
+        console.log('*** close')
+
+        this._updateActorValue().then(value => {
+            this.options.closeFunction()
+        }).catch(reason => {
+            ui.notifications.error("A problem occurred updating the character with the modifier value")
+            this.options.closeFunction()
+        })
+
+        // the dialog won't close with a 'state' of 'closing', only if it's 'rendered' or 'error'
+        this._state = Application.RENDER_STATES.RENDERED
+        return super.close();
+    }
+
+    _updateLocalValue(modifierStr: any) {
+        let modifier = Number.parseInt(modifierStr)
+        if (isNaN(modifier))
+            modifier = 0;
+
+        this.object.modifier =  modifier
+    }
+
+    _updateActorValue(): Promise<any> {
         const dataUpdate = {
             data: {
                 roll: {
@@ -74,32 +138,6 @@ export class ModifierDialog extends FormApplication {
         }
 
         const actor = this.object.actor as Actor
-        await actor.update(dataUpdate).catch(reason => {
-            ui.notifications.error("A problem occurred updating the character with the modifier value");
-        })
-
-        //await this.close()
-        this.submit({})
-
-        this.options.closeFunction()
-
-        return false
-    }
-
-    _updateObject(event, formData): Promise<any> {
-        let modifier = formData["modifier"]
-        modifier = Number.parseInt(modifier)
-        if (isNaN(modifier))
-            modifier = 0;
-
-        this.object.modifier =  modifier
-
-        //Re-render the form since it's not provided for free in FormApplications
-        this.render();
-
-        return new Promise<any>((resolve, reject) => {
-            resolve(false)
-        }).catch(reason => {
-        })
+        return actor.update(dataUpdate)
     }
 }

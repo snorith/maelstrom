@@ -2,3 +2,16 @@
 
 $font-primary: 'Roboto', sans-serif;
 $font-secondary: 'Roboto', sans-serif;
+
+.bold     { font-weight: bold; }
+.regular  { font-weight: normal; }
+.italic   { font-style: italic; }
+
+.ell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.break-word { word-wrap: break-word; }
+.no-wrap    { white-space: nowrap; }
