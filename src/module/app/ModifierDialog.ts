@@ -79,20 +79,12 @@ export class ModifierDialog extends FormApplication {
         event.preventDefault()
         event.stopPropagation()
 
-        console.log('*** _accept')
-
-        const field = $(`${this.id} input[name='modifier']`)
-        this._updateLocalValue(field.val())
-
-        //await this.close()
         this.submit({})
 
         return false
     }
 
     _updateObject(event, formData): Promise<any> {
-        console.log('*** _updatedObject')
-
         const modifier = formData["modifier"]
         this._updateLocalValue(modifier)
 
@@ -106,8 +98,6 @@ export class ModifierDialog extends FormApplication {
     }
 
     close(): Promise<void> {
-        console.log('*** close')
-
         this._updateActorValue().then(value => {
             this.options.closeFunction()
         }).catch(reason => {
