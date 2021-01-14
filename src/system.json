@@ -1,8 +1,8 @@
 {
   "name": "maelstrom",
   "title": "Maelstrom",
-  "description": "Simple support for Maelstrom Domesday / Gothic / Rome",
-  "version": "0.1.0",
+  "description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
+  "version": "0.1.1",
   "author": "snorith",
   "scripts": [
     "lib/tooltipster/tooltipster.bundle.min.js"
@@ -24,11 +24,11 @@
   ],
   "gridDistance": 1,
   "gridUnits": "",
-  "minimumCoreVersion": "0.6.6",
+  "minimumCoreVersion": "0.7.0",
   "compatibleCoreVersion": "0.7.0",
   "manifest": "",
   "download": "",
-  "license": "",
+  "license": "LICENSE",
   "readme": "",
   "bugs": "",
   "changelog": "",
