@@ -30,7 +30,7 @@ https://raw.githubusercontent.com/StasTserk/foundry-burningwheel/master/system.j
 
 * based on the [Foundry Project Creator](https://gitlab.com/foundry-projects/foundry-pc/create-foundry-project) by Nick v. Oosten
 * partially based on the [Boilerplate System](https://gitlab.com/asacolips-projects/foundry-mods/boilerplate) by Asacolips.
-* hints from []()
+* suggestions from [Numenera-FoundryVTT](https://github.com/SolarBear/Numenera-FoundryVTT) by SolarBear
 
 ## Changelog
 
