@@ -24,7 +24,7 @@
 
 To install and use MAELSTROM for FoundryVTT, paste the following URL into the Install System dialog in the setup menu of the application.
 
-https://raw.githubusercontent.com/StasTserk/foundry-burningwheel/master/system.json
+https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json
 
 ## Thanks
 
@@ -45,7 +45,7 @@ The Maelstrom RPG is © Alexander Scott all rights reserved.
 
 The Maelstrom RPG is a trademark of Alexander Scott and is used under license by Arion Games.
 
-The current edition is printed and distributed, under license, by Arion Games
+This edition is printed and distributed, under license, by Arion Games
 
 For further information about other Arion Games products check out their website and forums at http://www.arion-games.com
 
