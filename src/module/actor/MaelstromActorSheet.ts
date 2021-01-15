@@ -97,6 +97,11 @@ export class MaelstromActorSheet extends ActorSheet {
             attr.isCheckbox = attr.dtype === "Boolean";
         }
 
+        // Which game flavour are we playing?
+		const maelstromFlavour = game.settings.get(systemName, "characterSheet")
+		// @ts-ignore
+		sheetData.maelstromFlavour = maelstromFlavour
+
         // Prepare items.
         if (this.actor.data.type == 'character') {
             this._prepareCharacterItems(sheetData);

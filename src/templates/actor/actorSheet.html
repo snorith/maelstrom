@@ -24,8 +24,8 @@
                 <div class="info-grid-form">
                     <label class="resource-label" for="data.imbalance">{{localize "MAELSTROM.character.imbalance.label"}}</label>
                     <input type="text" name="data.imbalance" value="{{data.imbalance}}" data-dtype="String">
-
-                    <label class="resource-label" for="data.favour">{{localize "MAELSTROM.character.favour.label"}}</label>
+					
+					<label class="resource-label" for="data.favour">{{#if (eq maelstromFlavour 2)}}{{localize "MAELSTROM.character.renown.label"}}{{else}}{{localize "MAELSTROM.character.favour.label"}}{{/if}}</label>
                     <input type="text" name="data.favour" value="{{data.favour}}" data-dtype="String">
 
                     <label class="resource-label" for="data.patron">{{localize "MAELSTROM.character.patron.label"}}</label>
