@@ -1,35 +1,37 @@
 {
-	"name": "maelstrom",
-	"title": "Maelstrom",
-	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
-	"version": "0.1.3",
-	"author": "snorith (Stephen Smith)",
-	"scripts": [
-		"lib/tooltipster/tooltipster.bundle.min.js"
-	],
-	"esmodules": ["maelstrom.js"],
-	"styles": [
-		"maelstrom.css",
-		"lib/tooltipster/tooltipster.bundle.min.css"
-	],
-	"packs": [],
-	"languages": [
-		{
-			"lang": "en",
-			"name": "English",
-			"path": "lang/en.json"
-		}
-	],
-	"gridDistance": 1,
-	"gridUnits": "",
-	"minimumCoreVersion": "0.7.0",
-	"compatibleCoreVersion": "0.7.9",
-	"manifest": "https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json",
-	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.1.3/package/maelstrom-v0.1.3.zip",
-	"license": "LICENSE",
-	"readme": "https://github.com/snorith/maelstrom#readme",
-	"bugs": "https://github.com/snorith/maelstrom/issues",
-	"changelog": "https://github.com/snorith/maelstrom#readme",
-	"primaryTokenAttribute": "hp",
-	"url": "https://github.com/snorith/maelstrom.git"
+  "name": "maelstrom",
+  "title": "Maelstrom",
+  "description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
+  "version": "0.1.3",
+  "author": "snorith (Stephen Smith)",
+  "scripts": [
+    "lib/tooltipster/tooltipster.bundle.min.js"
+  ],
+  "esmodules": [
+    "maelstrom.js"
+  ],
+  "styles": [
+    "maelstrom.css",
+    "lib/tooltipster/tooltipster.bundle.min.css"
+  ],
+  "packs": [],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "gridDistance": 1,
+  "gridUnits": "",
+  "minimumCoreVersion": "0.7.0",
+  "compatibleCoreVersion": "0.7.9",
+  "manifest": "https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json",
+  "download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.1.3/package/maelstrom-v0.1.3.zip",
+  "license": "LICENSE",
+  "readme": "https://github.com/snorith/maelstrom#readme",
+  "bugs": "https://github.com/snorith/maelstrom/issues",
+  "changelog": "https://github.com/snorith/maelstrom#readme",
+  "primaryTokenAttribute": "hp",
+  "url": "https://github.com/snorith/maelstrom.git"
 }
