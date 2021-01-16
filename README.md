@@ -16,6 +16,8 @@
 * Combat scene initiative support with a modifier and separate initiative rolling with a modifier
 * The weapon/shield support can also be used for canned rolls needed for characteristics and abilities
 
+![Character sheet](https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png)
+
 ## Todo
 
 * Sheets for NPCs
