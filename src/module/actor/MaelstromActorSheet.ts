@@ -166,14 +166,18 @@ export class MaelstromActorSheet extends ActorSheet {
     async _reorderItems(items: any[]) {
         let currentOrder = 0
 
+		// update the order of each item based on the current sort results
         const updatedItemList = []
         for (let i = 0; i < items.length; i++) {
-            // @ts-ignore
-            if (items[i].data.order != currentOrder) {
-                updatedItemList.push({_id: items[i]._id, 'data.order': currentOrder})
-            }
-            currentOrder += 5
+			updatedItemList.push({_id: items[i]._id, 'data.order': currentOrder})
+			currentOrder += 5
         }
+
+        // tell each item what the last item's `order` value is
+		currentOrder -= 5
+		for (let i = 0; i < updatedItemList.length; i++) {
+			updatedItemList[i]['data.lastOrder'] = currentOrder
+		}
 
         if (updatedItemList.length > 0)
             await this.actor.updateEmbeddedEntity("OwnedItem", updatedItemList);

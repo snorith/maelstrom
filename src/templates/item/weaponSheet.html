@@ -11,7 +11,9 @@
                                 <option value="{{add data.order -6}}">{{localize "MAELSTROM.item.weapon.order.up"}}</option>
                             {{/if}}
                             <option value="{{data.order}}">{{localize "MAELSTROM.item.weapon.order.same"}}</option>
-                            <option value="{{add data.order 6}}">{{localize "MAELSTROM.item.weapon.order.down"}}</option>
+							{{#if (lt data.order data.lastOrder)}}
+                            	<option value="{{add data.order 6}}">{{localize "MAELSTROM.item.weapon.order.down"}}</option>
+							{{/if}}
                         {{/select}}
                     </select>
                 </label>
