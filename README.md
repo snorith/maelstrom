@@ -36,10 +36,13 @@ https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json
 
 ## Changelog
 
+#### v0.2.0 - 2021-01-16
+##### Modified
+* working reordering of weapons
+
 #### v0.1.1 - 2021-01-13
 ##### Added
 * Initial release
-##### Modified
 
 ---
 
