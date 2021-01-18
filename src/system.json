@@ -29,7 +29,7 @@
 	"license": "LICENSE",
 	"readme": "https://github.com/snorith/maelstrom#readme",
 	"bugs": "https://github.com/snorith/maelstrom/issues",
-	"changelog": "https://github.com/snorith/maelstrom#readme",
+	"changelog": "https://github.com/snorith/maelstrom#changelog",
 	"primaryTokenAttribute": "hp",
 	"url": "https://github.com/snorith/maelstrom.git"
 }

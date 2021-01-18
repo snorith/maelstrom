@@ -8,7 +8,7 @@
 ## Features
 
 * Sheets for characters
-* Calculation of wounds, bloodloss wounds, bleeding damage per round and character status (healthy, unconscious or death)
+* Calculation of wounds, bloodloss wounds, bleeding damage per round and character status (healthy, unconscious or dead)
 * Auto healing of all open wounds by 1 point
 * Attribute rolling including armour penalties, weapon modifiers and difficulty modifiers totaled and outcome determination  
 * Damage rolling for weapons  
