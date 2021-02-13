@@ -50,8 +50,6 @@ The Maelstrom RPG is © Alexander Scott all rights reserved.
 
 The Maelstrom RPG is a trademark of Alexander Scott and is used under license by Arion Games.
 
-This edition is printed and distributed, under license, by Arion Games
-
 For further information about other Arion Games products check out their website and forums at http://www.arion-games.com
 
 Content in this system or associated files derived from Arion Games publications is used as fan material and should not be construed as a challenge to those trademarks or copyrights.
