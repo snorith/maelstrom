@@ -6,8 +6,10 @@
 			"ES6",
 			"ES2017"
 		],
-		"types": ["foundry-pc-types"]
-	},
+    "types": ["@league-of-foundry-developers/foundry-vtt-types"],
+    "moduleResolution": "node",
+    "strictNullChecks": true
+  },
 	"exclude": [
 		"dist",
 		"node_modules"
