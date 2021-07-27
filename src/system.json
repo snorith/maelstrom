@@ -2,7 +2,7 @@
 	"name": "maelstrom",
 	"title": "Maelstrom",
 	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
-	"version": "0.3.0",
+	"version": "0.2.1",
   "templateVersion": 2,
 	"author": "snorith (Stephen Smith)",
 	"scripts": [
