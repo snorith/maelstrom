@@ -24,7 +24,7 @@
                 <div class="info-grid-form">
                     <label class="resource-label" for="data.imbalance">{{localize "MAELSTROM.character.imbalance.label"}}</label>
                     <input type="text" name="data.imbalance" value="{{data.imbalance}}" data-dtype="String">
-					
+
 					<label class="resource-label" for="data.favour">{{#if (eq maelstromFlavour 2)}}{{localize "MAELSTROM.character.renown.label"}}{{else}}{{localize "MAELSTROM.character.favour.label"}}{{/if}}</label>
                     <input type="text" name="data.favour" value="{{data.favour}}" data-dtype="String">
 
@@ -40,15 +40,15 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="attributes">{{localize "MAELSTROM.sheet.tabs.attributes"}}</a>
-        <a class="item" data-tab="equipment">{{localize "MAELSTROM.sheet.tabs.equip"}}</a>
-        <a class="item" data-tab="description">{{localize "MAELSTROM.sheet.tabs.description"}}</a>
+        <a class="item" data-tab="attributes" data-group="primary">{{localize "MAELSTROM.sheet.tabs.attributes"}}</a>
+        <a class="item" data-tab="equipment" data-group="primary">{{localize "MAELSTROM.sheet.tabs.equip"}}</a>
+        <a class="item" data-tab="description" data-group="primary">{{localize "MAELSTROM.sheet.tabs.description"}}</a>
     </nav>
 
     {{!-- Sheet Body --}}
     <section class="sheet-body">
         {{!-- Main sheet tab --}}
-        <div class="tab attributes active" data-group="primary" data-tab="attributes">
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
             <div class="resources grid grid-2col">
                 <div class="resource flex-group-center">
                     <table class="attributes">
@@ -217,16 +217,16 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {{#each data.items.abilities as |ability key|}}
-                            <tr class="item" data-item-id="{{ability._id}}">
-                                <td>{{#ifEmptyOrWhitespace ability.data.notes}}
+                        {{#each data.abilities as |ability key|}}
+                            <tr class="item" data-item-id="{{ability.id}}">
+                                <td>{{#ifEmptyOrWhitespace ability.data.data.notes}}
                                         <i class="fas fa-info-circle disabled"></i>
                                     {{else}}
-                                        <span class="tooltip" data-tooltip-content="#tooltip_content_{{ability._id}}"><i class="fas fa-info-circle"></i></span>
+                                        <span class="tooltip" data-tooltip-content="#tooltip_content_{{ability.id}}"><i class="fas fa-info-circle"></i></span>
                                 {{/ifEmptyOrWhitespace}}</td>
                                 <td class="left-align-text">{{ability.name}}</td>
-                                <td class="left-align-text">{{ability.data.rank}}</td>
-                                <td class="left-align-text">{{ability.data.benefit}}</td>
+                                <td class="left-align-text">{{ability.data.data.rank}}</td>
+                                <td class="left-align-text">{{ability.data.data.benefit}}</td>
                                 <td>
                                     <div class="item-controls">
                                         <a class="item-control item-edit" title="{{localize "MAELSTROM.abilities.controls.edit"}}"><i class="fas fa-edit"></i></a>
@@ -274,29 +274,29 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {{#each data.items.weapons as |weapon key|}}
-                            <tr class="item" data-item-id="{{weapon._id}}">
-                                <td>{{#ifEmptyOrWhitespace weapon.data.notes}}
+                        {{#each data.weapons as |weapon key|}}
+                            <tr class="item" data-item-id="{{weapon.id}}">
+                                <td>{{#ifEmptyOrWhitespace weapon.data.data.notes}}
                                     <i class="fas fa-info-circle disabled"></i>
                                 {{else}}
-                                    <span class="tooltip" data-tooltip-content="#tooltip_content_{{weapon._id}}"><i class="fas fa-info-circle"></i></span>
+                                    <span class="tooltip" data-tooltip-content="#tooltip_content_{{weapon.id}}"><i class="fas fa-info-circle"></i></span>
                                 {{/ifEmptyOrWhitespace}}</td>
                                 <td class="left-align-text">{{weapon.name}}</td>
-                                <td><a class="item-control weapon-roll" data-attribute="{{weapon.data.attributes.attack}}" data-name="{{weapon.name}}" data-modifier="{{weapon.data.as}}" title="{{localize "MAELSTROM.weapons.roll.attack"}}"><i class="fas fa-dice"></i></a></td>
-                                <td>{{weapon.data.as}}</td>
-                                <td><a class="item-control weapon-roll" data-attribute="{{weapon.data.attributes.defence}}" data-name="{{weapon.name}}" data-modifier="{{weapon.data.ds}}" title="{{localize "MAELSTROM.weapons.roll.defence"}}"><i class="fas fa-dice"></i></a></td>
-                                <td>{{weapon.data.ds}}</td>
-                                <td>{{#ifEmptyOrWhitespace weapon.data.damage}}
+                                <td><a class="item-control weapon-roll" data-attribute="{{weapon.data.data.attributes.attack}}" data-name="{{weapon.name}}" data-modifier="{{weapon.data.data.as}}" title="{{localize "MAELSTROM.weapons.roll.attack"}}"><i class="fas fa-dice"></i></a></td>
+                                <td>{{weapon.data.data.as}}</td>
+                                <td><a class="item-control weapon-roll" data-attribute="{{weapon.data.data.attributes.defence}}" data-name="{{weapon.name}}" data-modifier="{{weapon.data.data.ds}}" title="{{localize "MAELSTROM.weapons.roll.defence"}}"><i class="fas fa-dice"></i></a></td>
+                                <td>{{weapon.data.data.ds}}</td>
+                                <td>{{#ifEmptyOrWhitespace weapon.data.data.damage}}
                                         <i class="fas fa-dice-d20 disabled"></i>
                                     {{else}}
-                                        <a class="item-control weapon-damage" data-damage="{{weapon.data.damage}}" data-name="{{weapon.name}}" title="{{localize "MAELSTROM.weapons.roll.damage"}}"><i class="fas fa-dice-d20"></i></a>
+                                        <a class="item-control weapon-damage" data-damage="{{weapon.data.data.damage}}" data-name="{{weapon.name}}" title="{{localize "MAELSTROM.weapons.roll.damage"}}"><i class="fas fa-dice-d20"></i></a>
                                     {{/ifEmptyOrWhitespace}}
                                 </td>
-                                <td class="left-align-text">{{weapon.data.damage}}</td>
-                                <td class="left-align-text">{{weapon.data.range}}</td>
+                                <td class="left-align-text">{{weapon.data.data.damage}}</td>
+                                <td class="left-align-text">{{weapon.data.data.range}}</td>
                                 <td>
                                     <div class="item-controls">
-                                        <a class="item-control item-edit" title="{{localize "MAELSTROM.weapons.controls.add"}}"><i class="fas fa-edit"></i></a>
+                                        <a class="item-control item-edit" title="{{localize "MAELSTROM.weapons.controls.edit"}}"><i class="fas fa-edit"></i></a>
                                         <a class="item-control item-delete" title="{{localize "MAELSTROM.weapons.controls.delete"}}"><i class="fas fa-trash"></i></a>
                                     </div>
                                 </td>
@@ -322,55 +322,55 @@
 
                     {{!-- Hidden tooltip HTML content --}}
                     <div class="tooltip_templates">
-                        {{#each data.items.abilities as |ability key|}}
-                        <div id="tooltip_content_{{ability._id}}">
+                        {{#each data.abilities as |ability key|}}
+                        <div id="tooltip_content_{{ability.id}}">
                             <img src="{{ability.img}}" title="{{ability.name}}" alt="{{ability.name}}" height="50"/>
                             <h1 style="display: inline; margin-left: 4px;">{{ability.name}}</h1>
                             <table>
                                 <tbody>
                                 <tr>
                                     <td>{{localize "MAELSTROM.abilities.column.rank.title"}}</td>
-                                    <td>{{ability.data.rank}}</td>
+                                    <td>{{ability.data.data.rank}}</td>
                                 </tr>
                                 <tr>
                                     <td>{{localize "MAELSTROM.abilities.column.benefit.title"}}</td>
-                                    <td>{{ability.benefit.rank}}</td>
+                                    <td>{{ability.data.data.benefit}}</td>
                                 </tr>
                                 </tbody>
                             </table>
                             <hr>
                             {{!-- raw html output --}}
-                            {{{ability.data.notes}}}
+                            {{{ability.data.data.notes}}}
                         </div>
                         {{/each}}
 
-                        {{#each data.items.weapons as |weapon key|}}
-                            <div id="tooltip_content_{{weapon._id}}">
+                        {{#each data.weapons as |weapon key|}}
+                            <div id="tooltip_content_{{weapon.id}}">
                                 <img src="{{weapon.img}}" title="{{weapon.name}}" alt="{{weapon.name}}" height="50"/>
                                 <h1 style="display: inline; margin-left: 4px;">{{weapon.name}}</h1>
                                 <table>
                                     <tbody>
                                     <tr>
                                         <td>{{localize "MAELSTROM.weapons.column.as.title"}}</td>
-                                        <td>{{weapon.data.as}}</td>
+                                        <td>{{weapon.data.data.as}}</td>
                                     </tr>
                                     <tr>
                                         <td>{{localize "MAELSTROM.weapons.column.ds.title"}}</td>
-                                        <td>{{weapon.data.ds}}</td>
+                                        <td>{{weapon.data.data.ds}}</td>
                                     </tr>
                                     <tr>
                                         <td>{{localize "MAELSTROM.weapons.column.damage.title"}}</td>
-                                        <td>{{weapon.data.damage}}</td>
+                                        <td>{{weapon.data.data.damage}}</td>
                                     </tr>
                                     <tr>
                                         <td>{{localize "MAELSTROM.weapons.column.range.title"}}</td>
-                                        <td>{{weapon.data.range}}</td>
+                                        <td>{{weapon.data.data.range}}</td>
                                     </tr>
                                     </tbody>
                                 </table>
                                 <hr>
                                 {{!-- raw html output --}}
-                                {{{weapon.data.notes}}}
+                                {{{weapon.data.data.notes}}}
                             </div>
                         {{/each}}
                     </div>

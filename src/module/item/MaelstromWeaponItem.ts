@@ -1,3 +1,4 @@
+import {referenceToGame} from "../settings"
 
 export type MaelstromWeaponItemType = {
     name: string,
@@ -20,15 +21,18 @@ export class MaelstromWeaponItem extends Item {
     }
 
     prepareData() {
-        // Override common default icon
-        if (!this.data.img) this.data.img = 'icons/svg/sword.svg';
+		// @ts-ignore
+		if (!this.data.img || this.data.img === this.data.constructor.DEFAULT_ICON)
+			// Override common default icon
+			this.data.img = 'icons/svg/combat.svg';
+
         super.prepareData();
 
         let itemData = this.data as unknown as MaelstromWeaponItemType;
         if (itemData.hasOwnProperty("data"))
             itemData = itemData.data;
 
-        itemData.name = this.data.name || game.i18n.localize("MAELSTROM.item.weapon.newWeapon");
+		itemData.name = this.data.name || game.i18n.localize("MAELSTROM.item.weapon.newWeapon");
         itemData.notes = itemData.notes || "";
 
         itemData.as = itemData.as || "";

@@ -15,9 +15,12 @@
 import {MaelstromAbilityItem} from "./MaelstromAbilityItem"
 import {MaelstromWeaponItem} from "./MaelstromWeaponItem"
 
+// @ts-ignore
+// @ts-ignore
 export const MaelstromItem = new Proxy(function () {}, {
 
     //Calling a constructor from this proxy object
+	// @ts-ignore
     construct: function (target, info, ...args) {
         const [data, newTarget] = info
 
@@ -25,9 +28,13 @@ export const MaelstromItem = new Proxy(function () {}, {
 
         switch (data.type) {
             case MaelstromAbilityItem.type:
+            	data.img = data.img || 'icons/svg/aura.svg'
                 return new MaelstromAbilityItem(data, newTarget)
             case MaelstromWeaponItem.type:
+				data.img = data.img || 'icons/svg/combat.svg'
                 return new MaelstromWeaponItem(data, newTarget)
+			default:
+				console.log('Unknown item type = ' + data.type)
         }
     },
 
@@ -35,16 +42,25 @@ export const MaelstromItem = new Proxy(function () {}, {
     get: function (target, prop, receiver) {
         switch (prop) {
             case "create":
+			case "createDocuments":
                 //Calling the class' create() static function
                 return function (data, options) {
                     console.log('new item type = ' + data.type)
 
-                    switch (data.type) {
+					if (data.constructor === Array) {
+						//Array of data, this happens when creating Actors imported from a compendium
+						// @ts-ignore
+						return data.map(i => MaelstromItem.create(i, options));
+					}
+
+					switch (data.type) {
                         case MaelstromAbilityItem.type:
                             return MaelstromAbilityItem.create(data, options)
                         case MaelstromWeaponItem.type:
                             return MaelstromWeaponItem.create(data, options)
-                    }
+						default:
+							console.log('Unknown item type: ' + data.type)
+  					}
                 };
 
             case Symbol.hasInstance:

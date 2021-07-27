@@ -23,8 +23,6 @@ import {MAELSTROM} from "./module/config"
 import {MaelstromAbilityItem} from "./module/item/MaelstromAbilityItem"
 import {MaelstromWeaponItem} from "./module/item/MaelstromWeaponItem"
 import {MaelstromWeaponItemSheet} from "./module/item/sheets/MaelstromWeaponItemSheet"
-import {MaelstromItemSheet} from "./module/item/sheets/MaelstromItemSheet"
-import {ModifierDialog} from "./module/app/ModifierDialog"
 
 export const INITIATIVE_FORMULA = "2d10 + @attributes.speed.current + @initiative.modifier + (@attributes.speed.current / 100)"
 
@@ -35,18 +33,17 @@ Hooks.once('init', async function() {
 	console.log('Maelstrom | Initializing Maelstrom system');
 
 	// Assign custom classes and constants here
+	// @ts-ignore
 	game.maelstrom = {
 		MaelstromActor,
 		MaelstromActorSheet,
 		MaelstromAbilityItem,
 		MaelstromAbilityItemSheet,
 		MaelstromWeaponItem,
-		MaelstromWeaponItemSheet,
-		applications: {
-			ModifierDialog,
-		},
+		MaelstromWeaponItemSheet
 	}
 
+	// @ts-ignore
 	game.MAELSTROM = MAELSTROM
 
 	/**
@@ -59,9 +56,9 @@ Hooks.once('init', async function() {
 	};
 
 	// define custom entity classes
-	CONFIG.Actor.entityClass = MaelstromActor
+	CONFIG.Actor.documentClass = MaelstromActor
 	// @ts-ignore
-	CONFIG.Item.entityClass = MaelstromItem
+	CONFIG.Item.documentClass = MaelstromItem
 
 	Actors.unregisterSheet("core", ActorSheet)
 	Actors.registerSheet(systemName, MaelstromActorSheet, { makeDefault: true })
@@ -72,7 +69,7 @@ Hooks.once('init', async function() {
 
 	// Register custom system settings
 	registerSettings();
-	
+
 	// Preload Handlebars templates
 	await preloadTemplates();
 

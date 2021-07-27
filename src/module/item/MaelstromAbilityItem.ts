@@ -1,3 +1,4 @@
+import {referenceToGame} from "../settings"
 
 export type MaelstromAbilityItemType = {
     name: string,
@@ -14,15 +15,18 @@ export class MaelstromAbilityItem extends Item {
     }
 
     prepareData() {
-        // Override common default icon
-        if (!this.data.img) this.data.img = 'icons/svg/lightning.svg';
+		// @ts-ignore
+		if (!this.data.img || this.data.img === this.data.constructor.DEFAULT_ICON)
+			// Override common default icon
+			this.data.img = 'icons/svg/aura.svg';
+
         super.prepareData();
 
         let itemData = this.data as unknown as MaelstromAbilityItemType;
         if (itemData.hasOwnProperty("data"))
             itemData = itemData.data;
 
-        itemData.name = this.data.name || game.i18n.localize("MAELSTROM.item.ability.newAbility");
+		itemData.name = this.data.name || game.i18n.localize("MAELSTROM.item.ability.newAbility");
         itemData.notes = itemData.notes || "";
 
         itemData.rank = itemData.rank || "";

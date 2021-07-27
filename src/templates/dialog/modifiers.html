@@ -1,0 +1,11 @@
+<form class="modifier form-group" style="margin-bottom: 20px;" autocomplete="off" autocapitalize="off">
+    <div>
+        <label for="modifier" style="padding-bottom: 5px;" class="resource-label margin-right-quarter">{{localize "MAELSTROM.roll.modifier.label"}}</label>
+        <input type="number" name="modifier" id="modifier" class="normal-width select-on-focus" value="{{baseModifier}}" title="{{localize "MAELSTROM.roll.modifier.title"}}" autofocus data-dtype="Number">
+    </div>
+</form>
+<script type="text/javascript">
+    $(function () {
+        $(".form-group input[name='modifier']").focus();
+    });
+</script>

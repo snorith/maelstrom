@@ -1,18 +1,21 @@
 import {MaelstromActorMigrator} from "./MaelstromActorMigrator"
+import {referenceToGame} from "../settings"
 
 
 export async function migrateWorld() {
-    if (!game.user.isGM)
+	if (!game.user?.isGM)
         return
 
     const currentMaelstromActorVersion = MaelstromActorMigrator.forVersion;
 
-    let maelstromActors = game.actors.entities.filter(actor =>
+	let maelstromActors = game.actors?.contents.filter(actor =>
+		// @ts-ignore
         actor.data.type === 'character' && actor.data.data.version < currentMaelstromActorVersion
     )
 
     if (maelstromActors && maelstromActors.length > 0) {
-        ui.notifications.info(`Applying Maelstrom system migrations. Please be patient and do not close your game or shut down your server.`,
+        // @ts-ignore
+		ui.notifications.info(`Applying Maelstrom system migrations. Please be patient and do not close your game or shut down your server.`,
             {permanent: true});
 
         async function migrateCollection(migrator, collection, name) {
@@ -35,6 +38,7 @@ export async function migrateWorld() {
 
         migrateCollection(MaelstromActorMigrator, maelstromActors, "character");
 
-        ui.notifications.info(`Maelstrom system migration completed!`, {permanent: true});
+        // @ts-ignore
+		ui.notifications.info(`Maelstrom system migration completed!`, {permanent: true});
     }
 }

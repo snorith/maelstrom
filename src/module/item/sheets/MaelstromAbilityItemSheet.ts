@@ -1,5 +1,6 @@
 import {systemBasePath} from "../../settings"
 import {MaelstromAbilityItem} from "../MaelstromAbilityItem"
+import {MAELSTROM} from "../../config"
 
 export class MaelstromAbilityItemSheet extends ItemSheet {
     /**
@@ -27,6 +28,18 @@ export class MaelstromAbilityItemSheet extends ItemSheet {
         return `${systemBasePath}/templates/item/${this.type}Sheet.html`;
     }
 
+	getData(options?: Application.RenderOptions) {
+		const sheetData = super.getData(options)
+
+		// @ts-ignore
+		sheetData.data = sheetData.data.data
+
+		// @ts-ignore
+		sheetData.attributesList = MAELSTROM.attributes
+
+		return sheetData
+	}
+
     get type() {
         return MaelstromAbilityItem.type;
     }
@@ -36,7 +49,8 @@ export class MaelstromAbilityItemSheet extends ItemSheet {
         const position = super.setPosition(options);
         // @ts-ignore
         const sheetBody = this.element.find(".sheet-body")
-        const bodyHeight = position.height - 192
+        // @ts-ignore
+		const bodyHeight = position.height - 192
         sheetBody?.css("height", bodyHeight)
         return position
     }

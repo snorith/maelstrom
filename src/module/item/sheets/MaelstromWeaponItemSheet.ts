@@ -28,8 +28,11 @@ export class MaelstromWeaponItemSheet extends ItemSheet {
         return `${systemBasePath}/templates/item/${this.type}Sheet.html`;
     }
 
-    getData() {
-        const sheetData = super.getData()
+	getData(options?: Application.RenderOptions) {
+		const sheetData = super.getData(options)
+
+		// @ts-ignore
+		sheetData.data = sheetData.data.data
 
         // @ts-ignore
         sheetData.attributesList = MAELSTROM.attributes
@@ -46,7 +49,8 @@ export class MaelstromWeaponItemSheet extends ItemSheet {
         const position = super.setPosition(options);
         // @ts-ignore
         const sheetBody = this.element.find(".sheet-body")
-        const bodyHeight = position.height - 192
+        // @ts-ignore
+		const bodyHeight = position.height - 192
         sheetBody?.css("height", bodyHeight)
         return position
     }

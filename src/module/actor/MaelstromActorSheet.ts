@@ -1,6 +1,6 @@
 
 import {MaelstromAbilityItem} from "../item/MaelstromAbilityItem"
-import {systemBasePath, systemName} from "../settings"
+import {referenceToGame, systemBasePath, systemName} from "../settings"
 import {MaelstromWeaponItem} from "../item/MaelstromWeaponItem"
 
 /**
@@ -12,11 +12,11 @@ import {MaelstromWeaponItem} from "../item/MaelstromWeaponItem"
  * @returns
  */
 function onItemCreate(itemType, itemClass, callback = null) {
-    return async function(event = null) {
+    return async function(event) {
         if (event)
             event.preventDefault();
 
-        const newName = game.i18n.localize(`MAELSTROM.item.${itemType}.new${itemType.capitalize()}`);
+		const newName = game.i18n.localize(`MAELSTROM.item.${itemType}.new${itemType.capitalize()}`);
 
         const itemData = {
             name: newName,
@@ -24,16 +24,18 @@ function onItemCreate(itemType, itemClass, callback = null) {
             data: new itemClass({}),
         };
 
-        const newItem = await this.actor.createOwnedItem(itemData);
-        if (callback)
-            callback(newItem);
+        const newItem = await this.actor.createEmbeddedDocuments("Item", [itemData]);
+        if (!!callback) {
+			// @ts-ignore
+			callback(newItem);
+		}
 
-        return newItem;
+		return newItem;
     }
 }
 
 //Sort functions
-const sortByOrderFunction = (a, b) => a.data.order < b.data.order ? -1 : a.data.order > b.data.order ? 1 : 0;
+const sortByOrderFunction = (a, b) => a.data.data.order < b.data.data.order ? -1 : a.data.data.order > b.data.data.order ? 1 : 0;
 const sortByNameFunction = (a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
 
 // Stolen from https://stackoverflow.com/a/34064434/20043
@@ -61,7 +63,7 @@ export class MaelstromActorSheet extends ActorSheet {
             classes: ["boilerplate", "sheet", "actor"],
             width: 925,
             height: 1000,
-            tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
+            tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "attributes" }]
         });
     }
 
@@ -73,7 +75,7 @@ export class MaelstromActorSheet extends ActorSheet {
         // 1: Domesday
         // 2: Gothic
         // 3: Rome
-        switch (game.settings.get(systemName, "characterSheet"))
+		switch (game.settings.get(systemName, "characterSheet"))
         {
             case 1:
             case 2:
@@ -88,7 +90,13 @@ export class MaelstromActorSheet extends ActorSheet {
 
     /** @override */
     getData() {
+		//getData behaves MUCH differently in 0.8!
+		//see https://gitlab.com/foundrynet/foundryvtt/-/issues/4321
         const sheetData = super.getData();
+		//see https://discord.com/channels/170995199584108546/670336275496042502/836066464388743188
+		// @ts-ignore
+		sheetData.data = sheetData.data.data;
+
         // @ts-ignore
         sheetData.dtypes = ["String", "Number", "Boolean"];
         // @ts-ignore
@@ -104,7 +112,8 @@ export class MaelstromActorSheet extends ActorSheet {
 
         // Prepare items.
         if (this.actor.data.type == 'character') {
-            this._prepareCharacterItems(sheetData);
+            // @ts-ignore
+			this._prepareCharacterItems(sheetData);
         }
 
         return sheetData;
@@ -116,38 +125,42 @@ export class MaelstromActorSheet extends ActorSheet {
      * @param sheetData
      * @return {undefined}
      */
-    _prepareCharacterItems(sheetData: ActorSheetData) {
+    _prepareCharacterItems(sheetData: ActorSheet.Data) {
         // @ts-ignore
         sheetData.data.items = sheetData.actor.items || {};
-
-        // @ts-ignore
-        const items = sheetData.data.items;
 
         // filter out abilities and sort them
         Object.entries({
             abilities: MaelstromAbilityItem.type
         }).forEach(([val, type]) => {
-            // @ts-ignore
-            if (!sheetData.data.items[val])
-            { // @ts-ignore
-                sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByNameFunction)
-            }
+			if (sheetData.data.items.constructor.name !== "EmbeddedCollection") {
+				sheetData.data[val] = sheetData.items.filter(i => i.type === type);
+			}
+			else {
+				sheetData.data[val] = sheetData.data.items.filter(i => i.type === type);
+			}
+
+			sheetData.data[val].sort(sortByNameFunction);	// sorts in place
+
         });
 
         // filter out weapons and sort them
         Object.entries({
             weapons: MaelstromWeaponItem.type
         }).forEach(([val, type]) => {
-            // @ts-ignore
-            if (!sheetData.data.items[val])
-            {   // @ts-ignore
-                sheetData.data.items[val] = items.filter(i => i.type === type).sort(sortByOrderFunction)
-            }
+			if (sheetData.data.items.constructor.name !== "EmbeddedCollection") {
+				sheetData.data[val] = sheetData.items.filter(i => i.type === type);
+			}
+			else {
+				sheetData.data[val] = sheetData.data.items.filter(i => i.type === type);
+			}
+
+			sheetData.data[val].sort(sortByOrderFunction);	// sorts in place
         })
 
         // build a list of updates to weapon ordering
         // @ts-ignore
-        this._reorderItems(sheetData.data.items.weapons)
+        this._reorderItems(sheetData.data.weapons)
 
         // remove HTML from notes fields
         // @ts-ignore
@@ -167,9 +180,9 @@ export class MaelstromActorSheet extends ActorSheet {
         let currentOrder = 0
 
 		// update the order of each item based on the current sort results
-        const updatedItemList = []
+        const updatedItemList: any[] = []
         for (let i = 0; i < items.length; i++) {
-			updatedItemList.push({_id: items[i]._id, 'data.order': currentOrder})
+			updatedItemList.push({_id: items[i].id, 'data.order': currentOrder})
 			currentOrder += 5
         }
 
@@ -180,7 +193,7 @@ export class MaelstromActorSheet extends ActorSheet {
 		}
 
         if (updatedItemList.length > 0)
-            await this.actor.updateEmbeddedEntity("OwnedItem", updatedItemList);
+            await this.actor.updateEmbeddedDocuments("Item", updatedItemList);
     }
 
     /* -------------------------------------------- */
@@ -193,20 +206,23 @@ export class MaelstromActorSheet extends ActorSheet {
         if (!this.options.editable) return;
 
         // Add Inventory Item
-        html.find('.item-create').click(this._onItemCreate.bind(this));
+        html.find('.item-create').on("click", this._onItemCreate.bind(this));
 
         // Update Inventory Item
-        html.find('.item-edit').click(ev => {
+        html.find('.item-edit').on("click", ev => {
             const td = $(ev.currentTarget).parents(".item");
-            const item = this.actor.getOwnedItem(td.data("itemId"));
-            item.sheet.render(true);
+            const item = this.actor.getEmbeddedDocument("Item", td.data("itemId"));
+
+            // todo: does this work, is sheet on item in v0.8
+            // @ts-ignore
+			item.sheet.render(true);
         });
 
         // Delete Inventory Item
-        html.find('.item-delete').click(ev => {
+        html.find('.item-delete').on("click", ev => {
             if (window.confirm('Delete the item?')) {
                 const td = $(ev.currentTarget).parents(".item");
-                this.actor.deleteOwnedItem(td.data("itemId"));
+                this.actor.deleteEmbeddedDocuments("Item", [td.data("itemId")]);
                 td.slideUp(200, () => this.render(false));
             }
         });
@@ -217,22 +233,22 @@ export class MaelstromActorSheet extends ActorSheet {
         })
 
         // Heal all wounds by one
-        html.find('.item-heal-wounds').click(this._onItemHealByOne.bind(this))
+        html.find('.item-heal-wounds').on("click", this._onItemHealByOne.bind(this))
 
         // suffer bleeding damage
-        html.find('.item-add-bleeding-damage').click(this._onSufferBleedingDamage.bind(this))
+        html.find('.item-add-bleeding-damage').on("click", this._onSufferBleedingDamage.bind(this))
 
         // roll an attribute saving throw
-        html.find('.attribute-roll').click(this._onAttributeRoll.bind(this))
+        html.find('.attribute-roll').on("click", this._onAttributeRoll.bind(this))
 
         // roll an attribute with a weapon saving throw
-        html.find('.weapon-roll').click(this._onWeaponItemRoll.bind(this))
+        html.find('.weapon-roll').on("click", this._onWeaponItemRoll.bind(this))
 
         // roll weapon damage
-        html.find('.weapon-damage').click(this._onWeaponDamageRoll.bind(this))
+        html.find('.weapon-damage').on("click", this._onWeaponDamageRoll.bind(this))
 
         // roll initiative
-        html.find('.roll-initiative').click(this._onRollInitiative.bind(this))
+        html.find('.roll-initiative').on("click", this._onRollInitiative.bind(this))
 
         // // Rollable abilities.
         // html.find('.rollable').click(this._onRoll.bind(this));
@@ -251,7 +267,8 @@ export class MaelstromActorSheet extends ActorSheet {
     _onRollInitiative(event) {
         event.preventDefault();
 
-        return this.actor.rollActorInitiative()
+        // @ts-ignore
+		return this.actor.rollActorInitiative()
     }
 
     /**
@@ -265,7 +282,8 @@ export class MaelstromActorSheet extends ActorSheet {
         const element = event.currentTarget
         const attribute = element.dataset.attribute
 
-        return this.actor.rollAttribute(attribute)
+        // @ts-ignore
+		return this.actor.rollAttribute(attribute)
     }
 
     /**
@@ -287,7 +305,8 @@ export class MaelstromActorSheet extends ActorSheet {
                 modifier = ''
         }
 
-        return this.actor.rollAttribute(attribute, [modifier], name)
+        // @ts-ignore
+		return this.actor.rollAttribute(attribute, [modifier], name)
     }
 
     /**
@@ -302,7 +321,8 @@ export class MaelstromActorSheet extends ActorSheet {
         const name = element.dataset.name
         const damage = element.dataset.damage
 
-        return this.actor.rollItemDamage(name, damage)
+        // @ts-ignore
+		return this.actor.rollItemDamage(name, damage)
     }
 
     /**
@@ -317,7 +337,8 @@ export class MaelstromActorSheet extends ActorSheet {
         // @ts-ignore
         const wounds = this.actor.data.data?.wounds?.wounds
         if (wounds) {
-            const bleedingWounds = this.actor.data.data?.wounds?.bloodloss as number
+            // @ts-ignore
+			const bleedingWounds = this.actor.data.data?.wounds?.bloodloss as number
             if (Number.isFinite(bleedingWounds) && bleedingWounds > 0) {
                 const woundsArray = Object.values(wounds) as number[]           // convert object to an array of values
                 if (woundsArray.length < 1)
@@ -385,7 +406,7 @@ export class MaelstromActorSheet extends ActorSheet {
         delete itemData.data["type"];
 
         // Finally, create the item!
-        return this.actor.createOwnedItem(itemData);
+        return this.actor.createEmbeddedDocuments("Item", [itemData]);
     }
 
     /**

@@ -1,3 +1,17 @@
+# Development
+
+Builds and then links output directory to the corresponding Foundry system folder
+
+```shell
+npm run build
+```
+
+Watchs for changes and rebuilds them
+
+```shell
+npm run build:watch
+```
+
 # Development Publishing
 
 See: [Foundry Project Creator Wiki](https://gitlab.com/foundry-projects/foundry-pc/create-foundry-project/-/wikis/Publish) 

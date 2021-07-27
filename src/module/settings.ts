@@ -3,10 +3,18 @@ import {MaelstromActorAttributeType, MaelstromActorWoundsType} from "./actor/Mae
 export const systemName = "maelstrom"
 export const systemBasePath = `systems/${systemName}`
 
+declare global {
+	interface LenientGlobalVariableTypes {
+		game: never; // the type doesn't matter
+	}
+}
+
+export const referenceToGame: Game = game;
+
 export const registerSettings = function() {
 	// Register any custom system settings here
 
-    game.settings.register(systemName, "characterSheet", {
+	game.settings.register(systemName, "characterSheet", {
         name: "Character Sheet",
         hint: "Select the PC character sheet to use.",
         scope: "world",
@@ -20,7 +28,7 @@ export const registerSettings = function() {
         },
     });
 
-    game.settings.register(systemName, "trademarkNotice", {
+	game.settings.register(systemName, "trademarkNotice", {
         name: "Trademark Notice",
         hint: "The Maelstrom RPG is © Alexander Scott all rights reserved. \n" +
             "The Maelstrom RPG is a trademark of Alexander Scott and is used under license. \n\n" +
@@ -30,7 +38,7 @@ export const registerSettings = function() {
             "The contents of this site are for personal, non-commercial use only. Arion Games is not responsible for this site or any of the content.",
         scope: "world",
         config: true,
-        type: null,
+        type: undefined,
         default: null
     });
 

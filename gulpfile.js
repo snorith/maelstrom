@@ -185,11 +185,11 @@ async function copyFiles() {
 /**
  * Watch for changes for each build step
  */
-function buildWatch() {
-	gulp.watch('src/**/*.ts', { ignoreInitial: false }, buildTS);
-	gulp.watch('src/**/*.less', { ignoreInitial: false }, buildLess);
-	gulp.watch('src/**/*.scss', { ignoreInitial: false }, buildSASS);
-	gulp.watch(
+async function buildWatch() {
+	await gulp.watch('src/**/*.ts', { ignoreInitial: false }, buildTS);
+	await gulp.watch('src/**/*.less', { ignoreInitial: false }, buildLess);
+	await gulp.watch('src/**/*.scss', { ignoreInitial: false }, buildSASS);
+	await gulp.watch(
 		['src/fonts', 'src/lang', 'src/lib', 'src/templates', 'src/*.json'],
 		{ ignoreInitial: false },
 		copyFiles

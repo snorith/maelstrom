@@ -12,7 +12,7 @@ export class MaelstromItemSheet extends ItemSheet {
             throw new Error('No item sheet type provided')
 
         //First, create an object of the appropriate type...
-        let object = null
+        let object
         switch (type) {
             case MaelstromAbilityItem.type:
                 object = new MaelstromAbilityItemSheet(data, options)
