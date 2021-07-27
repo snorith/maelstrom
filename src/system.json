@@ -2,8 +2,8 @@
 	"name": "maelstrom",
 	"title": "Maelstrom",
 	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
-	"version": "0.2.1",
-  "templateVersion": 2,
+	"version": "0.3.0",
+	"templateVersion": 2,
 	"author": "snorith (Stephen Smith)",
 	"scripts": [
 		"lib/tooltipster/tooltipster.bundle.min.js"
@@ -21,17 +21,17 @@
 			"path": "lang/en.json"
 		}
 	],
-  "socket": false,
+	"socket": false,
 	"gridDistance": 10,
 	"gridUnits": "ft",
 	"minimumCoreVersion": "0.8.8",
 	"compatibleCoreVersion": "0.8.8",
 	"manifest": "https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json",
-	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.2.0/package/maelstrom-v0.2.0.zip",
+	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.3.0/package/maelstrom-v0.3.0.zip",
 	"license": "LICENSE",
 	"readme": "https://github.com/snorith/maelstrom#readme",
 	"bugs": "https://github.com/snorith/maelstrom/issues",
 	"changelog": "https://github.com/snorith/maelstrom#changelog",
 	"primaryTokenAttribute": "hp",
-	"url": "https://github.com/snorith/maelstrom"
+	"url": "https://github.com/snorith/maelstrom.git"
 }
