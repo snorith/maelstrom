@@ -36,6 +36,10 @@ https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json
 
 ## Changelog
 
+#### v0.3.0 - 2021-07-26
+##### Modified
+* Foundry VTT v0.8.x compatibility
+
 #### v0.2.0 - 2021-01-16
 ##### Modified
 * working reordering of weapons
