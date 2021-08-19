@@ -2,7 +2,7 @@
 	"name": "maelstrom",
 	"title": "Maelstrom",
 	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"templateVersion": 2,
 	"author": "Stephen Smith",
 	"scripts": [
@@ -27,31 +27,31 @@
 	"minimumCoreVersion": "0.8.8",
 	"compatibleCoreVersion": "0.8.9",
 	"manifest": "https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json",
-	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.3.0/package/maelstrom-v0.3.0.zip",
+	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.3.1/package/maelstrom-v0.3.1.zip",
 	"license": "LICENSE",
 	"readme": "https://github.com/snorith/maelstrom#readme",
 	"bugs": "https://github.com/snorith/maelstrom/issues",
 	"changelog": "https://github.com/snorith/maelstrom#changelog",
 	"primaryTokenAttribute": "hp",
 	"url": "https://github.com/snorith/maelstrom.git",
-  "media": [
-    {
-      "type": "cover",
-      "link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
-      "caption": "Maelstrom RPG"
-    },
-    {
-      "type": "screenshot",
-      "link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
-      "caption": "Player sheet"
-    }
-  ],
-  "authors": [
-    {
-      "name": "Stephen Smith",
-      "twitter": "@norith",
-      "reddit": "u/norith"
-    }
-  ],
-  "manifestPlusVersion": "1.2.0"
+	"media": [
+		{
+			"type": "cover",
+			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
+			"caption": "Maelstrom RPG"
+		},
+		{
+			"type": "screenshot",
+			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
+			"caption": "Player sheet"
+		}
+	],
+	"authors": [
+		{
+			"name": "Stephen Smith",
+			"twitter": "@norith",
+			"reddit": "u/norith"
+		}
+	],
+	"manifestPlusVersion": "1.2.0"
 }

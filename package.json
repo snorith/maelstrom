@@ -1,7 +1,7 @@
 {
 	"private": true,
 	"name": "maelstrom",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome in FoundryVTT",
 	"scripts": {
 		"package": "gulp package",
