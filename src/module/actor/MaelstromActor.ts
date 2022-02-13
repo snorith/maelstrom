@@ -96,7 +96,7 @@ export class MaelstromActor extends Actor {
     }
 
     _getAttributeValue(attributeName: string): number {
-        // @ts-ignore
+		// @ts-ignore
 		const attribute = this.data?.data?.attributes[attributeName]
         return attribute.current
     }
@@ -198,7 +198,7 @@ export class MaelstromActor extends Actor {
 					flavor: flavorText
 				},
 				// @ts-ignore
-				CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+				CONFIG.Dice.rollModes.publicroll).then((value => {}))
 
 			return false
 		})
@@ -223,7 +223,7 @@ export class MaelstromActor extends Actor {
                 flavor: flavorText
             },
 				// @ts-ignore
-				CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+				c).then((value => {}))
         }
         catch (e) {
 			const errorMsg = game.i18n.format("MAELSTROM.roll.item.damage.invalid", {
@@ -232,7 +232,7 @@ export class MaelstromActor extends Actor {
             flavorText += `<span style="color: red">${Handlebars.Utils.escapeExpression(errorMsg)}</span>`
 
 			ChatMessage.create({
-                user: game.user?._id,
+                user: game?.user?.id,
                 speaker: ChatMessage.getSpeaker({ actor: this }),
                 content: flavorText
             }).then((value => {}))
@@ -247,9 +247,8 @@ export class MaelstromActor extends Actor {
             roll = new Roll(INITIATIVE_FORMULA, this.data?.data).roll({ async: false });
 			roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: this }),
-				// @ts-ignore
-                flavor: Handlebars.Utils.escapeExpression(game.i18n.localize("MAELSTROM.initiative.roll.message.flavour"))
-            }, CONFIG.Dice.rollModes.PUBLIC).then((value => {}))
+				flavor: Handlebars.Utils.escapeExpression(game.i18n.localize("MAELSTROM.initiative.roll.message.flavour"))
+            }, CONFIG.Dice.rollModes.publicroll).then((value => {}))
         }
         catch (e) {
 

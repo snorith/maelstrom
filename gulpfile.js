@@ -8,7 +8,7 @@ const typescript = require('typescript');
 
 const ts = require('gulp-typescript');
 const less = require('gulp-less');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const git = require('gulp-git');
 
 const argv = require('yargs').argv;
