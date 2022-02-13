@@ -2,7 +2,7 @@
 	"name": "maelstrom",
 	"title": "Maelstrom",
 	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"templateVersion": 2,
 	"author": "Stephen Smith",
 	"scripts": [
@@ -27,7 +27,7 @@
 	"minimumCoreVersion": "9",
 	"compatibleCoreVersion": "9",
 	"manifest": "https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json",
-	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.3.1/package/maelstrom-v0.3.1.zip",
+	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.3.3/package/maelstrom-v0.3.3.zip",
 	"license": "LICENSE",
 	"readme": "https://github.com/snorith/maelstrom#readme",
 	"bugs": "https://github.com/snorith/maelstrom/issues",
