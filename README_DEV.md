@@ -67,7 +67,8 @@ users version-aware compatibility filtering. Manual, once:
 1. Submit the package at <https://foundryvtt.com/packages/submit> with id `maelstrom`
    and the rolling manifest URL
 2. Copy the "Package Release Token" (`fvttp_…`) from the package edit page
-3. Add it as the `FVTT_PACKAGE_TOKEN` secret in this repo's GitHub settings
+3. Add it as a repository **Actions** secret named `FVTT_PACKAGE_TOKEN`
+   (GitHub → Settings → Secrets and variables → Actions → New repository secret)
 
 From then on every tagged release is published to the registry automatically. The API
 rejects duplicate version numbers and rate-limits to one release per minute; a failed
