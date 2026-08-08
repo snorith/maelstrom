@@ -120,6 +120,32 @@ folded substantive findings, so **NOT yet converged**: a confirmation round is
 required. Note: single-reviewer round — devin-only convergence would be single-model
 evidence; the confirmation round should re-engage at least one other family.
 
+### Round 4 — rev 4 (commit 199a9ca), devin confirmation, 2026-08-08
+
+First dispatch blocked (devin attempted a confirmation-requiring tool call in headless
+mode); single allowed retry, narrowed to direct file reads with no git commands,
+succeeded.
+
+- **devin**: "the folds are correct. No P1–P4 findings." Confirmed: (a) `_preUpdate`
+  receives the raw change object BEFORE schema cleaning/migrateData, so partial wound
+  objects are distinguishable there; (b) full 11-key form submissions merge as an
+  identity overlay; (c) the guard is safe for non-character actors and during
+  creation; (d) EquipmentData + registration + documentTypes fully neutralizes the
+  legacy-world load risk with no sheet needed; (e) `isEditable` gating is correct for
+  GM-on-unowned (editable), LIMITED/OBSERVER (not), locked compendium (not);
+  `editItem` correctly left ungated.
+- **Gates:** G1 no new quantifiers this round · G2 outward passes stand from rounds
+  2–3 (write-path enumeration, channel trace, judgment sweep), nothing new · G3 no
+  disagreement · G4 **CONVERGED for this loop** (devin).
+- **Honest caveat:** the rev-3 delta (equipment type, roll gating, _preUpdate; ~110
+  lines) has been reviewed only by devin — codex/droid converged on the state BEFORE
+  those folds. The delta is small and implements devin's own findings, but a final
+  codex or droid pass over `git show 199a9ca` would upgrade it to cross-family. This
+  is Stephen's call, not an automatic next round.
+
+**Review loop closed at rev 4.** All three model families have signed off on the
+state each last reviewed. Do not re-open without new code changes.
+
 ## Implementation complete — remaining HUMAN tasks (Stephen)
 
 1. **Review** `z/SPEC.md` (the behavioral contract) and skim the new code
