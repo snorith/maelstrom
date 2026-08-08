@@ -38,6 +38,9 @@
 			},
 			"weapon": {
 				"htmlFields": ["notes"]
+			},
+			"equipment": {
+				"htmlFields": ["notes"]
 			}
 		}
 	},

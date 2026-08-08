@@ -73,7 +73,52 @@ Statuses: TODO → IN PROGRESS → DONE. Update this table as phases move.
 - Residual items deliberately outside review scope: `_source` legacy-key retention
   and real-Foundry rendering remain on the phase-7 manual checklist.
 
-**Review loop closed at rev 2.** Do not re-open without new code changes.
+**Review loop closed at rev 2** for codex+droid. Re-opened for round 3 (devin, third
+family) at Stephen's request.
+
+### Round 3 — rev 3 (commit d7a0a35 reviewed), devin (SWE-1.7), 2026-08-08
+
+Single-reviewer round (judgment focus). First dispatch failed on devin's
+workspace-trust gate; retried once with the wrapper-documented
+`--respect-workspace-trust false` per-run opt-in (read-only mode).
+
+**devin found (FOLDED):**
+- P1/P2 dropping the `equipment` type is an avoidable world-breakage risk if a legacy
+  world contains one → minimal `EquipmentData` declared + registered (no sheet, not
+  listed on actor sheet — pure safety net). NOTE: devin's claimed failure mode (actor
+  init throws) is unverified here — v10+ invalid-document quarantine may soften it —
+  but the mitigation is ~15 lines with zero downside, so the fold does not depend on
+  settling that. Checklist gained an explicit equipment-item test
+- P2 observer-visible dice rolls — **overturns droid round 2**, which blessed un-gated
+  rolls as "matches SPEC". Gate-3 resolution in devin's favor: the v9 sheet attached
+  NO listeners for non-editable viewers (rolls were owner-only), and rolls speak AS
+  the character. All four roll actions now `isEditable`-gated; checklist wording
+  hardened ("fully inert sheet")
+- P2 partial wound updates: ship a guard, not just documentation →
+  `MaelstromActor._preUpdate` now merges partial `wounds.wounds` objects onto the
+  current array before ArrayField replacement (macro footgun closed)
+- P3 README lacked a back-up-before-updating warning for a data-layer rewrite → added
+- P4 compendium actors outside `migrateWeaponOrderToSort` scope → documented in code
+  (system ships no packs)
+- P4 unused lang keys (`MAELSTROM.item.weapon.order.*`, `MAELSTROM.saveChanges`) →
+  removed after verifying unreferenced
+
+**devin REJECTED-by-us:** tombstone `minimumCoreVersion` as string — the v0.3.3
+manifest used string values too; consistency with legacy format is the point.
+
+**devin confirmed sound:** the full legacy-update-channel trace (v9 frozen safely,
+v13 upgrader migrates, fresh v14 installs clean), wound-button persistence and
+drag-reorder as right calls, migrateData fixes, AppV2 wiring, roll rules, release
+workflow.
+
+**Gates:** G1 — smoke suite is 32 assertions (rounds 1–2 ledger said 33: miscount,
+corrected), all pass after folds; lang audit re-run clean after key removals. G2 —
+devin's fresh angle (user-impact/judgment + channel trace) found the observer-roll
+gap both other families missed. G3 — one cross-round disagreement (droid r2 vs devin
+r3 on roll gating) resolved by legacy-behavior evidence, recorded above. G4 — round 3
+folded substantive findings, so **NOT yet converged**: a confirmation round is
+required. Note: single-reviewer round — devin-only convergence would be single-model
+evidence; the confirmation round should re-engage at least one other family.
 
 ## Implementation complete — remaining HUMAN tasks (Stephen)
 

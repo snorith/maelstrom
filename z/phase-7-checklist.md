@@ -54,4 +54,8 @@ have both; v14 alone covers most risk.
 
 ## Regression sweep
 - [ ] Reload (F5) mid-edit loses nothing (submitOnChange)
-- [ ] Non-owner user sees read-only sheet (no roll icons erroring, no edit)
+- [ ] Non-owner user sees a fully inert sheet: no edits, AND clicking any dice icon
+      does nothing (observers must not post rolls as the character — legacy behavior)
+- [ ] A world containing a legacy `equipment` item (create one via console:
+      `Item.create({name:"t", type:"equipment"})` on a v0.3.x install first) still
+      loads and the actor sheet renders (item is valid but not listed)

@@ -7,6 +7,28 @@ const { escapeHTML } = foundry.utils;
 
 export class MaelstromActor extends Actor {
 	/**
+	 * Foundry ArrayField deltas REPLACE the stored array, so a partial update
+	 * like `actor.update({"system.wounds.wounds.3": 5})` from a macro would
+	 * zero-fill the other slots. Merge partial wound objects onto the current
+	 * array before the replacement happens. Full-form submits (all 11 keys)
+	 * and full-array writes pass through unchanged.
+	 * (Review round 3, devin — see z/PLAN.md ledger.)
+	 */
+	async _preUpdate(changes, options, user) {
+		const partial = changes?.system?.wounds?.wounds;
+		if (partial && typeof partial === "object" && !Array.isArray(partial)) {
+			const current = this.system?.wounds?.wounds ?? [];
+			const merged = [...current];
+			for (const [key, value] of Object.entries(partial)) {
+				const idx = Number(key);
+				if (Number.isInteger(idx) && idx >= 0 && idx < merged.length) merged[idx] = value;
+			}
+			changes.system.wounds.wounds = merged;
+		}
+		return super._preUpdate(changes, options, user);
+	}
+
+	/**
 	 * Roll a 1d100 saving throw against an attribute (SPEC §1.3).
 	 *
 	 * @param {string} attributeName - key into system.attributes

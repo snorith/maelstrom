@@ -41,6 +41,10 @@ export async function migrateWorld() {
  * auto-assigned one that never reflected the legacy order): the legacy `order`
  * is authoritative, and the systemMigrationVersion gate ensures this runs only
  * once, so post-migration manual sorting is never overwritten.
+ *
+ * Scope: world actors only. Compendium actors are not visited — this system
+ * ships no packs, and user-created packs from the v9 era would need a manual
+ * export/import anyway (recorded in the z/PLAN.md review ledger, round 3).
  */
 async function migrateWeaponOrderToSort() {
 	for (const actor of game.actors) {

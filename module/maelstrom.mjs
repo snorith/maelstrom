@@ -15,6 +15,7 @@
 import { CharacterData } from "./data/character-data.mjs";
 import { AbilityData } from "./data/ability-data.mjs";
 import { WeaponData } from "./data/weapon-data.mjs";
+import { EquipmentData } from "./data/equipment-data.mjs";
 import { registerMigrationSetting, migrateWorld } from "./migrations.mjs";
 import { MaelstromActor } from "./documents/actor.mjs";
 import { MaelstromItem } from "./documents/item.mjs";
@@ -44,6 +45,7 @@ Hooks.once("init", () => {
 	CONFIG.Actor.dataModels.character = CharacterData;
 	CONFIG.Item.dataModels.ability = AbilityData;
 	CONFIG.Item.dataModels.weapon = WeaponData;
+	CONFIG.Item.dataModels.equipment = EquipmentData;
 
 	CONFIG.Actor.documentClass = MaelstromActor;
 	CONFIG.Item.documentClass = MaelstromItem;

@@ -196,13 +196,20 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 	/* Actions                                       */
 	/* -------------------------------------------- */
 
+	// Roll actions are owner-gated like everything else: the legacy sheet
+	// attached NO listeners for non-editable viewers, and rolls post to chat
+	// speaking AS the character — observers must not roll on its behalf.
+	// (Review round 3, devin — overturns the round-2 assumption.)
+
 	/** @this {MaelstromCharacterSheet} */
 	static onRollAttribute(event, target) {
+		if (!this.isEditable) return;
 		return this.actor.rollAttribute(target.dataset.attribute);
 	}
 
 	/** @this {MaelstromCharacterSheet} */
 	static onRollWeapon(event, target) {
+		if (!this.isEditable) return;
 		const modifier = Number.parseInt(target.dataset.modifier, 10);
 		return this.actor.rollAttribute(target.dataset.attribute, {
 			modifiers: Number.isFinite(modifier) ? [modifier] : [],
@@ -212,11 +219,13 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 
 	/** @this {MaelstromCharacterSheet} */
 	static onRollDamage(event, target) {
+		if (!this.isEditable) return;
 		return this.actor.rollItemDamage(target.dataset.name, target.dataset.damage);
 	}
 
 	/** @this {MaelstromCharacterSheet} */
 	static onRollInitiative() {
+		if (!this.isEditable) return;
 		return this.actor.rollActorInitiative();
 	}
 

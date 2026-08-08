@@ -8,6 +8,10 @@
 Requires **Foundry VTT v13 (13.347+) or v14**. Worlds created with older versions of this
 system (Foundry v9) are migrated automatically on first load.
 
+> ⚠️ **Back up your world folder before updating from v0.3.x.** Version 1.0.0 is a
+> complete rewrite with a new data layer; the migration is automatic and tested, but a
+> pre-update backup is your only way back.
+
 ## Features
 
 * Sheets for characters
