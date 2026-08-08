@@ -146,6 +146,31 @@ succeeded.
 **Review loop closed at rev 4.** All three model families have signed off on the
 state each last reviewed. Do not re-open without new code changes.
 
+## Rollout state (staged release, 2026-08-08)
+
+DONE:
+- Default branch renamed `master` → `main` (remote `main` = v0.3.3 `9ca75bc`;
+  leftover `master` ref removed)
+- `foundry-v13-rewrite` pushed; tag `v1.0.0` pushed from it
+- Release workflow ran green: [v1.0.0 release](https://github.com/snorith/maelstrom/releases/tag/v1.0.0)
+  with `system.json` + `maelstrom-v1.0.0.zip`; verified live: rolling manifest URL
+  serves the stamped 1.0.0 manifest, zip has system files at archive root
+- Registry publish step skipped (no FVTT_PACKAGE_TOKEN secret yet) — as designed
+
+DEFERRED until Stephen's Foundry smoke test passes (the whole point of staging):
+1. Merge `foundry-v13-rewrite` → `main` with a **merge commit** (not squash — the
+   v1.0.0 tag must remain reachable from main)
+2. Recreate a `master` branch pointing at the same commit (`git push origin main:refs/heads/master`)
+   — legacy v0.3.3 installs poll the literal `…/master/src/system.json` URL, and
+   raw.githubusercontent does not reliably follow branch renames. THIS is the step
+   that flips the legacy update channel; do it last
+3. Foundry package registry submission + FVTT_PACKAGE_TOKEN secret (see README_DEV)
+
+Until step 2, existing v0.3.3 users see nothing (their update check hits the old
+master URL, which currently 404s — no update offered, nothing breaks). Fresh installs
+of 1.0.0 are already possible via
+`https://github.com/snorith/maelstrom/releases/latest/download/system.json`.
+
 ## Implementation complete — remaining HUMAN tasks (Stephen)
 
 1. **Review** `z/SPEC.md` (the behavioral contract) and skim the new code
