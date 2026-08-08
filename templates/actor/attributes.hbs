@@ -1,0 +1,280 @@
+<section class="tab attributes {{tab.cssClass}}" data-tab="{{tab.id}}" data-group="{{tab.group}}">
+	<div class="resources grid grid-2col">
+		<div class="resource flex-group-center">
+			{{!-- Attributes --}}
+			<table class="attributes">
+				<thead>
+				<tr>
+					<td colspan="5">{{localize "MAELSTROM.attribute.title"}}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>{{localize "MAELSTROM.attribute.column.orig"}}</td>
+					<td></td>
+					<td>{{localize "MAELSTROM.attribute.column.temp"}}</td>
+					<td>{{localize "MAELSTROM.attribute.column.used"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				{{#each attributeRows}}
+					<tr>
+						<td class="left-align-text">
+							<label class="resource-label" data-tooltip="{{this.detailLabel}}">{{this.nameLabel}}</label>
+						</td>
+						<td><input type="number" name="{{this.baseName}}.orig" value="{{this.orig}}"/></td>
+						<td>
+							<a class="item-control" data-action="rollAttribute" data-attribute="{{this.key}}"
+								data-tooltip="{{this.rollLabel}}"><i class="fas fa-dice"></i></a>
+						</td>
+						<td><input type="number" name="{{this.baseName}}.temp" value="{{this.temp}}"/></td>
+						<td><input type="checkbox" name="{{this.baseName}}.used" {{checked this.used}}/></td>
+					</tr>
+				{{/each}}
+				</tbody>
+			</table>
+
+			{{!-- Wounds --}}
+			<table class="wounds">
+				<thead>
+				<tr>
+					<td colspan="2">{{localize "MAELSTROM.wounds.header"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td colspan="2">
+						<div class="grid-wounds">
+							<div class="flex-group-left">
+								{{#each normalWounds}}
+									<input type="number" class="wound" name="{{this.name}}" value="{{this.value}}"
+										data-tooltip="{{this.tooltip}}"/>
+								{{/each}}
+								{{#if canBleed}}
+									<a class="item-control" data-action="bleedingDamage"
+										data-tooltip="{{localize 'MAELSTROM.wounds.wounds.bleeding.damage.one.round'}}"><i class="fas fa-plus fa-border"></i></a>
+								{{else}}
+									<i class="fas fa-plus fa-border disabled"></i>
+								{{/if}}
+								<input type="number" class="wound bleeding-damage" name="{{bloodlossSlot.name}}"
+									value="{{bloodlossSlot.value}}"
+									data-tooltip="{{localize 'MAELSTROM.wounds.wounds.bloodloss.damage'}}"/>
+								<input type="number" class="wound bloodloss" name="system.wounds.bloodloss"
+									value="{{bloodlossDisplay}}"
+									data-tooltip="{{localize 'MAELSTROM.wounds.wounds.bleeding.title'}}"/>
+							</div>
+							<div class="flex-group-center">
+								<strong data-tooltip="{{localize 'MAELSTROM.wounds.total.title'}}">{{localize "MAELSTROM.wounds.total.header"}}</strong>
+								{{#if canHeal}}
+									<a class="item-control" data-action="healWounds"
+										data-tooltip="{{localize 'MAELSTROM.wounds.heal.one'}}"><i class="fas fa-stethoscope fa-border"></i></a>
+								{{else}}
+									<i class="fas fa-stethoscope fa-border disabled"></i>
+								{{/if}}
+								<br>
+								{{#if isDead}}
+									<i class="fas fa-skull-crossbones total-wounds" data-tooltip="{{localize 'MAELSTROM.wounds.total.status.dead'}}"></i>
+								{{else if isUnconscious}}
+									<i class="fas fa-dizzy total-wounds" data-tooltip="{{localize 'MAELSTROM.wounds.total.status.unconscious'}}"></i>
+								{{/if}}
+								<span class="total-wounds" data-tooltip="{{localize 'MAELSTROM.wounds.total.title'}}">{{system.hp.wounds}}</span>
+							</div>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="left-align-text">
+						<label class="resource-label" data-tooltip="{{localize 'MAELSTROM.wounds.injuries.title'}}">{{localize "MAELSTROM.wounds.injuries.label"}}</label>
+					</td>
+					<td><textarea name="system.wounds.injuries" rows="2">{{system.wounds.injuries}}</textarea></td>
+				</tr>
+				<tr>
+					<td class="left-align-text">
+						<label class="resource-label" data-tooltip="{{localize 'MAELSTROM.wounds.longterm.title'}}">{{localize "MAELSTROM.wounds.longterm.label"}}</label>
+					</td>
+					<td><textarea name="system.wounds.longterm" rows="2">{{system.wounds.longterm}}</textarea></td>
+				</tr>
+				</tbody>
+			</table>
+
+			{{!-- Armour --}}
+			<table class="armour">
+				<thead>
+				<tr>
+					<td colspan="4">{{localize "MAELSTROM.armour.header"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td colspan="1" class="left-align-text">
+						<label class="resource-label" data-tooltip="{{localize 'MAELSTROM.armour.armour.title'}}">{{localize "MAELSTROM.armour.armour.label"}}</label>
+					</td>
+					<td colspan="3">
+						<input type="text" name="system.armour.armour" value="{{system.armour.armour}}"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="left-align-text">
+						<label class="resource-label" data-tooltip="{{localize 'MAELSTROM.armour.ar.title'}}">{{localize "MAELSTROM.armour.ar.label"}}</label>
+					</td>
+					<td><input type="number" name="system.armour.ar" value="{{armourDisplay.ar}}"/></td>
+					<td class="left-align-text">
+						<label class="resource-label" data-tooltip="{{localize 'MAELSTROM.armour.penalty.title'}}">{{localize "MAELSTROM.armour.penalty.label"}}</label>
+					</td>
+					<td><input type="number" name="system.armour.penalty" value="{{armourDisplay.penalty}}"/></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+
+		{{!-- Second column --}}
+		<div class="resource flex-group-center">
+			{{!-- Characteristics --}}
+			<table class="characteristics">
+				<thead>
+				<tr>
+					<td>{{localize "MAELSTROM.characteristics.header"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr><td><input type="text" name="system.characteristics.characteristic1" value="{{system.characteristics.characteristic1}}"/></td></tr>
+				<tr><td><input type="text" name="system.characteristics.characteristic2" value="{{system.characteristics.characteristic2}}"/></td></tr>
+				<tr><td><input type="text" name="system.characteristics.characteristic3" value="{{system.characteristics.characteristic3}}"/></td></tr>
+				</tbody>
+			</table>
+
+			{{!-- Abilities --}}
+			<table class="abilities">
+				<thead>
+				<tr>
+					<td colspan="5">{{localize "MAELSTROM.abilities.header"}}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>{{localize "MAELSTROM.abilities.column.ability.title"}}</td>
+					<td>{{localize "MAELSTROM.abilities.column.rank.title"}}</td>
+					<td>{{localize "MAELSTROM.abilities.column.benefit.title"}}</td>
+					<td>
+						<div class="item-controls">
+							<a class="item-control" data-action="createItem" data-type="ability"
+								data-tooltip="{{localize 'MAELSTROM.abilities.controls.add'}}"><i class="fas fa-plus"></i></a>
+						</div>
+					</td>
+				</tr>
+				</thead>
+				<tbody>
+				{{#each abilities}}
+					<tr class="item" data-item-id="{{this.id}}">
+						<td>
+							{{#if this.hasNotes}}
+								<span data-tooltip-html="{{this.tooltip}}"><i class="fas fa-info-circle"></i></span>
+							{{else}}
+								<i class="fas fa-info-circle disabled"></i>
+							{{/if}}
+						</td>
+						<td class="left-align-text">{{this.name}}</td>
+						<td class="left-align-text">{{this.rank}}</td>
+						<td class="left-align-text">{{this.benefit}}</td>
+						<td>
+							<div class="item-controls">
+								<a class="item-control" data-action="editItem" data-tooltip="{{localize 'MAELSTROM.abilities.controls.edit'}}"><i class="fas fa-edit"></i></a>
+								<a class="item-control" data-action="deleteItem" data-tooltip="{{localize 'MAELSTROM.abilities.controls.delete'}}"><i class="fas fa-trash"></i></a>
+							</div>
+						</td>
+					</tr>
+				{{/each}}
+				</tbody>
+			</table>
+
+			{{!-- Weapons / stored rolls (drag rows to reorder) --}}
+			<table class="weapons">
+				<thead>
+				<tr>
+					<td colspan="10">{{localize "MAELSTROM.weapons.header"}}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>{{localize "MAELSTROM.weapons.column.weapon.title"}}</td>
+					<td></td>
+					<td>{{localize "MAELSTROM.weapons.column.as.title"}}</td>
+					<td></td>
+					<td>{{localize "MAELSTROM.weapons.column.ds.title"}}</td>
+					<td></td>
+					<td>{{localize "MAELSTROM.weapons.column.damage.title"}}</td>
+					<td>{{localize "MAELSTROM.weapons.column.range.title"}}</td>
+					<td>
+						<div class="item-controls">
+							<a class="item-control" data-action="createItem" data-type="weapon"
+								data-tooltip="{{localize 'MAELSTROM.weapons.controls.add'}}"><i class="fas fa-plus"></i></a>
+						</div>
+					</td>
+				</tr>
+				</thead>
+				<tbody>
+				{{#each weapons}}
+					<tr class="item draggable" data-item-id="{{this.id}}">
+						<td>
+							{{#if this.hasNotes}}
+								<span data-tooltip-html="{{this.tooltip}}"><i class="fas fa-info-circle"></i></span>
+							{{else}}
+								<i class="fas fa-info-circle disabled"></i>
+							{{/if}}
+						</td>
+						<td class="left-align-text">{{this.name}}</td>
+						<td>
+							<a class="item-control" data-action="rollWeapon" data-attribute="{{this.attackAttribute}}"
+								data-name="{{this.name}}" data-modifier="{{this.as}}"
+								data-tooltip="{{localize 'MAELSTROM.weapons.roll.attack'}}"><i class="fas fa-dice"></i></a>
+						</td>
+						<td>{{this.as}}</td>
+						<td>
+							<a class="item-control" data-action="rollWeapon" data-attribute="{{this.defenceAttribute}}"
+								data-name="{{this.name}}" data-modifier="{{this.ds}}"
+								data-tooltip="{{localize 'MAELSTROM.weapons.roll.defence'}}"><i class="fas fa-dice"></i></a>
+						</td>
+						<td>{{this.ds}}</td>
+						<td>
+							{{#if this.canRollDamage}}
+								<a class="item-control" data-action="rollDamage" data-damage="{{this.damage}}"
+									data-name="{{this.name}}"
+									data-tooltip="{{localize 'MAELSTROM.weapons.roll.damage'}}"><i class="fas fa-dice-d20"></i></a>
+							{{else}}
+								<i class="fas fa-dice-d20 disabled"></i>
+							{{/if}}
+						</td>
+						<td class="left-align-text">{{this.damage}}</td>
+						<td class="left-align-text">{{this.range}}</td>
+						<td>
+							<div class="item-controls">
+								<a class="item-control" data-action="editItem" data-tooltip="{{localize 'MAELSTROM.weapons.controls.edit'}}"><i class="fas fa-edit"></i></a>
+								<a class="item-control" data-action="deleteItem" data-tooltip="{{localize 'MAELSTROM.weapons.controls.delete'}}"><i class="fas fa-trash"></i></a>
+							</div>
+						</td>
+					</tr>
+				{{/each}}
+				</tbody>
+			</table>
+
+			{{!-- Initiative --}}
+			<table class="initiative">
+				<thead>
+				<tr>
+					<td colspan="3">{{localize "MAELSTROM.initiative.header"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td><label class="resource-label">{{localize "MAELSTROM.initiative.label"}}</label></td>
+					<td>
+						<a class="item-control" data-action="rollInitiative"
+							data-tooltip="{{localize 'MAELSTROM.initiative.roll.title'}}"><i class="fas fa-dice-d20"></i></a>
+					</td>
+					<td>
+						<input type="number" name="system.initiative.modifier" value="{{system.initiative.modifier}}"
+							data-tooltip="{{localize 'MAELSTROM.initiative.modifier.title'}}"/>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>

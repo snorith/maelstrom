@@ -1,37 +1,44 @@
 # Development
 
-Builds and then links output directory to the corresponding Foundry system folder
+The repository root **is** the Foundry system — there is no build step. Foundry loads
+the ES modules (`module/`), CSS (`styles/`), templates and lang files directly.
 
-```shell
-npm run build
-```
+## Setup
 
-Watchs for changes and rebuilds them
+1. Install [mise](https://mise.jdx.dev/) (optional — node is only needed for release
+   tooling): `mise install`
+2. Make the repo visible to Foundry as the `maelstrom` system, either by cloning it
+   directly into your user data folder:
 
-```shell
-npm run build:watch
-```
+   ```shell
+   git clone https://github.com/snorith/maelstrom.git "<FoundryUserData>/Data/systems/maelstrom"
+   ```
 
-# Development Publishing
+   or by symlinking an existing checkout:
 
-See: [Foundry Project Creator Wiki](https://gitlab.com/foundry-projects/foundry-pc/create-foundry-project/-/wikis/Publish) 
+   ```shell
+   ln -s /path/to/checkout "<FoundryUserData>/Data/systems/maelstrom"
+   ```
 
-## Creating a published release
+   The directory name must be exactly `maelstrom` (it must match the system `id`).
 
-This will update the version number in package.json and system.json, 
-updates the manifest and download links in system.json file and
-pushes the release to the remote 
+## Dev loop
 
-### publish, where the version number is automatically incremented according to what you provide below
+Edit files → reload Foundry (F5 in the client). That's it.
 
-```shell
-node_modules/gulp/bin/gulp.js publish -u 0.1.3
-```
+## Legacy note
 
-### publish, but once you've already set a version, you can now have it increment automatically, by choosing one of:
+`src/system.json` is a **tombstone** — do not delete it. Pre-1.0 installs poll that
+raw-GitHub path for updates; it redirects v13+ clients to the GitHub Releases update
+channel while its legacy `minimumCoreVersion` key stops old Foundry clients from
+updating into an incompatible version. The rest of the old Foundry-v9 implementation
+was removed after the rewrite (behavioral spec: `z/SPEC.md`; full history: `v0.3.3` tag).
 
-```shell
-node_modules/gulp/bin/gulp.js publish -u patch
-node_modules/gulp/bin/gulp.js publish -u minor
-node_modules/gulp/bin/gulp.js publish -u major
-```
+## Releasing
+
+1. Bump `version` in `system.json` (and `package.json`), commit
+2. `git tag v<version> && git push --tags`
+3. `.github/workflows/release.yml` verifies the tag matches the manifest, stamps the
+   `download`/`manifest` URLs, zips the system, and publishes the GitHub Release
+
+Do not hand-edit the manifest/download URLs — the workflow owns them.

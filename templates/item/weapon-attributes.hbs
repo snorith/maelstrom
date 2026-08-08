@@ -1,0 +1,47 @@
+<section class="tab attributes {{tab.cssClass}}" data-tab="{{tab.id}}" data-group="{{tab.group}}">
+	<div class="grid grid-2col">
+		<div class="resource">
+			<label data-tooltip="{{localize 'MAELSTROM.item.weapon.as.title'}}">{{localize "MAELSTROM.item.weapon.as.label"}}
+				<input type="number" name="system.as" value="{{system.as}}" class="as"/>
+			</label>
+		</div>
+
+		<div class="resource">
+			<label data-tooltip="{{localize 'MAELSTROM.item.weapon.ds.title'}}">{{localize "MAELSTROM.item.weapon.ds.label"}}
+				<input type="number" name="system.ds" value="{{system.ds}}" class="ds"/>
+			</label>
+		</div>
+
+		<div class="resource">
+			<label data-tooltip="{{localize 'MAELSTROM.item.weapon.damage.title'}}">{{localize "MAELSTROM.item.weapon.damage.label"}} <small>{{localize "MAELSTROM.item.weapon.damage.note"}}</small>
+				<input type="text" name="system.damage" value="{{system.damage}}" class="damage"/>
+			</label>
+		</div>
+
+		<div class="resource"></div>
+
+		<div class="resource">
+			<label data-tooltip="{{localize 'MAELSTROM.item.weapon.range.title'}}">{{localize "MAELSTROM.item.weapon.range.label"}}
+				<input type="text" name="system.range" value="{{system.range}}" class="range"/>
+			</label>
+		</div>
+
+		<div class="resource"></div>
+
+		<div class="resource">
+			<label data-tooltip="{{localize 'MAELSTROM.item.weapon.attributes.attack.title'}}">{{localize "MAELSTROM.item.weapon.attributes.attack.label"}}
+				<select name="system.attributes.attack" class="attack">
+					{{selectOptions attributeChoices selected=system.attributes.attack}}
+				</select>
+			</label>
+		</div>
+
+		<div class="resource">
+			<label data-tooltip="{{localize 'MAELSTROM.item.weapon.attributes.defence.title'}}">{{localize "MAELSTROM.item.weapon.attributes.defence.label"}}
+				<select name="system.attributes.defence" class="defence">
+					{{selectOptions attributeChoices selected=system.attributes.defence}}
+				</select>
+			</label>
+		</div>
+	</div>
+</section>

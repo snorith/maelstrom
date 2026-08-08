@@ -1,14 +1,8 @@
 {
 	"private": true,
 	"name": "maelstrom",
-	"version": "0.3.3",
+	"version": "1.0.0",
 	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome in FoundryVTT",
-	"scripts": {
-		"package": "gulp package",
-		"build": "gulp build && gulp link",
-		"build:watch": "gulp watch",
-		"clean": "gulp clean && gulp link --clean"
-	},
 	"author": "snorith (Stephen Smith)",
 	"license": "MIT",
 	"repository": {
@@ -18,20 +12,5 @@
 	"bugs": {
 		"url": "https://github.com/snorith/maelstrom/issues"
 	},
-	"homepage": "https://github.com/snorith/maelstrom#readme",
-	"devDependencies": {
-		"@league-of-foundry-developers/foundry-vtt-types": "^9.249.2",
-		"archiver": "^5.3.0",
-		"chalk": "^4.1.2",
-		"fs-extra": "^10.0.0",
-		"gulp": "^4.0.2",
-		"gulp-git": "^2.10.1",
-		"gulp-less": "^5.0.0",
-		"gulp-sass": "^5.1.0",
-		"gulp-typescript": "^6.0.0-alpha.1",
-		"json-stringify-pretty-compact": "^3.0.0",
-		"sass": "^1.30.0",
-		"typescript": "^4.5.5",
-		"yargs": "^17.3.1"
-	}
+	"homepage": "https://github.com/snorith/maelstrom#readme"
 }

@@ -1,0 +1,54 @@
+<section class="tab equipment {{tab.cssClass}}" data-tab="{{tab.id}}" data-group="{{tab.group}}">
+	<label class="resource-label" for="system.events.supernatural">{{localize "MAELSTROM.events.supernatural.header"}}</label>
+	<input type="text" name="system.events.supernatural" value="{{system.events.supernatural}}"/>
+	<div class="resources grid grid-2col">
+		<div class="resource flex-group-center">
+			<label class="resource-label" for="system.notes">{{localize "MAELSTROM.notes.header"}}</label>
+			<textarea name="system.notes" rows="10">{{system.notes}}</textarea>
+			<hr>
+			<label class="resource-label" for="system.equipment">{{localize "MAELSTROM.equipment.header"}}</label>
+			<textarea name="system.equipment" rows="25">{{system.equipment}}</textarea>
+		</div>
+		<div class="resource flex-group-center">
+			<table class="events">
+				<thead>
+				<tr>
+					<td colspan="3">{{localize "MAELSTROM.events.header"}}</td>
+				</tr>
+				<tr>
+					<td>{{localize "MAELSTROM.events.column.living.header"}}</td>
+					<td>{{localize "MAELSTROM.events.column.years.header"}}</td>
+					<td>{{localize "MAELSTROM.events.column.event.header"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				{{#each careers}}
+					<tr class="left-align-text">
+						<td><input type="text" name="{{this.baseName}}.living" value="{{this.living}}"/></td>
+						<td><input type="text" name="{{this.baseName}}.years" value="{{this.years}}"/></td>
+						<td><input type="text" name="{{this.baseName}}.event" value="{{this.event}}"/></td>
+					</tr>
+				{{/each}}
+				</tbody>
+			</table>
+
+			<table class="languages">
+				<thead>
+				<tr>
+					<td colspan="2">{{localize "MAELSTROM.languages.header"}}</td>
+				</tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td><input type="text" name="system.languages.lang1" value="{{system.languages.lang1}}"/></td>
+					<td><input type="text" name="system.languages.lang2" value="{{system.languages.lang2}}"/></td>
+				</tr>
+				<tr>
+					<td><input type="text" name="system.languages.lang3" value="{{system.languages.lang3}}"/></td>
+					<td><input type="text" name="system.languages.lang4" value="{{system.languages.lang4}}"/></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section>

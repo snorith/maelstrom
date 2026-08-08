@@ -1,0 +1,368 @@
+/**
+ * Maelstrom system styles — plain CSS (native nesting), scoped under .maelstrom.
+ * Colors ride on Foundry v13 theme variables so light and dark modes both work.
+ * Deliberately unlayered: system styles win over core's @layer'd defaults.
+ */
+
+.maelstrom {
+	--maelstrom-accent: saddlebrown;
+	--maelstrom-subtle: color-mix(in srgb, currentColor 8%, transparent);
+	--maelstrom-border: color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.theme-dark .maelstrom,
+.maelstrom.theme-dark {
+	--maelstrom-accent: peru;
+}
+
+/* ------------------------------------ */
+/* Window / body                        */
+/* ------------------------------------ */
+
+.maelstrom.sheet .window-content {
+	overflow-y: auto;
+
+	& > form,
+	& > .sheet-body {
+		height: 100%;
+	}
+}
+
+.maelstrom .sheet-body {
+	height: 100%;
+
+	/* Core toggles .tab visibility — never set display on .tab itself */
+	& .tab {
+		height: 100%;
+	}
+}
+
+/* ------------------------------------ */
+/* Layout skeleton (ported from v0.3.3) */
+/* ------------------------------------ */
+
+.maelstrom {
+	& .grid,
+	& .grid-2col {
+		display: grid;
+		grid-column: span 2 / span 2;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+		margin: 10px 0;
+		padding: 0;
+	}
+
+	& .flexrow {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+	}
+
+	& .flexcol {
+		display: flex;
+		flex-flow: column nowrap;
+	}
+
+	& .flex-group-center,
+	& .flex-group-left,
+	& .flex-group-right {
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		padding: 5px;
+		border: 1px solid var(--maelstrom-border);
+		border-radius: 3px;
+	}
+
+	& .flex-group-left {
+		justify-content: flex-start;
+		text-align: left;
+	}
+
+	& .flex-group-right {
+		justify-content: flex-end;
+		text-align: right;
+	}
+
+	& .info-grid-form {
+		display: grid;
+		grid-template-columns: 1fr 2fr;
+		column-gap: 10px;
+		row-gap: 5px;
+
+		& label {
+			text-align: right;
+			margin-top: 3px;
+			grid-column: 1 / 2;
+		}
+
+		& input,
+		& select,
+		& button {
+			grid-column: 2 / 3;
+		}
+	}
+
+	& .grid-wounds {
+		display: grid;
+		grid-template-columns: 3fr 1fr;
+		gap: 1px;
+		margin: 1px 0;
+	}
+
+	& .left-align-text {
+		text-align: left;
+		padding-left: 4px;
+	}
+}
+
+/* ------------------------------------ */
+/* Header                               */
+/* ------------------------------------ */
+
+.maelstrom .sheet-header {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	margin-bottom: 10px;
+
+	& .profile-img {
+		flex: 0 0 100px;
+		width: 100px;
+		height: 100px;
+		object-fit: cover;
+		margin-right: 10px;
+		cursor: pointer;
+	}
+
+	& .header-fields {
+		flex: 1;
+	}
+
+	& h1.char-name,
+	& h1.charname {
+		height: 50px;
+		padding: 0;
+		margin: 5px 0;
+		border-bottom: 0;
+
+		& input {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+		}
+	}
+}
+
+/* ------------------------------------ */
+/* Labels, controls, icons              */
+/* ------------------------------------ */
+
+.maelstrom {
+	& .resource-label {
+		font-weight: bold;
+		text-transform: uppercase;
+	}
+
+	& .item-control {
+		cursor: pointer;
+
+		&:hover,
+		&:focus {
+			text-shadow: 0 0 8px var(--color-shadow-primary, var(--maelstrom-accent));
+		}
+	}
+
+	& .item-controls {
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	/* Disabled FontAwesome state */
+	& .fas.disabled,
+	& .fas[disabled],
+	& .disabled > .fas,
+	& [disabled] > .fas {
+		opacity: 0.3;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	& .fa-border {
+		border-color: var(--maelstrom-accent);
+	}
+}
+
+/* ------------------------------------ */
+/* Tables                               */
+/* ------------------------------------ */
+
+.maelstrom table {
+	border: 1px solid var(--maelstrom-border);
+	margin: 5px 0;
+
+	& thead td {
+		font-weight: bold;
+		text-align: center;
+		background: var(--maelstrom-subtle);
+		padding: 3px;
+	}
+
+	& td {
+		padding: 2px 3px;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	& input[type="text"],
+	& input[type="number"] {
+		width: 100%;
+		text-align: center;
+	}
+
+	& textarea {
+		width: 100%;
+		resize: vertical;
+	}
+}
+
+.maelstrom table.abilities {
+	& td:nth-child(2) {
+		width: 40%;
+	}
+
+	& td:nth-child(4) {
+		width: 35%;
+	}
+}
+
+.maelstrom table.weapons {
+	& td:nth-child(2) {
+		width: 25%;
+	}
+
+	& td:nth-child(9) {
+		width: 20%;
+	}
+}
+
+.maelstrom table.events col.event,
+.maelstrom table.events td:nth-child(3) {
+	width: 50%;
+}
+
+/* ------------------------------------ */
+/* Wounds                               */
+/* ------------------------------------ */
+
+.maelstrom table.wounds {
+	margin-top: 5px;
+
+	& input.wound {
+		text-align: center;
+		width: 40px;
+		margin-bottom: 2px;
+	}
+
+	/* Bleeding-wound count: white on dark red in every theme (semantic) */
+	& input.bloodloss {
+		color: white;
+		background-color: darkred;
+	}
+
+	/* Bloodloss damage slot */
+	& input.bleeding-damage {
+		border-color: crimson;
+		border-width: 3px;
+	}
+
+	& .total-wounds {
+		color: var(--maelstrom-accent);
+		font-size: 200%;
+	}
+}
+
+/* ------------------------------------ */
+/* Armour                               */
+/* ------------------------------------ */
+
+.maelstrom table.armour label {
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+/* ------------------------------------ */
+/* Item sheets                          */
+/* ------------------------------------ */
+
+.maelstrom.sheet.item {
+	& .resource {
+		padding: 5px;
+
+		& label {
+			font-weight: bold;
+		}
+
+		& small {
+			font-weight: normal;
+			opacity: 0.8;
+		}
+	}
+}
+
+/* ------------------------------------ */
+/* Rich text editors                    */
+/* ------------------------------------ */
+
+.maelstrom prose-mirror {
+	min-height: 200px;
+}
+
+.maelstrom .tab.biography prose-mirror {
+	min-height: 90%;
+}
+
+/* ------------------------------------ */
+/* Item hover cards (tooltip content)   */
+/* ------------------------------------ */
+
+#tooltip .maelstrom-item-tooltip,
+.locked-tooltip .maelstrom-item-tooltip {
+	text-align: left;
+	max-width: 340px;
+
+	& img {
+		float: left;
+		margin-right: 6px;
+		border: none;
+	}
+
+	& h1 {
+		display: inline;
+		font-size: 1.2em;
+		border: none;
+		margin: 0;
+	}
+
+	& table {
+		clear: both;
+		width: 100%;
+		margin-top: 6px;
+	}
+}
+
+/* ------------------------------------ */
+/* Chat cards                           */
+/* ------------------------------------ */
+
+.maelstrom-roll-outcome {
+	text-align: center;
+	font-size: 140%;
+	font-weight: bold;
+}
+
+.maelstrom-roll-error {
+	color: var(--color-level-error, #c00);
+}

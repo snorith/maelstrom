@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify system.json version matches tag
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          MANIFEST_VERSION="$(jq -r .version system.json)"
+          if [ "$MANIFEST_VERSION" != "$VERSION" ]; then
+            echo "::error::system.json version ($MANIFEST_VERSION) != tag version ($VERSION). Update system.json before tagging."
+            exit 1
+          fi
+
+      - name: Stamp manifest URLs
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          jq --arg dl "https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/maelstrom-v${VERSION}.zip" \
+             --arg mf "https://github.com/${GITHUB_REPOSITORY}/releases/latest/download/system.json" \
+             '.download = $dl | .manifest = $mf' system.json > system.json.tmp
+          mv system.json.tmp system.json
+
+      - name: Build system archive
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          zip -r "maelstrom-v${VERSION}.zip" \
+            system.json module templates styles lang LICENSE README.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            system.json
+            maelstrom-v*.zip

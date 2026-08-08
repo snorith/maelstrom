@@ -3,38 +3,61 @@
 
 > ⚔️ This is an _unofficial_, fan created system and is not supported by Arion Games
 
-**This game system provides a character sheet and basic dice rolling to play MAELSTROM Domesday / Gothic / Rome** 
+**This game system provides a character sheet and basic dice rolling to play MAELSTROM Domesday / Gothic / Rome**
+
+Requires **Foundry VTT v13 (13.347+) or v14**. Worlds created with older versions of this
+system (Foundry v9) are migrated automatically on first load.
 
 ## Features
 
 * Sheets for characters
 * Calculation of wounds, bloodloss wounds, bleeding damage per round and character status (healthy, unconscious or dead)
 * Auto healing of all open wounds by 1 point
-* Attribute rolling including armour penalties, weapon modifiers and difficulty modifiers totaled and outcome determination  
-* Damage rolling for weapons  
+* Attribute rolling including armour penalties, weapon modifiers and difficulty modifiers totaled and outcome determination
+* Damage rolling for weapons
 * Support for an hp bar on tokens
 * Combat scene initiative support with a modifier and separate initiative rolling with a modifier
 * The weapon/shield support can also be used for canned rolls needed for characteristics and abilities
+* Light and dark theme support (Foundry v13 theming)
 
 ![Character sheet](https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png)
 
-## Todo
-
-* Sheets for NPCs
-
 ## Installation
 
-To install and use MAELSTROM for FoundryVTT, paste the following URL into the Install System dialog in the setup menu of the application.
+To install and use MAELSTROM for FoundryVTT, paste the following URL into the Install System
+dialog in the setup menu of the application:
 
-https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json
+https://github.com/snorith/maelstrom/releases/latest/download/system.json
+
+**Still on Foundry v9?** The last compatible release is v0.3.3; install it with this manifest URL:
+
+https://raw.githubusercontent.com/snorith/maelstrom/v0.3.3/src/system.json
+
+## Development
+
+See [README_DEV.md](README_DEV.md). There is no build step — the repository root is the
+system directory.
 
 ## Thanks
 
-* based on the [Foundry Project Creator](https://gitlab.com/foundry-projects/foundry-pc/create-foundry-project) by Nick v. Oosten
-* partially based on the [Boilerplate System](https://gitlab.com/asacolips-projects/foundry-mods/boilerplate) by Asacolips.
+* originally based on the [Foundry Project Creator](https://gitlab.com/foundry-projects/foundry-pc/create-foundry-project) by Nick v. Oosten
+* partially based on the [Boilerplate System](https://github.com/asacolips-projects/boilerplate) by Asacolips
 * suggestions from [Numenera-FoundryVTT](https://github.com/SolarBear/Numenera-FoundryVTT) by SolarBear
 
 ## Changelog
+
+#### v1.0.0 - 2026
+##### Modified
+* Complete rewrite for Foundry VTT v13/v14: ApplicationV2 sheets, TypeDataModel data
+  schemas, DialogV2 prompts, native tooltips, async dice
+* Weapons are now reordered by dragging rows on the character sheet
+* Wound heal / bleeding buttons now persist immediately
+* Light and dark theme support
+* Distribution moved to GitHub Releases
+##### Fixed
+* Weapon damage rolls with a valid formula failed to post to chat
+##### Removed
+* Foundry v9 support (use v0.3.3), gulp/TypeScript build chain, bundled tooltipster library
 
 #### v0.3.0 - 2021-07-26
 ##### Modified
