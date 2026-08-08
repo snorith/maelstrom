@@ -11,6 +11,11 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      # Optional: set this repo secret (from the package's edit page on
+      # foundryvtt.com) to also announce each release to the Foundry package
+      # registry. The workflow works without it; the registry step is skipped.
+      FVTT_PACKAGE_TOKEN: ${{ secrets.FVTT_PACKAGE_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,3 +57,29 @@ jobs:
           files: |
             system.json
             maelstrom-v*.zip
+
+      # Foundry Package Release API (https://foundryvtt.com/article/package-release-api/):
+      # tells the registry about the new version so users get in-app discovery and
+      # version-aware compatibility. NOTE the API requires the VERSION-SPECIFIC
+      # manifest URL here, not the rolling releases/latest one used inside system.json.
+      - name: Publish to Foundry package registry
+        if: ${{ env.FVTT_PACKAGE_TOKEN != '' }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          BODY="$(jq -n \
+            --arg version "$VERSION" \
+            --arg manifest "https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/system.json" \
+            --arg notes "https://github.com/${GITHUB_REPOSITORY}/releases/tag/v${VERSION}" \
+            --argjson compatibility "$(jq .compatibility system.json)" \
+            '{id: "maelstrom", release: {version: $version, manifest: $manifest, notes: $notes, compatibility: $compatibility}}')"
+          HTTP_CODE="$(curl -s -o /tmp/fvtt-response.json -w "%{http_code}" \
+            -X POST "https://foundryvtt.com/_api/packages/release_version/" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: ${FVTT_PACKAGE_TOKEN}" \
+            --data "$BODY")"
+          cat /tmp/fvtt-response.json
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "::error::Foundry package registry publish failed (HTTP $HTTP_CODE)"
+            exit 1
+          fi

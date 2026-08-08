@@ -157,7 +157,10 @@ state each last reviewed. Do not re-open without new code changes.
 4. Optional but recommended: **submit the system to the official Foundry package
    registry** (foundryvtt.com → "Submit a Package") so users get version-aware
    installs; the manifest URL to register is
-   `https://github.com/snorith/maelstrom/releases/latest/download/system.json`
+   `https://github.com/snorith/maelstrom/releases/latest/download/system.json`.
+   Then copy the package's `fvttp_…` release token into the repo secret
+   `FVTT_PACKAGE_TOKEN` — the release workflow will publish every future version
+   to the registry automatically (see README_DEV.md "Foundry package registry")
 5. If any checklist item fails: notes → me, I fix against SPEC
 
 ## Rules for every phase
