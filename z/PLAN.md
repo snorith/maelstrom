@@ -55,6 +55,26 @@ Statuses: TODO → IN PROGRESS → DONE. Update this table as phases move.
 
 **Gates:** G1 — normalization sites recounted after rewrite (character: age, 10×orig/temp, ar, penalty, wounds array, bloodloss, initiative.modifier; weapon: as, ds, 2×attributes) — all presence-guarded, verified by 16 new delta assertions in the smoke test (33/33 total). G2 — outward enumeration of paths into migrateData: sheet full-form submit, healAllWounds/sufferBleeding updates, world-migration sort updates (no system delta), item create, JSON/compendium import, external macros — presence guards cover all; residual ArrayField-replace semantics recorded above. G3 — no codex/droid disagreement; injection mechanism confirmed by direct inspection. G4 — **NOT converged** (substantive findings folded) → round 2 (confirmation) required.
 
+### Round 2 — rev 2 (commit 3725c82), confirmation, 2026-08-08
+
+- **codex** (`review --commit 3725c82`): clean — "changes correctly make migration
+  normalization delta-safe, preserve legacy weapon ordering, and gate mutating sheet
+  actions without introducing a concrete regression." Zero findings.
+- **droid** (same session as round 1): all fixes verified correct and complete — traced
+  all 17 SPEC §7 legacy shapes through the presence-guarded migrateData (full-document
+  and delta modes), checked every fix for regressions (none), and ran a NEW outward
+  sweep enumerating all 12 actor/item system-data write paths (form submits, action
+  handlers, world migration, item creation, compendium import, external macros) —
+  every path produces a shape migrateData + schema handle. No new findings.
+- **Gates:** G1 counts stated as tables (17 shapes, 12 paths) · G2 fresh outward
+  enumeration found nothing · G3 no disagreement · G4 **CONVERGED** — two model
+  families (GPT-5.6 + GLM-5.2; devin not selected, so convergence is two-family,
+  not three).
+- Residual items deliberately outside review scope: `_source` legacy-key retention
+  and real-Foundry rendering remain on the phase-7 manual checklist.
+
+**Review loop closed at rev 2.** Do not re-open without new code changes.
+
 ## Implementation complete — remaining HUMAN tasks (Stephen)
 
 1. **Review** `z/SPEC.md` (the behavioral contract) and skim the new code
