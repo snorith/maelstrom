@@ -37,7 +37,10 @@ export async function migrateWorld() {
 /**
  * v1: the legacy system kept weapon ordering in `system.order` (spaced 0, 5, 10…).
  * Map it onto the core `sort` field (×1000 preserves relative order with room to
- * drag between). Only touches weapons that still have default sort.
+ * drag between). Deliberately ignores any existing core `sort` (v9 may have
+ * auto-assigned one that never reflected the legacy order): the legacy `order`
+ * is authoritative, and the systemMigrationVersion gate ensures this runs only
+ * once, so post-migration manual sorting is never overwritten.
  */
 async function migrateWeaponOrderToSort() {
 	for (const actor of game.actors) {
@@ -45,7 +48,7 @@ async function migrateWeaponOrderToSort() {
 		for (const item of actor.items) {
 			if (item.type !== "weapon") continue;
 			const legacyOrder = foundry.utils.getProperty(item, "_source.system.order");
-			if (Number.isFinite(legacyOrder) && legacyOrder >= 0 && !item.sort) {
+			if (Number.isFinite(legacyOrder) && legacyOrder >= 0) {
 				updates.push({ _id: item.id, sort: (legacyOrder + 1) * 1000 });
 			}
 		}

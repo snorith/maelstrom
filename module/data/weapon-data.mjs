@@ -1,12 +1,6 @@
-import { ATTRIBUTES } from "./character-data.mjs";
+import { ATTRIBUTES, normalizeBlank } from "./character-data.mjs";
 
 const { fields } = foundry.data;
-
-/** Convert a legacy `""` value to null so NumberField doesn't cast it to 0. */
-function blankToNull(value) {
-	if (value === "" || value === undefined) return null;
-	return value;
-}
 
 export class WeaponData extends foundry.abstract.TypeDataModel {
 	static defineSchema() {
@@ -25,12 +19,17 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
 		};
 	}
 
+	/**
+	 * Presence-guarded (runs on update deltas too — an absent key must never be
+	 * assigned, or a partial update like {"system.damage": "1d6"} would also
+	 * null out as/ds or reset the attribute selections).
+	 */
 	static migrateData(source) {
-		source.as = blankToNull(source.as);
-		source.ds = blankToNull(source.ds);
+		normalizeBlank(source, "as");
+		normalizeBlank(source, "ds");
 		if (source.attributes) {
-			if (!source.attributes.attack) source.attributes.attack = "attack";
-			if (!source.attributes.defence) source.attributes.defence = "defence";
+			if ("attack" in source.attributes && !source.attributes.attack) source.attributes.attack = "attack";
+			if ("defence" in source.attributes && !source.attributes.defence) source.attributes.defence = "defence";
 		}
 		// Legacy `order`/`lastOrder` are handled by the one-time world migration
 		// (module/migrations.mjs) because core `sort` is a document-level field;

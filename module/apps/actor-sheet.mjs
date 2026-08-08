@@ -124,8 +124,11 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 			value: zeroBlank(wounds[last])
 		};
 		context.bloodlossDisplay = zeroBlank(system.wounds.bloodloss);
-		context.canBleed = Number.isFinite(system.wounds.bloodloss) && system.wounds.bloodloss !== 0;
-		context.canHeal = system.hp.wounds > 0;
+		// > 0 (not ≠ 0) to match the action's own guard; also gated on editability
+		// so observers see disabled icons instead of no-op controls
+		context.canBleed =
+			this.isEditable && Number.isFinite(system.wounds.bloodloss) && system.wounds.bloodloss > 0;
+		context.canHeal = this.isEditable && system.hp.wounds > 0;
 		context.isUnconscious = system.isUnconscious;
 		context.isDead = system.isDead;
 	}
@@ -219,16 +222,19 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 
 	/** @this {MaelstromCharacterSheet} */
 	static onHealWounds() {
+		if (!this.isEditable) return;
 		return this.actor.healAllWoundsByOne();
 	}
 
 	/** @this {MaelstromCharacterSheet} */
 	static onBleedingDamage() {
+		if (!this.isEditable) return;
 		return this.actor.sufferBleedingDamage();
 	}
 
 	/** @this {MaelstromCharacterSheet} */
 	static async onCreateItem(event, target) {
+		if (!this.isEditable) return;
 		const type = target.dataset.type;
 		const capitalized = type.charAt(0).toUpperCase() + type.slice(1);
 		const name = game.i18n.localize(`MAELSTROM.item.${type}.new${capitalized}`);
@@ -243,6 +249,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 
 	/** @this {MaelstromCharacterSheet} */
 	static async onDeleteItem(event, target) {
+		if (!this.isEditable) return;
 		const item = this.actor.items.get(target.closest("[data-item-id]")?.dataset.itemId);
 		if (!item) return;
 		const confirmed = await foundry.applications.api.DialogV2.confirm({

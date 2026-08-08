@@ -45,7 +45,6 @@
 	& .grid,
 	& .grid-2col {
 		display: grid;
-		grid-column: span 2 / span 2;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 10px;
 		margin: 10px 0;
@@ -248,7 +247,6 @@
 	}
 }
 
-.maelstrom table.events col.event,
 .maelstrom table.events td:nth-child(3) {
 	width: 50%;
 }

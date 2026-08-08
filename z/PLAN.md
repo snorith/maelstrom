@@ -32,6 +32,29 @@ as the behavioral spec. System `id` stays `maelstrom` so existing worlds keep wo
 
 Statuses: TODO → IN PROGRESS → DONE. Update this table as phases move.
 
+## External review ledger
+
+### Round 1 — rev 1 (commit 1ac79bf), reviewed 2026-08-08 by codex (GPT-5.6, `review --base master`) + droid (GLM-5.2)
+
+**codex found (all FOLDED):**
+- P1 `CharacterData.migrateData` injected absent keys into update deltas (blankToNull(undefined)→null assigned unconditionally): a wounds-only update also nulled `age`/`bloodloss`, a temp-only update nulled `orig` → rewritten presence-guarded (`normalizeBlank`)
+- P1 initiative modifier: non-blank values were forced through `Number.isFinite` (false for numeric strings) → 0; now only blank/null → 0, everything else left for NumberField casting
+- P1 `WeaponData.migrateData` same delta-injection class (as/ds nulled, other attribute reset on partial updates) → presence-guarded
+- P2 mutating sheet actions not gated for non-editable users → `isEditable` guards on heal/bleed/create/delete + canHeal/canBleed context gated (icons render disabled for observers)
+
+**droid found:**
+- Blocking Qs 1,2,4,5,7 (TABS/_prepareTabs, formInput+HTMLField→ProseMirror, ActorSheetV2 drag/drop, manifest/documentTypes/token bar, DialogV2.wait semantics incl. 0-returning callback): **verdict correct** — settled, do not re-review
+- P2 weapon order→sort migration: `!item.sort` guard could skip weapons whose v9 core sort was auto-assigned → FOLDED (guard dropped; legacy `order` is authoritative, once-only gate makes it safe). Residual: `_source` retention of undeclared keys is unverifiable statically → stays on the phase-7 manual checklist
+- P3 `MAELSTROM.events.column.event.header` said "Living" → FOLDED ("Event"). NOTE: legacy bug, present since v0.3.3 — droid caught a five-year-old defect
+- P3 wound object coercion via Object.values could misplace slots on partial objects → FOLDED (index-mapped). Residual (recorded, not fixable in migrateData): an external partial update still zero-fills unspecified slots — ArrayField deltas replace, they cannot merge
+- P3 README legal text not verbatim vs module header → **REJECTED**: each location preserves its own v0.3.3 wording verbatim; the divergence predates the rewrite. CLAUDE.md rule clarified to "verbatim per location"
+- P4 canBleed `≠0` vs action's `>0` → FOLDED (`>0`; same mismatch existed in old code)
+- P4 select-on-focus missing on modifiers dialog (SPEC §5) → FOLDED (DialogV2 render callback)
+- P4 as/ds zero-blank display differs between actor sheet and weapon sheet → **REJECTED**: 0 and blank are semantically identical for a nullable NumberField; actor-sheet blanking matches the legacy blank-string rendering
+- P4 dead CSS (`grid-column` on grid container; `col.event` selector) → FOLDED (removed)
+
+**Gates:** G1 — normalization sites recounted after rewrite (character: age, 10×orig/temp, ar, penalty, wounds array, bloodloss, initiative.modifier; weapon: as, ds, 2×attributes) — all presence-guarded, verified by 16 new delta assertions in the smoke test (33/33 total). G2 — outward enumeration of paths into migrateData: sheet full-form submit, healAllWounds/sufferBleeding updates, world-migration sort updates (no system delta), item create, JSON/compendium import, external macros — presence guards cover all; residual ArrayField-replace semantics recorded above. G3 — no codex/droid disagreement; injection mechanism confirmed by direct inspection. G4 — **NOT converged** (substantive findings folded) → round 2 (confirmation) required.
+
 ## Implementation complete — remaining HUMAN tasks (Stephen)
 
 1. **Review** `z/SPEC.md` (the behavioral contract) and skim the new code

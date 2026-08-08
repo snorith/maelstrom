@@ -129,7 +129,7 @@
   "MAELSTROM.events.header": "Events",
   "MAELSTROM.events.column.living.header": "Living",
   "MAELSTROM.events.column.years.header": "Years",
-  "MAELSTROM.events.column.event.header": "Living",
+  "MAELSTROM.events.column.event.header": "Event",
   "MAELSTROM.languages.header": "Languages",
   "MAELSTROM.roll.dialog.title": "Modifier",
   "MAELSTROM.roll.button.continue": "Continue",

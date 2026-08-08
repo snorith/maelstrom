@@ -20,6 +20,11 @@ export async function getRollModifiers(baseModifier = 0) {
 		window: { title: game.i18n.localize("MAELSTROM.roll.dialog.title") },
 		content,
 		rejectClose: false, // dismissing the window = cancel
+		render: (event, dialog) => {
+			// select-on-focus (SPEC §5): typing immediately replaces the default 0
+			const element = dialog?.element ?? dialog;
+			element?.querySelector?.('input[name="modifier"]')?.select();
+		},
 		buttons: [
 			{
 				action: "roll",

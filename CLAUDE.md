@@ -73,7 +73,9 @@ settings. `migrateWorld()` runs on `ready` (GM only).
 - Game flavour (world setting `characterSheet`: 1 Domesday / 2 Gothic / 3 Rome) only
   swaps the Favour/Renown label today, but keep new flavour logic keyed on it.
 - The Arion Games trademark/legal text (module header, settings hint, README) must be
-  preserved verbatim.
+  preserved verbatim **per location as inherited from v0.3.3** — the README's public
+  wording has always differed slightly from the module header; that divergence is
+  historical, not an error to "fix".
 
 ## Releasing
 
