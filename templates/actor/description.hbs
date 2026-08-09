@@ -1,4 +1,8 @@
 <section class="tab biography {{tab.cssClass}}" data-tab="{{tab.id}}" data-group="{{tab.group}}">
-	{{formInput fields.biography value=system.biography enriched=enrichedBiography
-		toggled=true name="system.biography" disabled=notEditable}}
+	{{#if editable}}
+		{{formInput fields.biography value=system.biography enriched=enrichedBiography
+			toggled=true name="system.biography"}}
+	{{else}}
+		{{{enrichedBiography}}}
+	{{/if}}
 </section>

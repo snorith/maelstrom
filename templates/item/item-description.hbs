@@ -1,4 +1,8 @@
 <section class="tab description {{tab.cssClass}}" data-tab="{{tab.id}}" data-group="{{tab.group}}">
-	{{formInput fields.notes value=system.notes enriched=enrichedNotes
-		toggled=true name="system.notes" disabled=notEditable}}
+	{{#if editable}}
+		{{formInput fields.notes value=system.notes enriched=enrichedNotes
+			toggled=true name="system.notes"}}
+	{{else}}
+		{{{enrichedNotes}}}
+	{{/if}}
 </section>

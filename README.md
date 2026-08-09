@@ -8,9 +8,21 @@
 Requires **Foundry VTT v13 (13.347+) or v14**. Worlds created with older versions of this
 system (Foundry v9) are migrated automatically on first load.
 
-> ⚠️ **Back up your world folder before updating from v0.3.x.** Version 1.0.0 is a
+> ⚠️ **Back up your world folder before updating from v0.3.x.** Version 1.x is a
 > complete rewrite with a new data layer; the migration is automatic and tested, but a
 > pre-update backup is your only way back.
+
+**Migration notes:**
+
+* Worlds from very old Foundry generations should step through core versions
+  (v11 → v12 → v13), opening the world at each step, rather than jumping straight to
+  the latest — Foundry core runs its own irreversible migrations per generation.
+* Weapon ordering migrates automatically for world actors, world items, and unlinked
+  scene tokens. Items inside **user-created compendium packs** keep their legacy order
+  and will need re-sorting by hand after import.
+* **Active Effects are not supported** by this system: there is no effects UI, and
+  derived values (attribute totals, HP) are recomputed from base data each render, so
+  effects targeting them will not apply.
 
 ## Features
 

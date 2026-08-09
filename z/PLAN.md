@@ -159,17 +159,18 @@ DONE:
 
 DEFERRED until Stephen's Foundry smoke test passes (the whole point of staging):
 1. Merge `foundry-v13-rewrite` → `main` with a **merge commit** (not squash — the
-   v1.0.0 tag must remain reachable from main)
-2. Recreate a `master` branch pointing at the same commit (`git push origin main:refs/heads/master`)
-   — legacy v0.3.3 installs poll the literal `…/master/src/system.json` URL, and
-   raw.githubusercontent does not reliably follow branch renames. THIS is the step
-   that flips the legacy update channel; do it last
-3. Foundry package registry submission + FVTT_PACKAGE_TOKEN secret (see README_DEV)
+   release tags must remain reachable from main). THIS is the step that flips the
+   legacy update channel: VERIFIED 2026-08-09 that GitHub's branch-rename redirect
+   serves `…/master/src/system.json` from `main` (HTTP 200, currently the v0.3.3
+   manifest) — so no `master` branch recreation is needed, and the channel was
+   never broken during staging (legacy users simply see "no update").
+2. Foundry package registry submission + FVTT_PACKAGE_TOKEN secret (see README_DEV)
 
-Until step 2, existing v0.3.3 users see nothing (their update check hits the old
-master URL, which currently 404s — no update offered, nothing breaks). Fresh installs
-of 1.0.0 are already possible via
+Fresh installs are already possible via
 `https://github.com/snorith/maelstrom/releases/latest/download/system.json`.
+NOTE: the v1.0.0 release zip contains the circular-import load crash — release
+v1.0.1 (load fix + best-practices pass, see BEST-PRACTICES-GAP-PLAN.md) once the
+smoke test passes; do not flip the channel onto 1.0.0.
 
 ## Implementation complete — remaining HUMAN tasks (Stephen)
 

@@ -46,6 +46,11 @@
 	},
 	"packs": [],
 	"socket": false,
+	"flags": {
+		"hotReload": {
+			"paths": ["styles", "templates", "lang"]
+		}
+	},
 	"grid": {
 		"distance": 10,
 		"units": "ft"
@@ -59,6 +64,11 @@
 	"bugs": "https://github.com/snorith/maelstrom/issues",
 	"changelog": "https://github.com/snorith/maelstrom#changelog",
 	"media": [
+		{
+			"type": "setup",
+			"url": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
+			"thumbnail": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png"
+		},
 		{
 			"type": "cover",
 			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",

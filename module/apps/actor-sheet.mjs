@@ -32,9 +32,10 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 	static PARTS = {
 		header: { template: `systems/${SYSTEM_ID}/templates/actor/header.hbs` },
 		tabs: { template: "templates/generic/tab-navigation.hbs" },
-		attributes: { template: `systems/${SYSTEM_ID}/templates/actor/attributes.hbs` },
-		equipment: { template: `systems/${SYSTEM_ID}/templates/actor/equipment.hbs` },
-		description: { template: `systems/${SYSTEM_ID}/templates/actor/description.hbs` }
+		// scrollable [""] = the part's root element scrolls (sanctioned idiom)
+		attributes: { template: `systems/${SYSTEM_ID}/templates/actor/attributes.hbs`, scrollable: [""] },
+		equipment: { template: `systems/${SYSTEM_ID}/templates/actor/equipment.hbs`, scrollable: [""] },
+		description: { template: `systems/${SYSTEM_ID}/templates/actor/description.hbs`, scrollable: [""] }
 	};
 
 	static TABS = {
@@ -210,7 +211,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 	/** @this {MaelstromCharacterSheet} */
 	static onRollWeapon(event, target) {
 		if (!this.isEditable) return;
-		const modifier = Number.parseInt(target.dataset.modifier, 10);
+		const modifier = Number(target.dataset.modifier);
 		return this.actor.rollAttribute(target.dataset.attribute, {
 			modifiers: Number.isFinite(modifier) ? [modifier] : [],
 			itemName: target.dataset.name

@@ -31,7 +31,9 @@ export async function getRollModifiers(baseModifier = 0) {
 				label: game.i18n.localize("MAELSTROM.roll.button.continue"),
 				default: true,
 				callback: (event, button) => {
-					const value = Number.parseInt(button.form.elements.modifier?.value, 10);
+					// Number(), not parseInt: number inputs accept exponent notation
+					// ("1e2"), which parseInt would truncate to 1
+					const value = Number(button.form.elements.modifier?.value);
 					return Number.isFinite(value) ? value : 0;
 				}
 			},

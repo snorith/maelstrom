@@ -67,8 +67,12 @@ settings. `migrateWorld()` runs on `ready` (GM only).
   `actor.system`, namespaced APIs (`foundry.documents.collections.Actors`,
   `foundry.applications.ux.TextEditor`), async `roll.evaluate()`.
 - CSS is scoped under `.maelstrom`, colors ride v13 theme variables (works in
-  `.theme-dark`); deliberately unlayered so it wins over core's `@layer` styles.
+  `.theme-dark`); no `@layer` wrapper of our own — v13 auto-wraps manifest
+  stylesheets in the `system` cascade layer, which already orders them above core.
   Never set `display` on `.tab` sections — core toggles their visibility.
+- Active Effects are not supported by this system: no AE UI is provided, and
+  derived fields (`attributes.*.current`, `hp.*`) are recomputed in data
+  preparation so they are not AE-targetable.
 - `lang/en.json`: add keys, never repurpose existing ones.
 - Game flavour (world setting `characterSheet`: 1 Domesday / 2 Gothic / 3 Rome) only
   swaps the Favour/Renown label today, but keep new flavour logic keyed on it.

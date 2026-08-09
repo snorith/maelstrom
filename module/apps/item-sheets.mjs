@@ -52,8 +52,8 @@ export class MaelstromAbilitySheet extends MaelstromItemSheetBase {
 	static PARTS = {
 		header: { template: `systems/${SYSTEM_ID}/templates/item/item-header.hbs` },
 		tabs: { template: "templates/generic/tab-navigation.hbs" },
-		attributes: { template: `systems/${SYSTEM_ID}/templates/item/ability-attributes.hbs` },
-		description: { template: `systems/${SYSTEM_ID}/templates/item/item-description.hbs` }
+		attributes: { template: `systems/${SYSTEM_ID}/templates/item/ability-attributes.hbs`, scrollable: [""] },
+		description: { template: `systems/${SYSTEM_ID}/templates/item/item-description.hbs`, scrollable: [""] }
 	};
 }
 
@@ -61,8 +61,8 @@ export class MaelstromWeaponSheet extends MaelstromItemSheetBase {
 	static PARTS = {
 		header: { template: `systems/${SYSTEM_ID}/templates/item/item-header.hbs` },
 		tabs: { template: "templates/generic/tab-navigation.hbs" },
-		attributes: { template: `systems/${SYSTEM_ID}/templates/item/weapon-attributes.hbs` },
-		description: { template: `systems/${SYSTEM_ID}/templates/item/item-description.hbs` }
+		attributes: { template: `systems/${SYSTEM_ID}/templates/item/weapon-attributes.hbs`, scrollable: [""] },
+		description: { template: `systems/${SYSTEM_ID}/templates/item/item-description.hbs`, scrollable: [""] }
 	};
 
 	async _prepareContext(options) {

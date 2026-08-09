@@ -1,7 +1,8 @@
 /**
  * Maelstrom system styles — plain CSS (native nesting), scoped under .maelstrom.
  * Colors ride on Foundry v13 theme variables so light and dark modes both work.
- * Deliberately unlayered: system styles win over core's @layer'd defaults.
+ * No @layer wrapper here: v13 automatically wraps manifest-declared stylesheets
+ * in the `system` cascade layer, which already orders them above core.
  */
 
 .maelstrom {

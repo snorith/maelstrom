@@ -9,9 +9,12 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
 			ds: new fields.NumberField({ required: true, nullable: true, initial: null }),
 			damage: new fields.StringField({ initial: "" }),
 			range: new fields.StringField({ initial: "" }),
+			// No `choices:` here — choices INVALIDATE nonconforming legacy documents
+			// instead of normalizing them; migrateData below maps out-of-list values
+			// to the defaults instead.
 			attributes: new fields.SchemaField({
-				attack: new fields.StringField({ initial: "attack", choices: ATTRIBUTES }),
-				defence: new fields.StringField({ initial: "defence", choices: ATTRIBUTES })
+				attack: new fields.StringField({ initial: "attack" }),
+				defence: new fields.StringField({ initial: "defence" })
 			}),
 			price: new fields.StringField({ initial: "0" }),
 			carriable: new fields.BooleanField({ initial: true }),
@@ -27,9 +30,15 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
 	static migrateData(source) {
 		normalizeBlank(source, "as");
 		normalizeBlank(source, "ds");
-		if (source.attributes) {
-			if ("attack" in source.attributes && !source.attributes.attack) source.attributes.attack = "attack";
-			if ("defence" in source.attributes && !source.attributes.defence) source.attributes.defence = "defence";
+		// Normalize ONLY present keys; anything not a known attribute id (blank,
+		// non-string, hand-edited garbage) becomes the field default.
+		if (source.attributes && typeof source.attributes === "object") {
+			if ("attack" in source.attributes && !ATTRIBUTES.includes(source.attributes.attack)) {
+				source.attributes.attack = "attack";
+			}
+			if ("defence" in source.attributes && !ATTRIBUTES.includes(source.attributes.defence)) {
+				source.attributes.defence = "defence";
+			}
 		}
 		// Legacy `order`/`lastOrder` are handled by the one-time world migration
 		// (module/migrations.mjs) because core `sort` is a document-level field;

@@ -43,7 +43,7 @@ circular-import load crash).
 | G1 | §2 `choices:` invalidates nonconforming legacy docs | Drop `choices` from WeaponData attack/defence StringFields; migrateData normalizes ONLY present keys: value ∉ ATTRIBUTES (incl. blank/non-string) → field default; never create a missing `attributes` sibling; guard `source.attributes` is an object. Smoke-test: partial deltas, malformed values, valid non-default values, double-run | S | P1 |
 | G2 | §3b `parseInt` truncates exponent input (`1e2`→1) | `Number()` in modifiers-dialog callback (real defect) + actor-sheet onRollWeapon (consistency only — dataset value is already field-cleaned) | S | P3 |
 | G3 | §3 `scrollable: [""]` idiom | Add to the three actor tab parts + both item sheets' attribute/description parts | S | P3 |
-| G4 | §9/§7 world migration surface incomplete | **New migration step 2** (`MIGRATION_VERSION = 2`, `current < 2` guard — v1.0.0 worlds already store 1 and would skip a widened step 1 forever). Step 2 applies order→sort to: standalone world items (`game.items`), and unlinked scene-token actor deltas (`scene.tokens` → actorDelta items). Advance the setting ONLY if every collection migrated without error (idempotent re-run on next load otherwise). User compendia: NOT migrated — documented limitation (G5) | S | P1 |
+| G4 | §9/§7 world migration surface incomplete | **New migration step 2** (`MIGRATION_VERSION = 2`, `current < 2` guard — v1.0.0 worlds already store 1 and would skip a widened step 1 forever). Step 2 applies order→sort to: (a) **rescan of `game.actors`** with the `!item.sort` guard — repairs actors that step 1 caught-and-skipped after advancing the setting, without clobbering post-migration manual sorts (codex rev-2 fold); (b) standalone world items (`game.items`, no guard — first touch, legacy order authoritative); (c) unlinked scene-token **delta-stored** items only (`token.delta.items` — pass-through base items are covered by (a); persistence via the synthetic actor's `updateEmbeddedDocuments`, v13 writes through to the delta — VERIFY this API during impl, droid note). Advance the setting ONLY if every collection migrated without error (idempotent re-run otherwise). Step 1's advance-unconditionally behavior stays as-is (pre-existing, conscious choice). User compendia: NOT migrated — documented limitation (G5) | S | P1 |
 | G5 | §7/§9 docs stance | README + CLAUDE.md: AEs not supported (derived fields recomputed in prep are not AE-targetable); compendium items keep legacy order (order→sort not applied inside packs); very old worlds should step through core generations (v11→v12→v13) rather than jump | S (docs) | P3 |
 | G6 | §1 `flags.hotReload` | `"flags": {"hotReload": {"paths": ["styles", "templates", "lang"]}}` | S | P4 |
 | G7 | §1 setup-screen `media` entry | `{"type": "setup", "url": <cover URL>, "thumbnail": <same URL>}` alongside existing cover/screenshot | S | P4 |
@@ -94,3 +94,24 @@ not opinion (Gate 3).
 reduced form both support (formInput stays for editable; observers get bare
 enriched HTML). G9 — both defer: moved out of scope.
 **Gate 4: NOT converged** (substantive folds) → plan confirmation round required.
+
+### Plan rev 2 → rev 3 (confirmation round), 2026-08-09, codex + droid
+
+- **droid**: "No objections. Proceed." Verified every rev-2 fold against the live
+  repo; two non-blocking notes folded as annotations: the unlinked-token
+  persistence API must be verified during impl (it fires through the token delta),
+  and step 1's advance-unconditionally failure handling stays as a recorded
+  conscious choice. Also noted `z/phase-6-plan.md` repeats the "unlayered" claim —
+  left as-is (historical planning document, not a live instruction surface).
+- **codex**: one conditional — step 2 must also idempotently **rescan
+  `game.actors`** because step 1 catches per-actor failures and advances the
+  setting anyway; "then it is ready to implement." Folded verbatim into G4(a)
+  with the `!item.sort` guard so the rescan repairs failures without clobbering
+  manual sorts.
+- **V1 RESOLVED by API-doc scrape** (not opinion): v13 `DocumentSheetV2.
+  DEFAULT_OPTIONS.actions` includes `editImage` — the `data-action="editImage"`
+  attributes are live core functionality; droid's rev-1 F6 was wrong. No code
+  change.
+- **Gate 4: CONVERGED at rev 3.** The single rev-3 delta is codex's own
+  prescription blessed by droid's proceed; a third round would re-review a
+  sentence both reviewers effectively wrote. → IMPLEMENT.
