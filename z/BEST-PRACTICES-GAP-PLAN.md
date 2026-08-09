@@ -142,3 +142,21 @@ enriched HTML). G9 — both defer: moved out of scope.
 - phase-7 checklist gained unlinked-token + world-item migration tests
   (including the de-link probe: edit a base weapon, confirm the token sees it).
 - **Gate 4: NOT converged** (P1 folded) → impl confirmation round required.
+
+### Implementation confirmation round — commits 9de8b00 + 3617ed7, 2026-08-09
+
+- **droid** (on 9de8b00): "Sound. No blockers." Verified the raw-record loop's
+  every shape assumption, the entry-version guard interplay (including that
+  2(c) unguarded-in-both-modes is correct — step 1 never touched deltas), and
+  the fold set complete.
+- **codex** (on 9de8b00): one remaining P2 — fresh-run unguarded rescan could
+  clobber a GM re-sort made DURING the async migration (nothing awaits
+  migrateWorld). FOLDED per its own prescription in 3617ed7: step 1 returns
+  failed actor ids; fresh-run rescan touches only those.
+- **codex** (on 3617ed7): clean — "correctly limits the fresh-run rescan …
+  preventing successful migrations from overwriting concurrent manual
+  re-sorts while retaining retry behavior."
+- **Gate 4: CONVERGED.** Plan loop converged at rev 3; implementation loop
+  converged at 3617ed7 with two-family agreement. Remaining verification is
+  Foundry-in-hand: z/phase-7-checklist.md (now including the unlinked-token
+  de-link probe), then version bump to v1.0.1 + tag, then channel flip.
