@@ -9,6 +9,10 @@
 	--maelstrom-accent: saddlebrown;
 	--maelstrom-subtle: color-mix(in srgb, currentColor 8%, transparent);
 	--maelstrom-border: color-mix(in srgb, currentColor 25%, transparent);
+	/* Field fill rides currentColor: lighter than the sheet in dark theme,
+	   slightly darker in light theme — visible in both without hard colors. */
+	--maelstrom-field-bg: color-mix(in srgb, currentColor 14%, transparent);
+	--maelstrom-field-bg-focus: color-mix(in srgb, currentColor 20%, transparent);
 }
 
 .theme-dark .maelstrom,
@@ -153,6 +157,32 @@
 			height: 100%;
 			margin: 0;
 		}
+	}
+}
+
+/* ------------------------------------ */
+/* Form fields                          */
+/* ------------------------------------ */
+
+/* Core's dark theme gives inputs nearly the same value as the sheet body;
+   lift them so fields read as fields. Checkboxes excluded — v13 renders
+   those as FontAwesome glyphs with their own styling. */
+.maelstrom input[type="text"],
+.maelstrom input[type="number"],
+.maelstrom select,
+.maelstrom textarea {
+	background: var(--maelstrom-field-bg);
+	border: 1px solid var(--maelstrom-border);
+	border-radius: 3px;
+
+	&:focus {
+		background: var(--maelstrom-field-bg-focus);
+		border-color: var(--maelstrom-accent);
+		outline: none;
+	}
+
+	&:disabled {
+		background: var(--maelstrom-subtle);
 	}
 }
 
