@@ -115,3 +115,30 @@ enriched HTML). G9 — both defer: moved out of scope.
 - **Gate 4: CONVERGED at rev 3.** The single rev-3 delta is codex's own
   prescription blessed by droid's proceed; a third round would re-review a
   sentence both reviewers effectively wrote. → IMPLEMENT.
+
+### Implementation review round 1 — commit c441904, 2026-08-09, codex + droid
+
+- **droid**: implementation sound, no P1/P2; verified all G-items vs plan in a
+  table; confirmed same-load step1+step2 has no double-migration; P4 dead
+  `&& ok` operand (FOLDED — simplified); P3 restated the plan's own
+  token-delta verify note.
+- **codex found (all FOLDED in follow-up commit):**
+  - P1 `token.delta.items` may include INHERITED base-actor items — updating
+    them through the synthetic actor adopts them into the delta and de-links
+    future base changes. **Gate-3 note: droid read the same API as safe** —
+    resolved without settling the API question by iterating the RAW delta
+    source (`token.delta._source.items`), which is delta-stored by definition
+    under both readings and also removes the DataModel-shape assumption
+    (droid's P3).
+  - P2 rescan guard hides step-1 failures on worlds stamped v1 (failed items
+    can carry positive v9 auto-sorts) — folded as entry-version-dependent
+    guard: unguarded on fresh runs (entry 0, same-load repair, nothing to
+    clobber), guarded when entering at v1 (manual re-sorts may exist).
+    Residual accepted + recorded: on a genuine stamped-v1 world a
+    positive-sort failed weapon stays unrepaired; in practice no pre-fix
+    v1.0.0 build could load far enough to stamp v1.
+  - P2 `flags.hotReload` needs `extensions` alongside `paths` — added
+    (css/hbs/json).
+- phase-7 checklist gained unlinked-token + world-item migration tests
+  (including the de-link probe: edit a base weapon, confirm the token sees it).
+- **Gate 4: NOT converged** (P1 folded) → impl confirmation round required.

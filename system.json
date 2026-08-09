@@ -48,7 +48,8 @@
 	"socket": false,
 	"flags": {
 		"hotReload": {
-			"paths": ["styles", "templates", "lang"]
+			"paths": ["styles", "templates", "lang"],
+			"extensions": ["css", "hbs", "json"]
 		}
 	},
 	"grid": {

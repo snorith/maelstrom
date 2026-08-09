@@ -30,7 +30,7 @@ export async function migrateWorld() {
 
 	let ok = true;
 	if (current < 1) await migrateWeaponOrderToSort();
-	if (current < 2) ok = (await migrateWeaponOrderStep2()) && ok;
+	if (current < 2) ok = await migrateWeaponOrderStep2(current);
 
 	// Step 2 advances only on full success so a failed collection retries on the
 	// next world load (all order→sort writes are idempotent).
@@ -75,23 +75,35 @@ async function migrateWeaponOrderToSort() {
 
 /**
  * v2: widen the order→sort surface that step 1 missed.
- *  (a) Rescan world actors WITH the sort guard — repairs actors step 1
- *      caught-and-skipped after advancing the setting, without clobbering
- *      manual re-sorts done since.
+ *  (a) Rescan world actors — repairs actors step 1 caught-and-skipped. The
+ *      sort guard is applied ONLY when the world entered this load already
+ *      stamped at v1 (a previous session ran step 1, so manual re-sorts may
+ *      exist and must not be clobbered — but weapons a failed step 1 left
+ *      with a positive v9 auto-sort then stay unrepaired; accepted, and in
+ *      practice no pre-fix v1.0.0 build could load far enough to stamp v1).
+ *      On a fresh run (entry version 0) the rescan is unguarded: step 1 just
+ *      ran in this same load, nobody has re-sorted anything yet, and the
+ *      re-writes are idempotent.
  *  (b) Standalone world items (game.items) — first touch, legacy order
  *      authoritative, no guard.
- *  (c) Unlinked scene tokens' DELTA-STORED items only (token.delta.items):
- *      pass-through base-actor items are covered by (a); persistence goes
- *      through the synthetic actor, which v13 writes into the token delta.
+ *  (c) Unlinked scene tokens: iterate the RAW delta source records
+ *      (token.delta._source.items) — never the merged collection, whose
+ *      contents differ between readings of the v13 API; updating an
+ *      inherited base-actor item through the synthetic actor would adopt it
+ *      into the delta and permanently de-link it. Raw records are by
+ *      definition delta-stored, and reading plain data avoids any DataModel
+ *      shape assumption. Persistence via the synthetic actor writes through
+ *      to the delta (v13).
  * User compendia are NOT migrated (documented limitation, see README).
  * Returns true only if every collection migrated without error.
  */
-async function migrateWeaponOrderStep2() {
+async function migrateWeaponOrderStep2(entryVersion) {
 	let ok = true;
 
-	// (a) world-actor rescan, guarded
+	// (a) world-actor rescan; guard only when a prior session already ran step 1
+	const onlyUnsorted = entryVersion >= 1;
 	for (const actor of game.actors) {
-		const updates = actor.items.map((i) => legacyOrderToSort(i, { onlyUnsorted: true })).filter(Boolean);
+		const updates = actor.items.map((i) => legacyOrderToSort(i, { onlyUnsorted })).filter(Boolean);
 		if (updates.length === 0) continue;
 		try {
 			await actor.updateEmbeddedDocuments("Item", updates);
@@ -113,15 +125,18 @@ async function migrateWeaponOrderStep2() {
 		console.error("Maelstrom | Weapon order migration failed for world items", err);
 	}
 
-	// (c) unlinked scene-token deltas, delta-stored items only
+	// (c) unlinked scene-token deltas — RAW delta source records only
 	for (const scene of game.scenes) {
 		for (const token of scene.tokens) {
 			if (token.actorLink || !token.actor) continue;
-			const deltaItems = token.delta?.items ?? [];
+			const rawDeltaItems = token.delta?._source?.items ?? [];
 			const updates = [];
-			for (const item of deltaItems) {
-				const update = legacyOrderToSort(item, { onlyUnsorted: false });
-				if (update) updates.push(update);
+			for (const record of rawDeltaItems) {
+				if (record?.type !== "weapon") continue;
+				const legacyOrder = record?.system?.order;
+				if (Number.isFinite(legacyOrder) && legacyOrder >= 0) {
+					updates.push({ _id: record._id, sort: (legacyOrder + 1) * 1000 });
+				}
 			}
 			if (updates.length === 0) continue;
 			try {

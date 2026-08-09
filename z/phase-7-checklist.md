@@ -17,6 +17,11 @@ have both; v14 alone covers most risk.
       armour, careers ×6, languages, characteristics, notes/equipment, biography all
       survived — compare against the old install side by side
 - [ ] Weapons kept their manual order (order → sort migration)
+- [ ] An UNLINKED token of a legacy actor (drop on a scene in the v0.3.x world,
+      reorder its weapons there first) keeps its weapon order after migration,
+      and its items still track the base actor afterwards (edit a base weapon,
+      confirm the token sees the change — delta must not have adopted it)
+- [ ] A standalone weapon in the world Items directory keeps its order
 - [ ] Blank temp values stayed blank (no attribute suddenly reads 0)
 
 ## Derived data & token
