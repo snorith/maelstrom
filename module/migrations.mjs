@@ -29,8 +29,8 @@ export async function migrateWorld() {
 	console.log(`Maelstrom | Running world migration ${current} → ${MIGRATION_VERSION}`);
 
 	let ok = true;
-	if (current < 1) await migrateWeaponOrderToSort();
-	if (current < 2) ok = await migrateWeaponOrderStep2(current);
+	const step1FailedActorIds = current < 1 ? await migrateWeaponOrderToSort() : null;
+	if (current < 2) ok = await migrateWeaponOrderStep2(current, step1FailedActorIds);
 
 	// Step 2 advances only on full success so a failed collection retries on the
 	// next world load (all order→sort writes are idempotent).
@@ -58,8 +58,10 @@ function legacyOrderToSort(item, { onlyUnsorted }) {
  * auto-assigned one that never reflected the legacy order): the legacy `order`
  * is authoritative on first touch. Historical behavior preserved as-is,
  * including advance-on-partial-failure — step 2 repairs what this step missed.
+ * Returns the ids of actors whose batch update failed (for step 2's same-load repair).
  */
 async function migrateWeaponOrderToSort() {
+	const failedActorIds = new Set();
 	for (const actor of game.actors) {
 		const updates = actor.items.map((i) => legacyOrderToSort(i, { onlyUnsorted: false })).filter(Boolean);
 		if (updates.length > 0) {
@@ -67,23 +69,26 @@ async function migrateWeaponOrderToSort() {
 				await actor.updateEmbeddedDocuments("Item", updates);
 				console.log(`Maelstrom | Migrated weapon order for actor "${actor.name}" (${updates.length} items)`);
 			} catch (err) {
+				failedActorIds.add(actor.id);
 				console.error(`Maelstrom | Weapon order migration failed for actor "${actor.name}"`, err);
 			}
 		}
 	}
+	return failedActorIds;
 }
 
 /**
  * v2: widen the order→sort surface that step 1 missed.
- *  (a) Rescan world actors — repairs actors step 1 caught-and-skipped. The
- *      sort guard is applied ONLY when the world entered this load already
- *      stamped at v1 (a previous session ran step 1, so manual re-sorts may
- *      exist and must not be clobbered — but weapons a failed step 1 left
- *      with a positive v9 auto-sort then stay unrepaired; accepted, and in
- *      practice no pre-fix v1.0.0 build could load far enough to stamp v1).
- *      On a fresh run (entry version 0) the rescan is unguarded: step 1 just
- *      ran in this same load, nobody has re-sorted anything yet, and the
- *      re-writes are idempotent.
+ *  (a) Rescan world actors — repairs actors step 1 caught-and-skipped.
+ *      Fresh run (entry version 0): step 1 just ran in this load, so the
+ *      rescan touches ONLY the actors whose step-1 batch actually failed,
+ *      unguarded — actors that succeeded are never re-written, which also
+ *      closes the race where a GM re-sorts mid-migration (nothing awaits
+ *      migrateWorld). Entering at v1 (previous session ran step 1): rescan
+ *      every actor WITH the sort guard, so manual re-sorts made since are
+ *      never clobbered — weapons a failed step 1 left with a positive v9
+ *      auto-sort then stay unrepaired; accepted residual, and in practice
+ *      no pre-fix v1.0.0 build could load far enough to stamp v1.
  *  (b) Standalone world items (game.items) — first touch, legacy order
  *      authoritative, no guard.
  *  (c) Unlinked scene tokens: iterate the RAW delta source records
@@ -97,12 +102,14 @@ async function migrateWeaponOrderToSort() {
  * User compendia are NOT migrated (documented limitation, see README).
  * Returns true only if every collection migrated without error.
  */
-async function migrateWeaponOrderStep2(entryVersion) {
+async function migrateWeaponOrderStep2(entryVersion, step1FailedActorIds) {
 	let ok = true;
 
-	// (a) world-actor rescan; guard only when a prior session already ran step 1
-	const onlyUnsorted = entryVersion >= 1;
+	// (a) world-actor rescan (see doc comment above for the two modes)
+	const freshRun = entryVersion < 1;
+	const onlyUnsorted = !freshRun;
 	for (const actor of game.actors) {
+		if (freshRun && !step1FailedActorIds?.has(actor.id)) continue;
 		const updates = actor.items.map((i) => legacyOrderToSort(i, { onlyUnsorted })).filter(Boolean);
 		if (updates.length === 0) continue;
 		try {
