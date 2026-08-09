@@ -1,5 +1,5 @@
 import { ATTRIBUTES } from "../data/character-data.mjs";
-import { SYSTEM_ID } from "../maelstrom.mjs";
+import { SYSTEM_ID } from "../constants.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ItemSheetV2 } = foundry.applications.sheets;

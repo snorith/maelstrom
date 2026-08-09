@@ -22,14 +22,8 @@ import { MaelstromItem } from "./documents/item.mjs";
 import { MaelstromCharacterSheet } from "./apps/actor-sheet.mjs";
 import { MaelstromAbilitySheet, MaelstromWeaponSheet } from "./apps/item-sheets.mjs";
 
-export const SYSTEM_ID = "maelstrom";
-
-/**
- * Combat initiative formula: 2d10 + speed + modifier, with speed/100 as a
- * deterministic tie-breaker (2 decimals shown in the tracker).
- */
-export const INITIATIVE_FORMULA =
-	"2d10 + @attributes.speed.current + @initiative.modifier + (@attributes.speed.current / 100)";
+export { SYSTEM_ID, INITIATIVE_FORMULA } from "./constants.mjs";
+import { SYSTEM_ID, INITIATIVE_FORMULA } from "./constants.mjs";
 
 /* ------------------------------------ */
 /* Initialize system                    */

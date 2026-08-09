@@ -1,7 +1,7 @@
 import { PHYSICAL_ATTRIBUTES } from "../data/character-data.mjs";
 import { rollOutcome, stackModifiers, formatBreakdown } from "../rolls.mjs";
 import { getRollModifiers } from "../apps/modifiers-dialog.mjs";
-import { INITIATIVE_FORMULA } from "../maelstrom.mjs";
+import { INITIATIVE_FORMULA } from "../constants.mjs";
 
 const { escapeHTML } = foundry.utils;
 

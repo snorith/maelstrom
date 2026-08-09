@@ -1,4 +1,4 @@
-import { SYSTEM_ID } from "./maelstrom.mjs";
+import { SYSTEM_ID } from "./constants.mjs";
 
 /**
  * Current world-level migration version. Bump when adding a new one-time

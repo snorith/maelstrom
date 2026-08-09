@@ -1,4 +1,8 @@
 {
+  "TYPES.Actor.character": "Character",
+  "TYPES.Item.ability": "Ability",
+  "TYPES.Item.weapon": "Weapon",
+  "TYPES.Item.equipment": "Equipment",
   "MAELSTROM.sheet.tabs.attributes": "Attributes/Abilities",
   "MAELSTROM.sheet.tabs.equip": "Equip/Events",
   "MAELSTROM.sheet.tabs.description": "Description",
