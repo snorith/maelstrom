@@ -1,0 +1,162 @@
+# Best-practices gap plan — maelstrom vs FOUNDRY-BEST-PRACTICES.md (hellas, 2026-08)
+
+Comparison of the shipped v13 rewrite against
+`/Users/stephen/WebstormProjects/hellas/z/FOUNDRY-BEST-PRACTICES.md` (§ refs below).
+Target release for the fixes: **v1.0.1** (which also carries the already-fixed
+circular-import load crash).
+
+## Already compliant (verified, no action)
+
+- §1 id/version/compatibility/manifest/download/documentTypes/grid/primaryTokenAttribute
+- §2 TypeDataModel per sub-type; ""→null before NumberField cleaning; delta-safe
+  presence-guarded migrateData; derived data in prepareDerivedData; no DB writes in prep
+- §3 AppV2 core contract (DEFAULT_OPTIONS/PARTS/TABS/actions/isEditable gating);
+  free drag-drop; tab template structure; sheet registration via namespaced collections;
+  tooltip CSS scoped under #tooltip
+- §3b DialogV2 form-less content; render-callback focus; wait() semantics
+- §4 package-class scoping; no external fonts; core theme variables
+- §5 TYPES.* labels (fixed after first boot); composed-key audit
+- §7 async dice + toMessage + CONST roll modes; single Item class; _preUpdate for
+  whole-document context
+- §8 tag-push CI, stamped manifest, both assets attached, stable manifest URL,
+  pinned download, Package Release API step, dev material excluded from zip
+- §9 both migration layers (migrateData + gated world runner)
+- §10 no deprecated APIs in use; mise pins node 24
+
+## Corrections to our own records (no code)
+
+- **C1. Rollout plan**: hellas §8 says renamed-branch raw URLs redirect — VERIFIED
+  live today: `…/master/src/system.json` returns HTTP 200 serving main's content.
+  Therefore (a) the legacy channel never broke during the staged rollout (it serves
+  v0.3.3's manifest → "no update"), and (b) the deferred "recreate master branch"
+  step is unnecessary — merging to main flips the channel alone. Update PLAN.md.
+- **C2. CSS-layer explanation**: our stylesheet header AND CLAUDE.md claim we
+  "deliberately unlayered" to beat core; per hellas §4 v13 auto-wraps
+  manifest-declared stylesheets in the `system` cascade layer. Behavior fine,
+  explanation wrong — fix both locations (droid F1: plan originally missed
+  CLAUDE.md).
+
+## Gaps to implement (proposed, severity-ordered)
+
+| # | Gap (doc §) | Change | Size | Sev |
+|---|---|---|---|---|
+| G1 | §2 `choices:` invalidates nonconforming legacy docs | Drop `choices` from WeaponData attack/defence StringFields; migrateData normalizes ONLY present keys: value ∉ ATTRIBUTES (incl. blank/non-string) → field default; never create a missing `attributes` sibling; guard `source.attributes` is an object. Smoke-test: partial deltas, malformed values, valid non-default values, double-run | S | P1 |
+| G2 | §3b `parseInt` truncates exponent input (`1e2`→1) | `Number()` in modifiers-dialog callback (real defect) + actor-sheet onRollWeapon (consistency only — dataset value is already field-cleaned) | S | P3 |
+| G3 | §3 `scrollable: [""]` idiom | Add to the three actor tab parts + both item sheets' attribute/description parts | S | P3 |
+| G4 | §9/§7 world migration surface incomplete | **New migration step 2** (`MIGRATION_VERSION = 2`, `current < 2` guard — v1.0.0 worlds already store 1 and would skip a widened step 1 forever). Step 2 applies order→sort to: (a) **rescan of `game.actors`** with the `!item.sort` guard — repairs actors that step 1 caught-and-skipped after advancing the setting, without clobbering post-migration manual sorts (codex rev-2 fold); (b) standalone world items (`game.items`, no guard — first touch, legacy order authoritative); (c) unlinked scene-token **delta-stored** items only (`token.delta.items` — pass-through base items are covered by (a); persistence via the synthetic actor's `updateEmbeddedDocuments`, v13 writes through to the delta — VERIFY this API during impl, droid note). Advance the setting ONLY if every collection migrated without error (idempotent re-run otherwise). Step 1's advance-unconditionally behavior stays as-is (pre-existing, conscious choice). User compendia: NOT migrated — documented limitation (G5) | S | P1 |
+| G5 | §7/§9 docs stance | README + CLAUDE.md: AEs not supported (derived fields recomputed in prep are not AE-targetable); compendium items keep legacy order (order→sort not applied inside packs); very old worlds should step through core generations (v11→v12→v13) rather than jump | S (docs) | P3 |
+| G6 | §1 `flags.hotReload` | `"flags": {"hotReload": {"paths": ["styles", "templates", "lang"]}}` | S | P4 |
+| G7 | §1 setup-screen `media` entry | `{"type": "setup", "url": <cover URL>, "thumbnail": <same URL>}` alongside existing cover/screenshot | S | P4 |
+| G8 | §3 rich-text observer view (REDUCED after review) | Keep `{{formInput}}` for editable (it emits the sanctioned prose-mirror); render bare `{{{enriched}}}` when not editable (biography + item notes) | S | P4 |
+| V1 | verify-then-decide | Confirm whether DocumentSheetV2 (v13) ships an `editImage` action: if yes, header.hbs `data-action="editImage"` is live (droid F6 wrong, keep); if no, wire a FilePicker action per doc §3. Settle by API-doc scrape during implementation | S | P4 |
+
+## Explicitly out of scope for v1.0.1 (recorded so reviewers don't propose them)
+
+- `background` login image (§1): needs a real local asset; none exists post-rewrite
+- Active Effects UI (§7): dropping AE support note is enough for a system this size;
+  an AE tab is a feature, not a compliance fix
+- Compendia practices (§6): system ships no packs; user-compendium order→sort is a
+  documented limitation (G5), not silent exclusion
+- **G9 (LOCALIZATION_PREFIXES + schema labels)** — moved out of scope by BOTH
+  reviewers (rev 1): sheets hand-write every label and G8-reduced keeps formInput
+  only for label-less HTMLFields; schema localization would have zero user-visible
+  effect. Revisit at formGroup adoption
+- trademarkNotice setting name/hint as i18n keys (codex rev-1 P3) — REJECTED:
+  intentional literal legal text; translation must not alter licensed wording
+  (droid concurs). Recorded here so it is not re-proposed
+
+## Sequencing
+
+1. C1+C2 (record fixes) → 2. V1 verification → 3. G1–G8 (all small now) →
+4. re-run full static suite (load smoke, migrate smoke incl. new G1/G4 cases, lang
+   audit, template parse, CSS parse) → 5. version bump v1.0.1 + tag AFTER Stephen's
+   Foundry smoke test passes (bundles the load-crash fix already on the branch)
+
+## Review ledger (this plan)
+
+### Plan rev 1 → rev 2, reviewed 2026-08-09 by codex (GPT-5.6) + droid (GLM-5.2)
+
+**codex found (FOLDED):** P1 G4 needed a new migration step (v1.0.0 worlds at
+setting=1 would skip a widened step 1 forever) · P2 G4 surface incomplete (world
+items, compendium decision, no version-advance on failure) · P4 G7 missing
+thumbnail · G1 approach confirmed with a tightened normalization spec · G2
+severity split (dialog half real, sheet half consistency) · fold core-generation
+advice into G5.
+**codex found (REJECTED):** P3 trademarkNotice i18n — intentional literal legal
+text (droid concurs); recorded in out-of-scope.
+**droid found (FOLDED):** F1 C2 must also fix CLAUDE.md · F5 G7 thumbnail
+(agrees w/ codex) · F3+F4 G8/G9 assessment.
+**droid found (VERIFY-THEN-DECIDE):** F6 claims header.hbs `data-action="editImage"`
+is dead (no such action in the sheet's map) — conflicts with round-1 review-loop
+verification that DocumentSheetV2 provides it. Became V1; settle by API-doc scrape,
+not opinion (Gate 3).
+**Gate-3 resolutions:** G8 — codex "keep (S)" vs droid "churn, defer": folded the
+reduced form both support (formInput stays for editable; observers get bare
+enriched HTML). G9 — both defer: moved out of scope.
+**Gate 4: NOT converged** (substantive folds) → plan confirmation round required.
+
+### Plan rev 2 → rev 3 (confirmation round), 2026-08-09, codex + droid
+
+- **droid**: "No objections. Proceed." Verified every rev-2 fold against the live
+  repo; two non-blocking notes folded as annotations: the unlinked-token
+  persistence API must be verified during impl (it fires through the token delta),
+  and step 1's advance-unconditionally failure handling stays as a recorded
+  conscious choice. Also noted `z/phase-6-plan.md` repeats the "unlayered" claim —
+  left as-is (historical planning document, not a live instruction surface).
+- **codex**: one conditional — step 2 must also idempotently **rescan
+  `game.actors`** because step 1 catches per-actor failures and advances the
+  setting anyway; "then it is ready to implement." Folded verbatim into G4(a)
+  with the `!item.sort` guard so the rescan repairs failures without clobbering
+  manual sorts.
+- **V1 RESOLVED by API-doc scrape** (not opinion): v13 `DocumentSheetV2.
+  DEFAULT_OPTIONS.actions` includes `editImage` — the `data-action="editImage"`
+  attributes are live core functionality; droid's rev-1 F6 was wrong. No code
+  change.
+- **Gate 4: CONVERGED at rev 3.** The single rev-3 delta is codex's own
+  prescription blessed by droid's proceed; a third round would re-review a
+  sentence both reviewers effectively wrote. → IMPLEMENT.
+
+### Implementation review round 1 — commit c441904, 2026-08-09, codex + droid
+
+- **droid**: implementation sound, no P1/P2; verified all G-items vs plan in a
+  table; confirmed same-load step1+step2 has no double-migration; P4 dead
+  `&& ok` operand (FOLDED — simplified); P3 restated the plan's own
+  token-delta verify note.
+- **codex found (all FOLDED in follow-up commit):**
+  - P1 `token.delta.items` may include INHERITED base-actor items — updating
+    them through the synthetic actor adopts them into the delta and de-links
+    future base changes. **Gate-3 note: droid read the same API as safe** —
+    resolved without settling the API question by iterating the RAW delta
+    source (`token.delta._source.items`), which is delta-stored by definition
+    under both readings and also removes the DataModel-shape assumption
+    (droid's P3).
+  - P2 rescan guard hides step-1 failures on worlds stamped v1 (failed items
+    can carry positive v9 auto-sorts) — folded as entry-version-dependent
+    guard: unguarded on fresh runs (entry 0, same-load repair, nothing to
+    clobber), guarded when entering at v1 (manual re-sorts may exist).
+    Residual accepted + recorded: on a genuine stamped-v1 world a
+    positive-sort failed weapon stays unrepaired; in practice no pre-fix
+    v1.0.0 build could load far enough to stamp v1.
+  - P2 `flags.hotReload` needs `extensions` alongside `paths` — added
+    (css/hbs/json).
+- phase-7 checklist gained unlinked-token + world-item migration tests
+  (including the de-link probe: edit a base weapon, confirm the token sees it).
+- **Gate 4: NOT converged** (P1 folded) → impl confirmation round required.
+
+### Implementation confirmation round — commits 9de8b00 + 3617ed7, 2026-08-09
+
+- **droid** (on 9de8b00): "Sound. No blockers." Verified the raw-record loop's
+  every shape assumption, the entry-version guard interplay (including that
+  2(c) unguarded-in-both-modes is correct — step 1 never touched deltas), and
+  the fold set complete.
+- **codex** (on 9de8b00): one remaining P2 — fresh-run unguarded rescan could
+  clobber a GM re-sort made DURING the async migration (nothing awaits
+  migrateWorld). FOLDED per its own prescription in 3617ed7: step 1 returns
+  failed actor ids; fresh-run rescan touches only those.
+- **codex** (on 3617ed7): clean — "correctly limits the fresh-run rescan …
+  preventing successful migrations from overwriting concurrent manual
+  re-sorts while retaining retry behavior."
+- **Gate 4: CONVERGED.** Plan loop converged at rev 3; implementation loop
+  converged at 3617ed7 with two-family agreement. Remaining verification is
+  Foundry-in-hand: z/phase-7-checklist.md (now including the unlinked-token
+  de-link probe), then version bump to v1.0.1 + tag, then channel flip.

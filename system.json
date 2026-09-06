@@ -1,0 +1,84 @@
+{
+	"id": "maelstrom",
+	"title": "Maelstrom",
+	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
+	"version": "1.0.0",
+	"compatibility": {
+		"minimum": "13.347",
+		"verified": "14"
+	},
+	"authors": [
+		{
+			"name": "Stephen Smith",
+			"discord": "norith",
+			"flags": {
+				"twitter": "@norith",
+				"reddit": "u/norith"
+			}
+		}
+	],
+	"esmodules": ["module/maelstrom.mjs"],
+	"styles": ["styles/maelstrom.css"],
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		}
+	],
+	"documentTypes": {
+		"Actor": {
+			"character": {
+				"htmlFields": ["biography"]
+			}
+		},
+		"Item": {
+			"ability": {
+				"htmlFields": ["notes"]
+			},
+			"weapon": {
+				"htmlFields": ["notes"]
+			},
+			"equipment": {
+				"htmlFields": ["notes"]
+			}
+		}
+	},
+	"packs": [],
+	"socket": true,
+	"flags": {
+		"hotReload": {
+			"paths": ["styles", "templates", "lang"],
+			"extensions": ["css", "hbs", "json"]
+		}
+	},
+	"grid": {
+		"distance": 10,
+		"units": "ft"
+	},
+	"primaryTokenAttribute": "hp",
+	"url": "https://github.com/snorith/maelstrom",
+	"manifest": "https://github.com/snorith/maelstrom/releases/latest/download/system.json",
+	"download": "https://github.com/snorith/maelstrom/releases/download/v1.0.0/maelstrom-v1.0.0.zip",
+	"license": "LICENSE",
+	"readme": "https://github.com/snorith/maelstrom#readme",
+	"bugs": "https://github.com/snorith/maelstrom/issues",
+	"changelog": "https://github.com/snorith/maelstrom#changelog",
+	"media": [
+		{
+			"type": "setup",
+			"url": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
+			"thumbnail": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png"
+		},
+		{
+			"type": "cover",
+			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
+			"caption": "Maelstrom RPG"
+		},
+		{
+			"type": "screenshot",
+			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
+			"caption": "Player sheet"
+		}
+	]
+}

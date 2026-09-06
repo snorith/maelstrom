@@ -1,19 +1,24 @@
 {
+	"id": "maelstrom",
 	"name": "maelstrom",
 	"title": "Maelstrom",
-	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome",
-	"version": "0.3.3",
-	"templateVersion": 2,
+	"description": "Fan contributed support for Maelstrom Domesday / Gothic / Rome. NOTE: as of v1.0.0 this system requires Foundry VTT v13+ and is distributed via GitHub Releases; this file exists only so legacy installs (which poll this URL) discover the new update channel.",
+	"version": "1.0.0",
+	"compatibility": {
+		"minimum": "13.347",
+		"verified": "14"
+	},
+	"minimumCoreVersion": "13",
+	"compatibleCoreVersion": "14",
 	"author": "Stephen Smith",
-	"scripts": [
-		"lib/tooltipster/tooltipster.bundle.min.js"
+	"authors": [
+		{
+			"name": "Stephen Smith",
+			"discord": "norith"
+		}
 	],
-	"esmodules": ["maelstrom.js"],
-	"styles": [
-		"maelstrom.css",
-		"lib/tooltipster/tooltipster.bundle.min.css"
-	],
-	"packs": [],
+	"esmodules": ["module/maelstrom.mjs"],
+	"styles": ["styles/maelstrom.css"],
 	"languages": [
 		{
 			"lang": "en",
@@ -21,37 +26,11 @@
 			"path": "lang/en.json"
 		}
 	],
-	"socket": false,
-	"gridDistance": 10,
-	"gridUnits": "ft",
-	"minimumCoreVersion": "9",
-	"compatibleCoreVersion": "9",
-	"manifest": "https://raw.githubusercontent.com/snorith/maelstrom/master/src/system.json",
-	"download": "https://raw.githubusercontent.com/snorith/maelstrom/v0.3.3/package/maelstrom-v0.3.3.zip",
+	"url": "https://github.com/snorith/maelstrom",
+	"manifest": "https://github.com/snorith/maelstrom/releases/latest/download/system.json",
+	"download": "https://github.com/snorith/maelstrom/releases/download/v1.0.0/maelstrom-v1.0.0.zip",
 	"license": "LICENSE",
 	"readme": "https://github.com/snorith/maelstrom#readme",
 	"bugs": "https://github.com/snorith/maelstrom/issues",
-	"changelog": "https://github.com/snorith/maelstrom#changelog",
-	"primaryTokenAttribute": "hp",
-	"url": "https://github.com/snorith/maelstrom.git",
-	"media": [
-		{
-			"type": "cover",
-			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
-			"caption": "Maelstrom RPG"
-		},
-		{
-			"type": "screenshot",
-			"link": "https://user-images.githubusercontent.com/1318926/104818700-25f0aa80-57f7-11eb-91a1-80f706857850.png",
-			"caption": "Player sheet"
-		}
-	],
-	"authors": [
-		{
-			"name": "Stephen Smith",
-			"twitter": "@norith",
-			"reddit": "u/norith"
-		}
-	],
-	"manifestPlusVersion": "1.2.0"
+	"changelog": "https://github.com/snorith/maelstrom#changelog"
 }

@@ -4,162 +4,130 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-An unofficial **Foundry VTT game system** for the Maelstrom RPG (Domesday / Gothic / Rome). It is not a
-web app or a library — the build output is a directory that Foundry loads, and `src/system.json` on
-`master` *is* the live install manifest users point Foundry at.
+An unofficial **Foundry VTT game system** for the Maelstrom RPG (Domesday / Gothic / Rome),
+targeting **Foundry v13 (13.347+) and v14**. Rewritten in 2026 from a Foundry-v9 codebase —
+the rewrite's plan, behavioral spec, and manual QA checklist live in `z/` (see `z/PLAN.md`
+and `z/SPEC.md`; `z/SPEC.md` is the contract for what the system must do).
+
+**There is no build step.** The repository root IS the system directory: Foundry loads
+`module/*.mjs` (plain ES modules), `styles/maelstrom.css` (plain CSS, native nesting),
+`templates/*.hbs`, and `lang/en.json` directly. No TypeScript, no SASS, no bundler, no
+`node_modules` needed to run.
 
 ## Commands
 
-There is **no test framework and no linter** in this repo. Type checking is the only automated check:
-
 ```shell
-npm ci                    # required first on a fresh clone -- see note below
-npx tsc --noEmit          # typecheck (currently clean)
-npx gulp build            # clean + compile TS/SASS + copy statics into dist/
-npx gulp watch            # rebuild on change (the dev loop)
-npm run build             # gulp build && gulp link  -- requires foundryconfig.json (see below)
-npm run build:watch       # gulp watch
-npx gulp package          # zip dist/ into package/maelstrom-v<version>.zip
-npx gulp link             # symlink dist/ into the Foundry user data dir
-npx gulp clean            # remove built files from dist/
+node --check module/**/*.mjs      # the only "compile" check that exists
+mise install                      # node 24 — needed only for release tooling/scripts
 ```
 
-`npx gulp --tasks` lists everything; individual tasks are not all mirrored in `package.json` scripts.
+Regressions use Node's built-in test runner with installed Foundry v13/v14 fields
+and custom-socket forwarding: `FOUNDRY_APP_PATH=/path/to/resources/app node --test tests/*.mjs`.
+Worker clients and database transport/sheet enrichment fixtures do not
+replace live-world verification. Further verification is: `node --check`, the static audit pattern in
+`z/phase-7-plan.md` (actions ↔ handlers, lang keys, field paths, PARTS paths), and the
+manual checklist `z/phase-7-checklist.md` run inside Foundry.
 
-Without local `node_modules`, gulp aborts with `Local modules not found` and `npx` will happily fetch
-**gulp 5** from the registry — which is not the gulp 4.0.2 this gulpfile targets. Run `npm ci` first so
-`npx gulp` resolves to the pinned local binary.
-
-### foundryconfig.json (gitignored — absent from a fresh clone)
-
-`gulp link`, `gulp update`, and `gulp publish` all require a `foundryconfig.json` at the repo root.
-`linkUserData` reads it *outside* its try block, so `npm run build` throws without it. Plain
-`npx gulp build` needs nothing. Shape:
-
-```json
-{
-  "dataPath": "/path/to/FoundryVTT",
-  "repository": "https://github.com/snorith/maelstrom.git",
-  "rawURL": "https://raw.githubusercontent.com/snorith/maelstrom"
-}
-```
-
-`gulp link` symlinks `dist/` → `<dataPath>/Data/systems/maelstrom`, and only if that path does not
-already exist. Combined with `gulp watch`, that is the live-reload loop: edit `src/`, reload Foundry.
-
-**The checkout directory must be named `maelstrom`.** Both `clean()` and `linkUserData()` derive the
-system name from `path.basename(path.resolve('.'))`. Under any other directory name, `clean` silently
-finds nothing to remove and `link` symlinks to `<dataPath>/Data/systems/<dirname>`, where Foundry
-never looks. Both fail quietly.
-
-### Releasing (mutates git — do not run exploratorily)
-
-```shell
-npx gulp publish -u patch     # or minor | major | 0.3.4
-```
-
-Runs clean → updateManifest → build → package → **git add, git commit, git tag**. It keeps
-`package.json` version, `src/system.json` version, and the `manifest`/`download` URLs in sync.
-**Never bump the version by hand** — the download URL embeds the version and the tag must match it.
-
-### Node version
-
-`.nvmrc` pins v14.18.1 (gulp 4 / gulp-sass 5 era), but the build was verified working on Node 22.
-SASS emits a wall of `/`-division deprecation warnings; they are noise, not failures.
+To develop: symlink or clone this repo as `<FoundryUserData>/Data/systems/maelstrom`
+(directory name must be exactly `maelstrom`), edit, reload Foundry (F5). See README_DEV.md.
 
 ## Architecture
 
-### Entry and registration
+Entry: `system.json` → `esmodules: ["module/maelstrom.mjs"]`, whose single `init` hook
+registers everything: data models (`CONFIG.*.dataModels`), document classes, sheets,
+settings. `migrateWorld()` runs on `ready` (GM only).
 
-`system.json` declares `esmodules: ["maelstrom.js"]` → built from `src/maelstrom.ts`. Its
-`Hooks.once('init')` is the single wiring point: sets `CONFIG.Actor.documentClass` /
-`CONFIG.Item.documentClass`, unregisters the core sheets, registers one sheet per item type, calls
-`registerSettings()` and `preloadTemplates()`. `migrateWorld` runs on `ready`.
+- **Data schemas**: `module/data/*-data.mjs` — `TypeDataModel` subclasses. Types are
+  declared in `system.json` `documentTypes` (no template.json — deprecated in v14).
+  `CharacterData.prepareDerivedData()` computes `attributes.*.current`, `hp.*`
+  (max = endurance + 20; wounds = sum of the 11-slot array whose LAST slot is bloodloss
+  damage). `hp` is persisted schema so token bars can bind to it, but always recomputed.
+- **Legacy migration**: two layers. Per-document shape fixes in each model's static
+  `migrateData` (runs automatically on load AND on update deltas — this is why wound
+  inputs submitting `{0:…,10:…}` objects get coerced to arrays). One-time world-level
+  fixes in `module/migrations.mjs` gated by the hidden `systemMigrationVersion` world
+  setting (e.g. legacy weapon `system.order` → core `sort`, read from `_source`).
+  WeaponData deliberately retains nullable `order`: v14 prunes undeclared source
+  keys before ready. Successful sort writes atomically clear it to null so retries
+  cannot undo subsequent manual sorting. Already-stamped worlds require explicit
+  recovery (README_DEV.md), not an automatic migration-version reset.
+  `migrateData` must stay idempotent; blank-string numerics must become `null` BEFORE
+  NumberField cleaning (`Number("") === 0` would turn "no value" into a 0 override).
+  On v14 `cleanData` runs BEFORE `_preUpdate`: Actor.cleanData merges partial wound
+  objects using the cleaning source before system migration converts them to arrays.
+  v13 migrates even before cleaning, so the instance Actor.update override preserves
+  raw indexed edits as well. `_preUpdate` is only a compatibility fallback.
+  On v14 synthetic actor.update also runs Actor.cleanData before the outgoing
+  request is rewritten to ActorDelta. Live synthetic-token persistence still needs QA.
+- **Wound coordination**: `wound-journal.mjs` owns immutable revision streams and
+  request deduplication; `wound-service.mjs` supplies authenticated GM socket transport,
+  server-backed reads, and durable in-tab requests with automatic retry.
+  Each GM window queues requests per actor. Non-retryable errors retain the request
+  in an explicit blocked state; manual retry after correction reuses its ID.
+  `wound-database.mjs` scopes expected-collision acknowledgement handling to registered
+  revision creations, leaving other core requests/errors unchanged. It reads fresh
+  initial baseline numerics and token overrides from storage, then uses CharacterData
+  to migrate/clean them. Explicit world index fields are required for these reads.
+  Derived preparation uses a full-content-checked projection cache; authoritative
+  commit reads always replay history. Never cache validation by last revision ID
+  alone, which would miss same-ID corruption or changed inherited history.
+  A fixed embedded equipment-item ID claims each next actor-scoped revision.
+  Core serialized duplicate-ID rejection arbitrates competing/late writers.
+  Never persist an asynchronously computed wound snapshot back to Actor.system:
+  journal history is authoritative, projected by CharacterData.prepareDerivedData.
+  First edit snapshots the old numeric baseline; unlinked tokens and imported clones
+  branch from inherited history. Keep all revisions, including conflict outcomes:
+  deleting old receipts would make delayed requests unsafe. No automatic compaction.
+  No leases/release/recovery for journal operations. Reload/reconnect resumes pending
+  requests with unchanged IDs. Old unpublished lease data is inert; deployment must
+  close old clients and restart once. README_DEV.md describes the legacy-pending
+  exception, raw-source/export compatibility, and privileged API bypass boundary.
+- **Documents**: `module/documents/actor.mjs` owns the roll flows; the pure rules
+  (d100 outcome banding, modifier stacking with floor-at-0) are in `module/rolls.mjs`
+  with no Foundry imports — keep them pure, they're node-testable. Roll banding:
+  ≥96 fails (critical fail only if target ≤90); ≤ floor(target/10) crits.
+- **Sheets**: ApplicationV2 + `HandlebarsApplicationMixin` (`module/apps/`). PARTS per
+  template file, `static TABS` + `_prepareTabs("primary")`, declarative `actions` map
+  instead of listeners — a `data-action` in a template MUST have a matching entry in
+  the sheet's actions (the Phase 7 audit checks this). ALL display logic (zero-blank
+  numbers, flavour label swap, tooltip HTML, sorted item lists) is computed in
+  `_prepareContext` — there are deliberately NO custom Handlebars helpers.
+  Item tooltip notes must pass through TextEditor.enrichHTML with the item's
+  ownership setting; HTML sanitization alone does not remove secret sections.
+- **Drag-sort**: weapon rows rely on ActorSheetV2's built-in drag/drop — `class="draggable"`
+  + `data-item-id` is the entire wiring. Don't add manual DragDrop.
+- **Dialogs**: `DialogV2` only (`module/apps/modifiers-dialog.mjs` uses
+  `DialogV2.wait` with `rejectClose: false` so dismissal = cancel).
 
-### The `.js` import transformer
+## Conventions and constraints
 
-`gulpfile.js` installs a TypeScript transformer that appends `.js` to relative import specifiers at
-compile time, so extensionless relative imports work as native browser ESM. This is why source
-imports are inconsistent (`'./module/settings.js'` next to `'./module/actor/MaelstromActor'`) —
-both work. Write relative imports without an extension.
+- **No jQuery, no external assets** (fonts included), no `@ts-ignore`-era idioms —
+  `actor.system`, namespaced APIs (`foundry.documents.collections.Actors`,
+  `foundry.applications.ux.TextEditor`), async `roll.evaluate()`.
+- CSS is scoped under `.maelstrom`, colors ride v13 theme variables (works in
+  `.theme-dark`); no `@layer` wrapper of our own — v13 auto-wraps manifest
+  stylesheets in the `system` cascade layer, which already orders them above core.
+  Never set `display` on `.tab` sections — core toggles their visibility.
+- Active Effects are not supported by this system: no AE UI is provided, and
+  derived fields (`attributes.*.current`, `hp.*`) are recomputed in data
+  preparation so they are not AE-targetable.
+- `lang/en.json`: add keys, never repurpose existing ones.
+- Game flavour (world setting `characterSheet`: 1 Domesday / 2 Gothic / 3 Rome) only
+  swaps the Favour/Renown label today, but keep new flavour logic keyed on it.
+- The Arion Games trademark/legal text (module header, settings hint, README) must be
+  preserved verbatim **per location as inherited from v0.3.3** — the README's public
+  wording has always differed slightly from the module header; that divergence is
+  historical, not an error to "fix".
 
-### `MaelstromItem` is a Proxy, not a class
+## Releasing
 
-Foundry does not support real Item subclass polymorphism, so `src/module/item/MaelstromItem.ts` is a
-`Proxy` faking it: it dispatches on `data.type` in `construct`, in `create`/`createDocuments`, and in
-`Symbol.hasInstance`. **Adding an item type touches five places:**
+Bump `version` in `system.json` (keep `package.json` in sync), commit, tag `v<version>`,
+push the tag. `.github/workflows/release.yml` verifies tag == manifest version, stamps
+`download`/`manifest` URLs, zips the system (archive root = system root), and publishes a
+GitHub Release. The installable manifest URL is
+`https://github.com/snorith/maelstrom/releases/latest/download/system.json`.
 
-1. new class with a `static get type()` in `src/module/item/`
-2. a case in the proxy's `construct` switch *and* its `create` switch
-3. a sheet in `src/module/item/sheets/` + `Items.registerSheet` in `maelstrom.ts`
-4. a type entry in `src/template.json`
-5. a template in `src/templates/item/` (the sheet's `get template()` derives the path from `type`)
-
-Note `equipment` exists in `template.json` with no class and no sheet — `MaelstromItemSheet` throws
-on it. `MaelstromItemSheet` itself is a similar constructor-time proxy and is not registered anywhere.
-
-### Data model
-
-Schema lives in `src/template.json` (Foundry's declarative actor/item shape). Derived values are
-computed in `MaelstromActor._prepareCharacterData`:
-
-- `attributes.<name>.current` = `temp` if finite, else `orig`, else 0
-- `hp.max` = `attributes.endurance.current + 20`
-- `hp.wounds` = sum of the `wounds.wounds` array (Foundry hands it back as an object, not an array)
-- `hp.value` = `hp.max - hp.wounds`, surfaced on token bars via `primaryTokenAttribute: "hp"`
-
-`MaelstromActorSheet._prepareCharacterItems` **recomputes the same three hp values** — change one,
-change both.
-
-### Migrations
-
-`src/module/migrations/Migrator.ts` is a prototype-based migrator chained via `previousMigrator`,
-keyed on the integer `data.version` from the `base` template. `migrateWorld` is GM-only and runs on
-`ready`. To add one: `Object.create(Migrator)` with `forVersion: N` and `forType`, link
-`previousMigrator` to the N-1 migrator, re-export it as `MaelstromActorMigrator`, and bump `version`
-in `template.json`'s `base` template. `Migrator.migrate` stamps `data.version` for you — the doc
-comment says migration functions must not set it, though the shipped `MaelstromActorMigrator` sets it
-anyway (harmlessly, to the same value). Follow the comment.
-
-### Game flavour
-
-The world setting `characterSheet` (1 = Domesday, 2 = Gothic, 3 = Rome) is exposed to templates as
-`maelstromFlavour`. All three return the *same* `actorSheet.html` from `get template()`; the flavour
-only drives conditional labels inside that one template.
-
-### Roll pipeline
-
-`data-*` attributes in the HTML → `_on*Roll` handlers in `MaelstromActorSheet` → methods on
-`MaelstromActor`:
-
-- `rollAttribute` awaits `getRollModifiers()` (a discriminated-union promise from
-  `ModifiersDialog.ts`), auto-prepends the armour penalty for attributes in
-  `MAELSTROM.physicalAttributes`, rolls `1d100`, and bands the result in `_getRollOutcome`:
-  roll ≥ 96 is a fail (critical fail if target ≤ 90); roll ≤ `floor(target/10)` is a critical success.
-- `INITIATIVE_FORMULA` is defined in `maelstrom.ts` and used both as `CONFIG.Combat.initiative` and
-  by `rollActorInitiative`.
-
-### Odd placements worth knowing
-
-- **All Handlebars helpers are registered inside `registerSettings()`** in `src/module/settings.ts`,
-  not anywhere named for templating.
-- `preloadTemplates.ts` lists only `actorSheet.html` and `abilitySheet.html`; `weaponSheet.html` and
-  `dialog/modifiers.html` are not preloaded.
-- `src/maelstrom.scss` is the only SASS entry point (gulp compiles `src/*.scss`); everything under
-  `src/styles/` is `@import`ed by it.
-
-## Foundry API era
-
-Targets **Foundry v9** (`minimumCoreVersion: 9`, `foundry-vtt-types ^9.249.2`). That means the
-pre-v10 idioms: `actor.data.data` (not `actor.system`), the `sheetData.data = sheetData.data.data`
-dance in every `getData()`, and `createEmbeddedDocuments`/`updateEmbeddedDocuments`. Do not apply
-modern Foundry patterns here without an explicit migration decision.
-
-`@ts-ignore` is pervasive because the v9 typings fight the actual API. Be aware it suppresses errors
-on the *next line*, which in multi-line call expressions can hide genuine mistakes — `tsc --noEmit`
-passing does not mean a line is correct.
-
-## Style
-
-`.editorconfig` governs: tabs at width 4 for source, 2 spaces for JSON/YAML/Markdown, LF endings.
-Existing files are inconsistent (mixed tabs and spaces); match the file you are editing.
+**Do not delete `src/system.json`.** It is a tombstone: every pre-1.0 install polls that
+raw-GitHub path for updates. It carries BOTH legacy (`minimumCoreVersion`) and modern
+(`compatibility`) keys so old Foundry clients refuse the incompatible update while v13+
+clients migrate to the Releases update channel. It is not part of the installed system.

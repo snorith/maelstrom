@@ -1,0 +1,38 @@
+<header class="sheet-header">
+	<img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img"
+		title="{{actor.name}}" alt="{{actor.name}}" height="100" width="100"/>
+	<div class="header-fields">
+		<h1 class="char-name">
+			<input name="name" type="text" value="{{actor.name}}" placeholder="{{localize 'Name'}}"/>
+		</h1>
+		<div class="grid grid-2col">
+			<div class="info-grid-form">
+				<label class="resource-label" for="system.age">{{localize "MAELSTROM.character.age.label"}}</label>
+				<input type="number" name="system.age" value="{{system.age}}"/>
+
+				<label class="resource-label" for="system.race">{{localize "MAELSTROM.character.race.label"}}</label>
+				<input type="text" name="system.race" value="{{system.race}}"/>
+
+				<label class="resource-label" for="system.sex">{{localize "MAELSTROM.character.sex.label"}}</label>
+				<input type="text" name="system.sex" value="{{system.sex}}"/>
+
+				<label class="resource-label" for="system.social">{{localize "MAELSTROM.character.social.label"}}</label>
+				<input type="text" name="system.social" value="{{system.social}}"/>
+			</div>
+
+			<div class="info-grid-form">
+				<label class="resource-label" for="system.imbalance">{{localize "MAELSTROM.character.imbalance.label"}}</label>
+				<input type="text" name="system.imbalance" value="{{system.imbalance}}"/>
+
+				<label class="resource-label" for="system.favour">{{favourLabel}}</label>
+				<input type="text" name="system.favour" value="{{system.favour}}"/>
+
+				<label class="resource-label" for="system.patron">{{localize "MAELSTROM.character.patron.label"}}</label>
+				<input type="text" name="system.patron" value="{{system.patron}}"/>
+
+				<label class="resource-label" for="system.money.amount">{{localize "MAELSTROM.character.money.label"}}</label>
+				<input type="text" name="system.money.amount" value="{{system.money.amount}}"/>
+			</div>
+		</div>
+	</div>
+</header>

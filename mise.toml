@@ -1,0 +1,4 @@
+[tools]
+# Node is only needed for release tooling (e.g. foundryvtt-cli, CI helpers).
+# The system itself has no build step — Foundry loads the ES modules and CSS directly.
+node = "24"
