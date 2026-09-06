@@ -59,6 +59,9 @@ test("installed core forwarding with independent GM windows and player clients",
 			ack({ result: true });
 		});
 		socket.on("fixtureRead", ({ uuid }, ack) => ack({ result: state[uuid].items }));
+		socket.on("fixtureReadActor", (_data, ack) => ack({ result: [{ _id: "base", type: "character", ...state["Actor.base"] }] }));
+		socket.on("fixtureReadTokens", (_data, ack) => ack({ result: [{ _id: "token", actorId: "base", actorLink: false,
+			delta: { system: state["Scene.scene.Token.token.Actor.base"].system } }] }));
 		socket.on("fixtureUpdate", (_data, ack) => ack({ error: "Mutable wound writes are forbidden" }));
 		socket.on("fixtureDelete", ({ uuid, id }, ack) => {
 			state[uuid].items = state[uuid].items.filter((item) => item._id !== id);

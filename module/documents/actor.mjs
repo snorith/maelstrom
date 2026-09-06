@@ -28,6 +28,15 @@ function mergeIndexedWounds(data, current) {
 }
 
 export class MaelstromActor extends Actor {
+	/** Existing journal history cannot be replaced by an older JSON snapshot. */
+	async importFromJSON(json) {
+		if (this.items?.some((item) => item.getFlag?.("maelstrom", "woundJournal"))) {
+			ui.notifications.error(game.i18n.localize("MAELSTROM.wounds.journal.importBlocked"));
+			return null;
+		}
+		return super.importFromJSON(json);
+	}
+
 	/** v13 migrates update data even before cleaning; preserve raw instance edits. */
 	async update(data = {}, operation = {}) {
 		return super.update(mergeIndexedWounds(data, this._source?.system?.wounds?.wounds), operation);
@@ -51,8 +60,8 @@ export class MaelstromActor extends Actor {
 	 * cleaning precedes this hook; cleanData above handles that path instead.
 	 */
 	async _preUpdate(changes, options, user) {
-		if (Array.from(this.items ?? []).some((item) => item.getFlag?.("maelstrom", "woundJournal"))
-			&& (changes.system?.wounds?.wounds !== undefined || changes.system?.wounds?.bloodloss !== undefined)) {
+		if ((changes.system?.wounds?.wounds !== undefined || changes.system?.wounds?.bloodloss !== undefined)
+			&& this.items?.some((item) => item.getFlag?.("maelstrom", "woundJournal"))) {
 			throw new Error("Journal-backed wounds must be changed through actor.applyWoundOperation().");
 		}
 		const partial = changes?.system?.wounds?.wounds;

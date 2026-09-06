@@ -62,6 +62,15 @@ settings. `migrateWorld()` runs on `ready` (GM only).
 - **Wound coordination**: `wound-journal.mjs` owns immutable revision streams and
   request deduplication; `wound-service.mjs` supplies authenticated GM socket transport,
   server-backed reads, and durable in-tab requests with automatic retry.
+  Each GM window queues requests per actor. Non-retryable errors retain the request
+  in an explicit blocked state; manual retry after correction reuses its ID.
+  `wound-database.mjs` scopes expected-collision acknowledgement handling to registered
+  revision creations, leaving other core requests/errors unchanged. It reads fresh
+  initial baseline numerics and token overrides from storage, then uses CharacterData
+  to migrate/clean them. Explicit world index fields are required for these reads.
+  Derived preparation uses a full-content-checked projection cache; authoritative
+  commit reads always replay history. Never cache validation by last revision ID
+  alone, which would miss same-ID corruption or changed inherited history.
   A fixed embedded equipment-item ID claims each next actor-scoped revision.
   Core serialized duplicate-ID rejection arbitrates competing/late writers.
   Never persist an asynchronously computed wound snapshot back to Actor.system:

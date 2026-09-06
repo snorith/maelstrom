@@ -109,12 +109,22 @@ This is the contract for the rewrite. Phase 7 walks every checkbox.
       Pending requests persist in the requesting tab before sending and retry the
       same ID automatically. Unavailable database/GM leaves them pending, not replayed
       under a new ID. Full tab closure can lose local unsent/pending request data
+- [ ] Non-retryable actor/permission/history/state/request failures show their reason
+      and pause automatic retry. Check / retry preserves the original request ID;
+      ambiguous requests cannot be discarded. Confirmed results survive local
+      storage-cleanup failure, with a warning
 - [ ] First journal edit snapshots legacy wounds. Thereafter derived wounds and HP
       read journal state; numeric source fields stay as baseline. Direct numeric
-      updates are rejected once journal-backed. Unrelated updates retain semantics
+      updates are rejected once journal-backed. Unrelated updates retain semantics.
+      Concurrent legacy numeric API writes during first initialization are outside
+      the guarantee; finish them before adoption
+- [ ] First adoption uses server-backed numeric values and token overrides, not
+      cached client broadcasts. Expected revision-collision acknowledgements are
+      quiet; permission, validation and unrelated database errors remain visible
 - [ ] Unlinked tokens snapshot an independent branch on first edit. Export/new-actor
       import retains history and branches on first edit; raw-source-only tools and
-      destructive imports over an existing journal actor are not supported
+      destructive imports over an existing journal actor are not supported.
+      Import Data over an existing journal actor displays explicit rejection guidance
 - [ ] Plain HTTP clients need no secure-context-only APIs. No custom server code
 - [ ] Journal corruption pauses editing. Normal item APIs cannot alter/delete
       revision records; privileged tampering and external bypasses are out of scope

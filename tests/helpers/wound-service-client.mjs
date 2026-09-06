@@ -2,6 +2,7 @@ import { parentPort, workerData } from "node:worker_threads";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { EventEmitter } from "node:events";
+import { pathToFileURL } from "node:url";
 import { woundRequestId } from "../../module/wound-ids.mjs";
 import { readWoundJournal } from "../../module/wound-journal.mjs";
 // Simulate plain-HTTP browser capability for the entire real adapter.
@@ -38,7 +39,11 @@ const actors = new Map();
 const storage = new Map(workerData.storage ?? []);
 globalThis.sessionStorage = { getItem: (key) => storage.get(key), setItem: (key, value) => storage.set(key, value) };
 globalThis.Hooks = { callAll() {}, on() {} };
-globalThis.foundry = { applications: { api: { DialogV2: { confirm: async () => true } } } };
+globalThis.foundry = {
+	applications: { api: { DialogV2: { confirm: async () => true } } },
+	helpers: { SocketInterface: class { static dispatch() {} } },
+	utils: await import(pathToFileURL(resolve(workerData.app, "common/utils/_module.mjs")))
+};
 const users = new Map(workerData.users.map((user) => [user.id, user]));
 users.activeGM = users.get("gm");
 globalThis.game = {
@@ -48,13 +53,18 @@ globalThis.game = {
 const write = (event, data) => new Promise((done, reject) => socket.emit(event, data,
 	(response) => response.error ? reject(new Error(response.error)) : done(response.result)));
 const itemClass = { database: { get: (_cls, { parent }) => write("fixtureRead", { uuid: parent.uuid }) } };
-globalThis.CONFIG = { Item: { documentClass: itemClass } };
+globalThis.CONFIG = {
+	Item: { documentClass: itemClass },
+	Actor: { documentClass: { database: { get: () => write("fixtureReadActor", {}) } },
+		dataModels: { character: class { constructor(data) { this._source = data; } } } },
+	Token: { documentClass: { database: { get: () => write("fixtureReadTokens", {}) } } }
+};
 function sync(state) {
 	for (const [uuid, record] of Object.entries(state)) {
 		let actor = actors.get(uuid);
 		if (!actor) {
 			actor = {
-				uuid, documentName: "Actor", type: "character",
+				id: "base", uuid, documentName: "Actor", type: "character",
 				testUserPermission: (user) => user.isGM || user.id === "player",
 				getFlag: (scope, key) => actor.flags?.[scope]?.[key],
 				update: async (data) => { await write("fixtureUpdate", { uuid, data }); return actor; },
@@ -62,6 +72,10 @@ function sync(state) {
 					await write("fixtureCreate", { uuid, data });
 					return data.map((item) => actor.items.get(item._id));
 				}
+			};
+			if (uuid.startsWith("Scene.")) actor.parent = {
+				id: "token", uuid: "Scene.scene.Token.token", parent: { uuid: "Scene.scene" },
+				delta: { id: "token", uuid: "Scene.scene.Token.token.ActorDelta.token", documentName: "ActorDelta" }
 			};
 			actors.set(uuid, actor);
 		}

@@ -1,7 +1,8 @@
 import { SYSTEM_ID } from "./constants.mjs";
 import { validateWoundOperation, WoundOperationError } from "./wound-operations.mjs";
 import { woundRequestId } from "./wound-ids.mjs";
-import { commitWoundRequest, legacyTokenWoundOverrides } from "./wound-journal.mjs";
+import { commitWoundRequest } from "./wound-journal.mjs";
+import { createWoundRevision, readWoundBaseline } from "./wound-database.mjs";
 
 const CHANNEL = `system.${SYSTEM_ID}`;
 const PROTOCOL = "wound-journal-v1";
@@ -9,6 +10,8 @@ const calls = new Map();
 const unresolved = new Map();
 const inFlight = new Set();
 const retryTimers = new Map();
+const actorQueues = new Map();
+const blockedCodes = new Set(["invalidActor", "invalidJournal", "invalidState", "requestIdReused", "permissionDenied", "legacyPending"]);
 const codeError = (code) => new WoundOperationError(code);
 const storageKey = () => `${SYSTEM_ID}.wounds.${game.world.id}.${game.user.id}`;
 const canEdit = (actor, userId) => {
@@ -20,22 +23,28 @@ const save = () => sessionStorage.setItem(storageKey(), JSON.stringify([...unres
 
 export function woundStatus(actor) {
 	if (actor.system?.woundJournalError) return "invalidJournal";
+	if (unresolved.get(actor.uuid)?.blockedError) return "blocked";
 	return unresolved.has(actor.uuid) ? "pending" : !game.socket?.connected || !game.users?.activeGM ? "unavailable" : "ready";
 }
 export const pendingWoundOperation = (actor) => unresolved.get(actor.uuid)?.operation;
 
 async function resolveActor(uuid) {
 	if (typeof uuid !== "string" || uuid.length > 256 || uuid.startsWith("Compendium.")) return null;
-	const actor = await fromUuid(uuid);
+	let actor;
+	try { actor = await fromUuid(uuid); } catch { return null; }
 	return actor?.documentName === "Actor" && actor.type === "character" && actor.uuid === uuid ? actor : null;
 }
 
 /** Fetch through core's database queue, not a possibly stale client collection. */
 async function readJournal(actor) {
 	const cls = CONFIG.Item.documentClass;
+	// index:true returns raw records on the CLIENT. It does not reduce the
+	// server payload for embedded items (which includes the full history).
 	const items = await cls.database.get(cls, { parent: actor, index: true });
-	const source = actor._source?.system?.wounds ?? actor.system.wounds;
-	return { items, baseline: { wounds: [...source.wounds], bloodloss: source.bloodloss }, overrides: legacyTokenWoundOverrides(actor) };
+	// An existing local stream carries its own baseline. Before first adoption,
+	// fetch fresh legacy numeric data (and token overrides) from the database too.
+	if (items.some((item) => item.flags?.maelstrom?.woundJournal?.scope === actor.uuid)) return { items };
+	return { items, ...await readWoundBaseline(actor) };
 }
 
 async function receive(message, senderId) {
@@ -52,19 +61,24 @@ async function receive(message, senderId) {
 	if (typeof message.callId !== "string" || message.callId.length > 64) return;
 	try {
 		const actor = await resolveActor(message.actorUuid);
-		if (!actor || !canEdit(actor, senderId)) return;
+		if (!actor) throw codeError("invalidActor");
+		if (!canEdit(actor, senderId)) throw codeError("permissionDenied");
 		const request = { id: message.request?.id, operation: message.request?.operation, senderId };
-		const result = await commitWoundRequest({
+		// Serialize the entire read/propose/create loop locally. Deterministic
+		// revision IDs still arbitrate other GM windows and late writes.
+		const previous = actorQueues.get(actor.uuid) ?? Promise.resolve();
+		const work = previous.then(() => commitWoundRequest({
 			read: () => readJournal(actor),
-			create: async (record) => {
-				const created = await actor.createEmbeddedDocuments("Item", [record], { keepId: true, renderSheet: false });
-				return created.some((item) => item.id === record._id);
-			},
+			create: (record) => createWoundRevision(actor, record),
 			canWrite: () => {
 				if (!game.socket.connected || !game.user.isGM) throw codeError("retryableWrite");
 				return canEdit(actor, senderId);
 			}
-		}, actor.uuid, request);
+		}, actor.uuid, request));
+		const tail = work.catch(() => {});
+		actorQueues.set(actor.uuid, tail);
+		void tail.then(() => { if (actorQueues.get(actor.uuid) === tail) actorQueues.delete(actor.uuid); });
+		const result = await work;
 		reply(senderId, message.callId, { result });
 	} catch (error) {
 		reply(senderId, message.callId, { error: error.code ?? "retryableWrite" });
@@ -76,7 +90,8 @@ function reply(userId, callId, data) {
 }
 
 function rpc(actor, request) {
-	if (!game.socket.connected || !canEdit(actor, game.user.id)) return Promise.reject(codeError("unavailable"));
+	if (!game.socket.connected) return Promise.reject(codeError("unavailable"));
+	if (!canEdit(actor, game.user.id)) return Promise.reject(codeError("permissionDenied"));
 	const userId = game.users.activeGM?.id;
 	if (!userId) return Promise.reject(codeError("unavailable"));
 	const callId = woundRequestId();
@@ -88,13 +103,13 @@ function rpc(actor, request) {
 }
 
 function scheduleRetry(actor) {
-	if (retryTimers.has(actor.uuid) || !unresolved.has(actor.uuid)) return;
+	if (retryTimers.has(actor.uuid) || !unresolved.has(actor.uuid) || unresolved.get(actor.uuid).blockedError) return;
 	retryTimers.set(actor.uuid, setTimeout(async () => {
 		retryTimers.delete(actor.uuid);
 		if (!game.socket.connected || !game.users.activeGM) return;
 		try { await retryWoundOperation(actor); }
 		catch (error) {
-			if (["conflict", "invalidState", "invalidJournal", "legacyPending"].includes(error.code)) {
+			if (!error.notified && blockedCodes.has(error.code)) {
 				globalThis.ui?.notifications?.warn(game.i18n.localize(`MAELSTROM.wounds.coordinator.${error.code}`));
 			}
 		}
@@ -106,7 +121,12 @@ function finish(actor, request, result) {
 	unresolved.delete(actor.uuid);
 	clearTimeout(retryTimers.get(actor.uuid));
 	retryTimers.delete(actor.uuid);
-	save();
+	try { save(); }
+	catch {
+		// A durable result is still a success if local cleanup fails. A stale
+		// saved request is safe to replay under its original ID after reload.
+		globalThis.ui?.notifications?.warn(game.i18n.localize("MAELSTROM.wounds.journal.storageCleanup"));
+	}
 	Hooks.callAll("maelstromWoundResult", actor, request.operation, result);
 	changed(actor);
 }
@@ -114,18 +134,29 @@ function finish(actor, request, result) {
 async function send(actor, request) {
 	if (inFlight.has(actor.uuid)) throw codeError("pending");
 	inFlight.add(actor.uuid);
+	delete request.blockedError;
 	try {
 		// Old unpublished lease requests cannot be blindly converted to new edits.
 		if (request.protocol !== PROTOCOL) throw codeError("legacyPending");
 		const result = await rpc(actor, request);
 		if (!["committed", "rejected"].includes(result?.status) || result.id !== request.id) throw codeError("retryableWrite");
 		finish(actor, request, result);
-		if (result.error) throw codeError(result.error);
+		if (result.error) {
+			// One notification per result, independent of how many sheets are open
+			// or whether this attempt was a manual or automatic retry.
+			globalThis.ui?.notifications?.warn(game.i18n.localize(`MAELSTROM.wounds.coordinator.${result.error}`));
+			throw Object.assign(codeError(result.error), { notified: true });
+		}
 		return result;
 	} catch (error) {
 		if (unresolved.has(actor.uuid)) {
 			if (["invalidOperation", "invalidRequest"].includes(error.code)) finish(actor, request, { status: "rejected", error: error.code });
-			else if (!["invalidJournal", "invalidState", "requestIdReused", "permissionDenied", "legacyPending"].includes(error.code)) scheduleRetry(actor);
+			else if (blockedCodes.has(error.code)) {
+				request.blockedError = error.code;
+				clearTimeout(retryTimers.get(actor.uuid));
+				retryTimers.delete(actor.uuid);
+				try { save(); } catch { /* The original request is already persisted. */ }
+			} else scheduleRetry(actor);
 		}
 		throw error;
 	} finally { inFlight.delete(actor.uuid); changed(actor); }
@@ -161,7 +192,10 @@ export async function discardWoundRequest(actor) {
 
 export function woundCoordinatorControls(actor) {
 	const request = unresolved.get(actor.uuid);
-	return { canResolveLegacyWounds: !!request && request.protocol !== PROTOCOL };
+	return {
+		canResolveLegacyWounds: !!request && request.protocol !== PROTOCOL,
+		woundBlockReason: blockedCodes.has(request?.blockedError) ? `MAELSTROM.wounds.coordinator.${request.blockedError}` : null
+	};
 }
 
 async function resumePending() {
@@ -175,7 +209,10 @@ async function resumePending() {
 export function registerWoundService() {
 	try {
 		for (const [uuid, request] of JSON.parse(sessionStorage.getItem(storageKey()) ?? "[]")) {
-			if (request?.actorUuid === uuid) unresolved.set(uuid, request);
+			if (request?.actorUuid === uuid) {
+				if (!blockedCodes.has(request.blockedError)) delete request.blockedError;
+				unresolved.set(uuid, request);
+			}
 		}
 	} catch { /* Invalid local data cannot confer write authority. */ }
 	game.socket.on(CHANNEL, receive);

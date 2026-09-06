@@ -11,8 +11,11 @@ globalThis.foundry = {
 	data: { fields: {} }, abstract: { TypeDataModel: class {} }, utils: {},
 	applications: { api: { HandlebarsApplicationMixin: (cls) => cls }, sheets: { ActorSheetV2: Sheet } }
 };
-globalThis.Hooks = { on: () => 1, callAll() {} };
-globalThis.ui = { notifications: { warn() {} } };
+const hooks = new EventEmitter();
+hooks.setMaxListeners(100);
+globalThis.Hooks = { on: (name, fn) => { hooks.on(name, fn); return fn; }, off: hooks.off.bind(hooks), callAll: hooks.emit.bind(hooks) };
+const warnings = [];
+globalThis.ui = { notifications: { warn: (message) => warnings.push(message) } };
 globalThis.sessionStorage = { getItem: () => null, setItem() {} };
 const socket = new EventEmitter();
 socket.connected = true;
@@ -30,25 +33,22 @@ function fixture() {
 		uuid: `Actor.sheet${++sequence}`, items: new Map(), testUserPermission: () => true,
 		getFlag: () => receipts,
 		applyWoundOperation: (operation) => {
-			if (failHello) throw Object.assign(new Error("invalidOperation"), { code: "invalidOperation" });
+			if (failValidation) throw Object.assign(new Error("invalidOperation"), { code: "invalidOperation" });
 			return service.submitWoundOperation(actor, operation);
 		},
 		sufferBleedingDamage: () => service.submitWoundOperation(actor, { type: "applyBleeding" })
 	};
-	let failHello = false, loseReply = false, operations = 0;
+	let failValidation = false, loseReply = false, conflict = false, operations = 0;
 	socket.on("system.maelstrom", (message) => {
 		if (message.actorUuid !== actor.uuid) return;
 		let error, result;
-		if (message.kind === "hello") {
-			if (failHello) error = "unavailable";
-			else result = { sessionId: "gm-session", issuedAt: Date.now() };
-		} else if (message.kind === "operation") {
+		if (message.kind === "operation") {
 			if (!receipts.some((r) => r.id === message.request.id)) {
 				operations++;
 				receipts.push({ id: message.request.id });
 			}
 			if (loseReply) error = "retryableWrite";
-			else result = { id: message.request.id, status: "committed" };
+			else result = { id: message.request.id, status: conflict ? "rejected" : "committed", error: conflict ? "conflict" : null };
 		} else return;
 		queueMicrotask(() => socket.emit("system.maelstrom", {
 			protocol: "wound-journal-v1", kind: "reply", callId: message.callId, error, result
@@ -62,21 +62,52 @@ function fixture() {
 		return input;
 	};
 	return { sheet, render, operations: () => operations,
-		failHello: (value) => { failHello = value; }, loseReply: (value) => { loseReply = value; } };
+		failValidation: (value) => { failValidation = value; }, loseReply: (value) => { loseReply = value; },
+		conflict: () => { conflict = true; } };
 }
 
 test("retrying bleeding cannot erase a draft from an earlier rejected numeric edit", async () => {
 	const f = fixture();
 	let input = await f.render();
 	input.value = "7"; input.oninput();
-	f.failHello(true);
+	f.failValidation(true);
 	await f.sheet._onChangeForm({}, { target: input });
-	f.failHello(false); f.loseReply(true);
+	f.failValidation(false); f.loseReply(true);
 	await MaelstromCharacterSheet.onBleedingDamage.call(f.sheet);
 	f.loseReply(false);
 	await MaelstromCharacterSheet.onRetryWounds.call(f.sheet);
 	input = await f.render();
 	assert.equal(input.value, "7", "unrelated retry must preserve the failed numeric draft");
+	assert.equal(f.operations(), 1);
+});
+
+test("manual retry conflict emits one warning even with result hooks installed", async () => {
+	const f = fixture();
+	let input = await f.render();
+	input.value = "7"; input.oninput();
+	f.loseReply(true);
+	await f.sheet._onChangeForm({}, { target: input });
+	f.loseReply(false); f.conflict();
+	warnings.length = 0;
+	await MaelstromCharacterSheet.onRetryWounds.call(f.sheet);
+	assert.equal(warnings.length, 1);
+	input = await f.render("5");
+	assert.equal(input.value, "5");
+});
+
+test("native change during pending retains draft without another submission or toast", async () => {
+	const f = fixture();
+	let input = await f.render();
+	f.loseReply(true);
+	await MaelstromCharacterSheet.onBleedingDamage.call(f.sheet);
+	warnings.length = 0;
+	input.value = "8";
+	await f.sheet._onChangeForm({}, { target: input });
+	assert.equal(warnings.length, 0);
+	f.loseReply(false);
+	await MaelstromCharacterSheet.onRetryWounds.call(f.sheet);
+	input = await f.render();
+	assert.equal(input.value, "8");
 	assert.equal(f.operations(), 1);
 });
 

@@ -109,7 +109,7 @@ test("journal projection drives real character wounds and HP without rewriting t
   actor.uuid = "Actor.projected";
   const head = readWoundJournal([], actor.uuid, actor.system.wounds);
   const record = nextWoundRevision(head, { id: "projected-request", senderId: "gm", operation: { type: "applyBleeding" } });
-  actor.items = [{ toObject: () => record, getFlag: (scope, key) => record.flags?.[scope]?.[key] }];
+  actor.items = [{ id: record._id, toObject: () => record, getFlag: (scope, key) => record.flags?.[scope]?.[key] }];
   class ParentModel extends DataModel { static TYPES = []; static defineSchema() { return {}; } }
   const parent = new ParentModel();
   parent.uuid = actor.uuid;
@@ -120,6 +120,12 @@ test("journal projection drives real character wounds and HP without rewriting t
   assert.equal(model.hp.wounds, 8);
   assert.equal(model._source.wounds.wounds[10], 0);
   await assert.rejects(actor.update({ "system.wounds.wounds.0": 50 }), /applyWoundOperation/);
+  const errors = [];
+  globalThis.ui = { notifications: { error: (message) => errors.push(message) } };
+  assert.equal(await actor.importFromJSON("{}"), null);
+  assert.deepEqual(errors, ["MAELSTROM.wounds.journal.importBlocked"]);
+  actor.items = { some() { throw new Error("unrelated update scanned items"); } };
+  await actor._preUpdate({ name: "Renamed" }, {}, {});
 });
 
 test("rapid bleeding and mixed wound actions accumulate in invocation order", async () => {

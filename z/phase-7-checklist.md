@@ -49,6 +49,8 @@ have both; v14 alone covers most risk.
 - [ ] Mixed HTTP/HTTPS clients can edit; the same next revision ID is computed
 - [ ] Two GM windows/two player windows contend: one revision per request; accepted
       bleeding operations accumulate, including two rapid accepted actions
+- [ ] Expected cross-window revision collisions do not show a red duplicate-ID
+      toast; unrelated duplicate-ID/permission/database errors remain visible
 - [ ] Same-slot stale edits report durable conflict; different-slot edits survive
 - [ ] Name/notes submissions never overwrite wounds; injury notes remain editable
 - [ ] Restored draft blur without typing submits exactly once; native change plus
@@ -62,6 +64,8 @@ have both; v14 alone covers most risk.
 - [ ] Database/GM outage pauses pending work; restored connection resumes it
 - [ ] First journal edit preserves existing wounds; derived HP/token bars update
       on embedded-item creation and remain correct after full world restart
+- [ ] Delay a completed legacy update's broadcast before first adoption: the initial
+      revision uses stored values, including fresh base/token numeric overrides
 - [ ] Unlinked token inherits base history, then branches independently. Base actor
       updates after branching do not change token wounds. Export/import into a new
       actor preserves wounds and supports a new independent branch
@@ -70,6 +74,14 @@ have both; v14 alone covers most risk.
 - [ ] Numeric actor.update works before first journal revision (indexed updates
       preserve other slots); afterward it explicitly rejects, directing to the API
 - [ ] Ownership revoked while processing prevents creation; body sender spoof fails
+- [ ] Permission/missing-actor errors show a blocked reason, not an automatic-retry
+      promise; restore the actor/permission and Check / retry the same request
+- [ ] A conflicted numeric retry shows one warning even with multiple sheets open;
+      native change during pending preserves the draft without a second submission
+- [ ] Import Data over an existing journal actor explicitly rejects with guidance
+      and no success toast; importing into a new actor still works
+- [ ] Browser storage cleanup failure after confirmation still updates the sheet;
+      reload safely rechecks the original ID without another wound change
 - [ ] Upgrade test: old lease items stay inert. Old clients are closed during
       deployment; legacy pending requests are flagged rather than blindly replayed
 ## Items

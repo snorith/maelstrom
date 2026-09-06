@@ -1,4 +1,4 @@
-import { readWoundJournal, JOURNAL_FLAG, legacyTokenWoundOverrides } from "../wound-journal.mjs";
+import { projectWoundJournal } from "../wound-journal.mjs";
 const { fields } = foundry.data;
 
 /** The ten Maelstrom attributes, in sheet order. */
@@ -195,14 +195,13 @@ export class CharacterData extends foundry.abstract.TypeDataModel {
 		super.prepareDerivedData();
 		this.woundJournalError = null;
 		const actor = this.parent;
-		const items = Array.from(actor?.items ?? [], (item) => item.toObject ? item.toObject() : item);
-		if (items.some((item) => item.flags?.maelstrom?.[JOURNAL_FLAG])) {
-			try {
-				const head = readWoundJournal(items, actor.uuid, this._source.wounds, legacyTokenWoundOverrides(actor));
-				this.wounds.wounds = [...head.state.wounds];
-				this.wounds.bloodloss = head.state.bloodloss;
-			} catch { this.woundJournalError = "invalidJournal"; }
-		}
+		try {
+			const state = projectWoundJournal(actor, this._source.wounds);
+			if (state) {
+				this.wounds.wounds = [...state.wounds];
+				this.wounds.bloodloss = state.bloodloss;
+			}
+		} catch { this.woundJournalError = "invalidJournal"; }
 
 		for (const key of ATTRIBUTES) {
 			const att = this.attributes[key];

@@ -5,6 +5,28 @@ export const JOURNAL_FLAG = "woundJournal";
 const fail = () => { throw new WoundOperationError("invalidJournal"); };
 export const revisionId = (scope, revision) => woundLeaseId(`journal-v1:${scope}:${revision}`);
 const equal = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const projections = new WeakMap();
+
+/** Local derived-data cache only; authoritative commit reads always replay. */
+export function projectWoundJournal(actor, baseline) {
+	if (!actor) return null;
+	const items = [];
+	for (const item of actor.items ?? []) {
+		const entry = item.getFlag?.("maelstrom", JOURNAL_FLAG) ?? item.flags?.maelstrom?.[JOURNAL_FLAG];
+		if (entry) items.push({ _id: item.id ?? item._id, flags: { maelstrom: { [JOURNAL_FLAG]: entry } } });
+	}
+	if (!items.length) { projections.delete(actor); return null; }
+	const overrides = legacyTokenWoundOverrides(actor);
+	// Compare complete contents, NOT just head ID: privileged edits, removals,
+	// inherited changes and same-ID corruption must invalidate cached validation.
+	const signature = JSON.stringify([actor.uuid, baseline.wounds, baseline.bloodloss, overrides, items]);
+	const cached = projections.get(actor);
+	if (cached?.signature === signature) return cached.state;
+	const head = readWoundJournal(items, actor.uuid, baseline, overrides);
+	const state = Object.freeze({ wounds: Object.freeze([...head.state.wounds]), bloodloss: head.state.bloodloss });
+	projections.set(actor, { signature, state });
+	return state;
+}
 
 export function validateJournalRequest(request) {
 	if (!request || !/^[a-zA-Z0-9_-]{16,64}$/.test(request.id ?? "")

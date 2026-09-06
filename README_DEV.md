@@ -78,12 +78,19 @@ the same ID. Check / retry is also available. A late old writer can only contend
 an immutable revision; it cannot overwrite the latest wounds. Conflicts are recorded
 too, so an already-rejected edit cannot unexpectedly succeed on a later retry.
 If the database or all GMs are unavailable, changes remain pending until available.
+Permission denial, a missing actor, invalid history/state, or a mismatched request
+instead shows **automatic retry paused**, with the reason. Correct that problem and
+use Check / retry. The original request stays saved; do not repeat it as a new edit.
+Reload does not clear a blocked request or silently restart its automatic retry.
+If browser storage cleanup fails after confirmation, the result still completes;
+a warning explains that reload may safely recheck the already-recorded request.
 Closing a tab may discard its local pending request; do not assume a vanished tab's
 uncertain edit failed. The committed journal survives regardless.
 
 ### Storage and compatibility
 
-The first journal revision snapshots existing wounds and bleeding count; no bulk
+The first journal revision reads stored wounds and bleeding count through the
+database, including fresh base-actor values and unlinked-token overrides; no bulk
 world migration is needed. Thereafter journal history is authoritative.
 CharacterData projects its latest state into ordinary `actor.system.wounds` and HP
 on every preparation, so sheets, rolls and token bars use the journal state.
@@ -105,6 +112,8 @@ retain the embedded journal items; tools reading raw numeric source alone will s
 the old baseline. Import into a **new** actor is supported: inherited history provides
 the starting values, and its next edit starts its own branch. Overwriting an existing
 journal-backed actor with older JSON is not a supported wound reset operation.
+The Import Data action explicitly rejects that operation with guidance to import
+into a new character; it does not report a successful import.
 Unlinked tokens inherit base wounds until their first journal edit, which snapshots
 a token-specific branch independent of subsequent base edits.
 Existing pre-journal token numeric overrides are preserved rather than replaced
@@ -114,11 +123,24 @@ Journal items are hidden from the sheet's ability/weapon lists. They are immutab
 through normal item update/delete APIs. Do not manually modify, delete, or truncate
 history: request deduplication relies on it. There is deliberately no five-minute
 receipt eviction or automatic compaction; storage and replay cost grow with edits.
+Derived preparation caches validated projections by full journal contents, numeric
+baseline and token overrides. Unrelated items are not cloned; unchanged preparations
+avoid replay. Authoritative commit reads always revalidate the complete history.
 Raw document APIs, external modules, and privileged journal tampering remain outside
 the protocol guarantee. No custom Foundry server code is required.
 
 Plain HTTP LAN clients work: IDs use getRandomValues and local SHA-256.
 Normal wound editing still requires a connected GM.
+
+Each GM window queues operations per actor. Separate GM windows can still compete.
+An acknowledgement adapter quietly rejects only the exact duplicate-ID collision
+for a registered journal creation, allowing its normal read/retry loop to continue.
+Other database errors retain their notifications. Core may still log expected
+collisions on the server; the system does not patch server logging.
+Do not run legacy numeric-update macros concurrently with first journal initialization.
+The fresh read fixes delayed-broadcast staleness, but is not a transaction with later
+revision creation. Arbitrary bypass writes during that interval remain outside the
+protocol; close old clients and finish legacy updates before adopting the journal.
 
 ### Upgrading from the unpublished lease prototype
 

@@ -24,6 +24,21 @@ projection drives wounds and HP thereafter. Equipment is the internal revision t
 See WOUND-COORDINATION.md for storage/import compatibility, one-time deployment over
 old prototype code, retained-history cost, tests, and remaining live verification.
 
+PR #4 follow-up: added per-actor queues within each GM window; explicit invalid-actor
+and permission replies; persisted blocked-request reasons with manual same-ID retry;
+best-effort local cleanup after durable confirmation; one result warning independent
+of sheet count; native-change pending guard; explicit rejection of JSON import over
+existing journal actors; and full-content-checked projection caching without cloning
+unrelated items. Removed unused unpublished lease localization and test handshake.
+`index: true` is retained because it selects raw client results, not a slim payload.
+The subsequent follow-up handles expected collision acknowledgements through a
+strictly scoped SocketInterface adapter (other requests/errors retain core behavior),
+and reads the initial numeric baseline plus token overrides from storage rather
+than cached documents. Tests exercise the installed SocketInterface, server index
+projection and real character cleaning in both supported versions. Server logging
+is unchanged. Arbitrary legacy writes between the fresh read and revision creation
+are still an external-bypass boundary, not an atomic transaction claim.
+
 Clean rewrite of the system against current Foundry idioms, using the old v9 codebase
 as the behavioral spec. System `id` stays `maelstrom` so existing worlds keep working.
 

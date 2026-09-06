@@ -52,12 +52,11 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		this.#woundStatusHook ??= Hooks.on("maelstromWoundStatus", (actor) => {
 			if (!actor || actor.uuid === this.actor.uuid) this.render({ parts: ["attributes"] });
 		});
-		this.#woundResultHook ??= Hooks.on("maelstromWoundResult", (actor, operation, result) => {
+		this.#woundResultHook ??= Hooks.on("maelstromWoundResult", (actor, operation) => {
 			const edit = this.#pendingWoundEdit;
 			if (actor.uuid !== this.actor.uuid || edit?.operation !== operation) return;
 			if (this.#woundDrafts.get(edit.field) === edit.draft) this.#woundDrafts.delete(edit.field);
 			this.#pendingWoundEdit = undefined;
-			if (result.error) ui.notifications.warn(game.i18n.localize(`MAELSTROM.wounds.coordinator.${result.error}`));
 		});
 		for (const input of this.element.querySelectorAll("input[name]")) {
 			if (!MaelstromCharacterSheet.woundField(input.name)) continue;
@@ -107,6 +106,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		};
 		if (this.#submittingDrafts.has(draft)) return;
 		this.#woundDrafts.set(input.name, draft);
+		if (woundStatus(this.actor) !== "ready") return;
 		operation.expectedValue = draft.expectedValue;
 		operation.value = input.value === "" ? null : Number(input.value);
 		this.#submittingDrafts.add(draft);
@@ -125,7 +125,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 			if (error.code === "conflict") clearDraft();
 			if (edit && pendingWoundOperation(this.actor) === edit.operation) this.#pendingWoundEdit = edit;
 			const key = error.code === "unavailable" ? "MAELSTROM.wounds.journal.offline" : `MAELSTROM.wounds.coordinator.${error.code ?? "retryableWrite"}`;
-			ui.notifications.warn(game.i18n.has(key) ? game.i18n.localize(key) : game.i18n.localize("MAELSTROM.wounds.coordinator.unavailable"));
+			if (!error.notified) ui.notifications.warn(game.i18n.has(key) ? game.i18n.localize(key) : game.i18n.localize("MAELSTROM.wounds.journal.offline"));
 		} finally {
 			if (this.#pendingWoundEdit?.operation !== pendingWoundOperation(this.actor)) this.#pendingWoundEdit = undefined;
 			this.render({ parts: ["attributes"] });
@@ -167,7 +167,8 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		context.editable = this.isEditable;
 		context.notEditable = !this.isEditable;
 		context.woundPending = woundStatus(actor) === "pending";
-		context.woundUnavailable = !["ready", "pending"].includes(woundStatus(actor));
+		context.woundBlocked = woundStatus(actor) === "blocked";
+		context.woundUnavailable = !["ready", "pending", "blocked"].includes(woundStatus(actor));
 		context.woundStatusMessage = woundStatus(actor) === "unavailable" ? "MAELSTROM.wounds.journal.offline" : `MAELSTROM.wounds.coordinator.${woundStatus(actor)}`;
 		Object.assign(context, await woundCoordinatorControls(actor));
 		context.tabs = this._prepareTabs("primary");
