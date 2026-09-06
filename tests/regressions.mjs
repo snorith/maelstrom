@@ -212,7 +212,10 @@ test("actor tooltips request ownership-filtered notes for both item types", asyn
   } });
   assert.deepEqual(unrelatedEdit, { name: "New name", system: { wounds: { injuries: "Keep this note" } } },
     "ordinary sheet submissions must exclude stale wound numbers but retain wound notes");
+  let statusReads = 0;
+  Object.defineProperty(actor.system, "woundJournalError", { get() { statusReads++; return null; }, configurable: true });
   const context = await sheet._prepareContext({});
+  assert.equal(statusReads, 1, "context and wound controls share one status evaluation");
   for (const item of [...context.weapons, ...context.abilities]) {
     assert.doesNotMatch(item.tooltip, /GM SECRET/);
     assert.match(item.tooltip, /Visible notes/);

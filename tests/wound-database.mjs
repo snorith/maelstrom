@@ -22,14 +22,29 @@ const { CharacterData } = await import("../module/data/character-data.mjs");
 const errors = [];
 globalThis.ui = { notifications: { error: (message) => errors.push(message) } };
 
+async function coreCollision(parent, id) {
+	const { default: ServerBackend } = await core("dist/database/backend/server-backend.mjs");
+	const collection = new Map([[id, {}]]);
+	collection.documentClass = {};
+	const serverParent = { ...parent, getSublevel: () => ({}), getEmbeddedCollection: () => collection };
+	try {
+		await new ServerBackend()._createDocuments({ documentName: "Item", collectionName: "items" },
+			{ parent: serverParent, data: [{ _id: id }], keepId: true }, {});
+		assert.fail("installed core must reject an existing embedded ID");
+	} catch (error) {
+		assert.match(error.message, /already exists/);
+		return error.message;
+	}
+}
+
 test("expected revision collisions reject quietly through installed core dispatch; other errors remain visible", async () => {
 	const actor = { id: "base", uuid: "Actor.base", documentName: "Actor" };
 	const record = { _id: "1234567890abcdef", flags: { maelstrom: { woundJournal: { request: { id: "request-123456789" } } } } };
-	const duplicate = `The _id [${record._id}] already exists within the parent collection: Actor [base] items`;
+	const duplicate = await coreCollision(actor, record._id);
 	let responseError = duplicate, emitted = 0;
 	game.socket = { emit(_event, _request, ack) { emitted++; ack({ error: { message: responseError } }); } };
 	actor.createEmbeddedDocuments = async (_type, data, options) => SocketInterface.dispatch("modifyDocument", {
-		type: "Item", action: "create", operation: { data, parentUuid: actor.uuid, ...options }
+		type: "Item", action: "create", operation: Object.assign(options, { data, parentUuid: actor.uuid })
 	});
 	installWoundDatabaseTransport(SocketInterface);
 	const installed = SocketInterface.dispatch;
@@ -66,7 +81,7 @@ test("quiet collision still reaches journal re-read and preserves both competing
 		} else { items.push(record); ack({ result: [{ id: record._id }] }); }
 	} };
 	actor.createEmbeddedDocuments = async (_type, data, options) => (await SocketInterface.dispatch("modifyDocument", {
-		type: "Item", action: "create", operation: { data, parentUuid: actor.uuid, ...options }
+		type: "Item", action: "create", operation: Object.assign(options, { data, parentUuid: actor.uuid })
 	})).result;
 	errors.length = 0;
 	await commitWoundRequest({ read: async () => ({ items, baseline }), canWrite: () => true,
@@ -80,14 +95,14 @@ test("synthetic revision errors are scoped to their ActorDelta while unrelated r
 	const parent = { id: "token", uuid: "Scene.scene.Token.token.ActorDelta.token", documentName: "ActorDelta" };
 	const actor = { id: "base", uuid: "Scene.scene.Token.token.Actor.base", parent: { delta: parent } };
 	const record = { _id: "1234567890abcdef", flags: { maelstrom: { woundJournal: { request: { id: "token-request-id" } } } } };
-	const duplicate = `The _id [${record._id}] already exists within the parent collection: ActorDelta [token] items`;
+	const duplicate = await coreCollision(parent, record._id);
 	let acknowledge;
 	game.socket = { emit(_event, request, ack) {
-		if (request.operation.maelstromWoundAttempt) acknowledge = ack;
+		if (request.operation.data) acknowledge = ack;
 		else ack({ error: { message: duplicate } });
 	} };
 	actor.createEmbeddedDocuments = async (_type, data, options) => SocketInterface.dispatch("modifyDocument", {
-		type: "Item", action: "create", operation: { data, parentUuid: parent.uuid, ...options }
+		type: "Item", action: "create", operation: Object.assign(options, { data, parentUuid: parent.uuid })
 	});
 	errors.length = 0;
 	const pending = assert.rejects(createWoundRevision(actor, record), { message: duplicate });
@@ -96,6 +111,58 @@ test("synthetic revision errors are scoped to their ActorDelta while unrelated r
 	acknowledge({ error: { message: duplicate } });
 	await pending;
 	assert.deepEqual(errors, [duplicate]);
+});
+
+test("core document and backend creation preserve private operation identity without wire metadata", async () => {
+	const { default: Document } = await core("common/abstract/document.mjs");
+	const { default: Backend } = await core("common/abstract/backend.mjs");
+	const actor = { id: "base", uuid: "Actor.base", documentName: "Actor", getEmbeddedCollection() {} };
+	const record = { _id: "1234567890abcdef", flags: { maelstrom: { woundJournal: { request: { id: "private-attempt-id" } } } } };
+	const duplicate = await coreCollision(actor, record._id);
+	let supplied, wire;
+	class CaptureBackend extends Backend {
+		async _getParent(operation) { return operation.parent; }
+		async _createDocuments(_cls, operation) {
+			assert.equal(operation, supplied, "actual core create/configure must retain identity");
+			operation.parentUuid = operation.parent.uuid;
+			delete operation.parent;
+			return SocketInterface.dispatch("modifyDocument", { type: "Item", action: "create", operation });
+		}
+	}
+	const backend = new CaptureBackend();
+	class ItemDocument extends Document {
+		static get implementation() { return this; }
+		static get database() { return backend; }
+		static get documentName() { return "Item"; }
+	}
+	globalThis.getDocumentClass = () => ItemDocument;
+	actor.createEmbeddedDocuments = function (...args) {
+		supplied = args[2];
+		assert.deepEqual(Object.keys(supplied).sort(), ["keepId", "renderSheet"]);
+		return Document.prototype.createEmbeddedDocuments.apply(this, args);
+	};
+	game.socket = { emit(_event, request, ack) {
+		wire = JSON.stringify(request);
+		queueMicrotask(() => ack({ error: { message: duplicate } }));
+	} };
+	errors.length = 0;
+	await assert.rejects(createWoundRevision(actor, record), { message: duplicate });
+	assert.deepEqual(errors, [], "WeakMap registration survives actual core methods");
+	assert.doesNotMatch(wire, /maelstromWoundAttempt/);
+});
+
+test("unexpected asynchronous error rejects even when notifications are unavailable", async () => {
+	const actor = { id: "base", uuid: "Actor.base", documentName: "Actor" };
+	const record = { _id: "1234567890abcdef", flags: { maelstrom: { woundJournal: { request: { id: "no-notifications" } } } } };
+	actor.createEmbeddedDocuments = async (_type, data, operation) => SocketInterface.dispatch("modifyDocument", {
+		type: "Item", action: "create", operation: Object.assign(operation, { data, parentUuid: actor.uuid })
+	});
+	game.socket = { emit(_event, _request, ack) { queueMicrotask(() => ack({ error: { message: "Storage error" } })); } };
+	const notifications = ui.notifications;
+	try {
+		delete ui.notifications;
+		await assert.rejects(createWoundRevision(actor, record), /Storage error/);
+	} finally { ui.notifications = notifications; }
 });
 
 test("first baseline reads fresh server numerics and token overrides using real character cleaning", async () => {

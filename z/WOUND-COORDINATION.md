@@ -27,12 +27,16 @@ client clocks and does not depend on a GM session ID.
   that user may compete safely; there is no elected persistent writer window.
   Each window serializes the complete read/create loop per actor, with independent
   queues for unrelated actors. `wound-database.mjs` wraps SocketInterface.dispatch
-  only for active journal-creation attempts matched by nonce, revision ID, request
+  only for active journal-creation attempts matched by operation-object identity, revision ID, request
   ID, parent UUID and operation. Its acknowledgement handler rejects the exact
   expected duplicate-ID error without a toast. Other errors still notify; unmarked
   operations delegate unchanged to the original dispatch. Core pre-create hooks,
   validation and successful response/broadcast handling remain in the backend.
   Server duplicate-ID logging is unchanged; no server patch is installed.
+  Correlation is held in a WeakMap, never a serializable option. Tests invoke the
+  installed core document/backend creation path to verify identity preservation,
+  and its server duplicate-ID rejection to pin the English message contract.
+  Missing notification UI must not prevent an unexpected error from rejecting.
 - Requests persist to the player's sessionStorage before sending. Missing replies
   retry automatically after two seconds, using the original ID. RPC waits at most
   fifteen seconds; database/GM outages leave the request pending. Reconnect and
@@ -90,7 +94,7 @@ Installed versions: Foundry 13.351 and 14.365.
 
 ## Verification and release gate
 
-The 44-test suite passes against installed 13.351 and 14.365, including localhost
+The 46-test suite passes against installed 13.351 and 14.365, including localhost
 Socket.IO forwarding runs with a fixture database. The follow-up adds per-GM
 serialization, blocked errors, storage-cleanup,
 notification, native-change, projection-cache, scoped collision and fresh-baseline

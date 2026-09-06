@@ -1,9 +1,7 @@
-import { woundRequestId } from "./wound-ids.mjs";
 import { WoundOperationError } from "./wound-operations.mjs";
 
-const attempts = new Map();
+const attempts = new WeakMap();
 const installed = new WeakSet();
-const ATTEMPT = "maelstromWoundAttempt";
 
 /**
  * Core shows database errors before rejecting its Promise. Route only registered
@@ -16,7 +14,7 @@ export function installWoundDatabaseTransport(SocketInterface) {
 	const original = SocketInterface.dispatch;
 	SocketInterface.dispatch = function (event, request) {
 		const operation = request?.operation;
-		const attempt = attempts.get(operation?.[ATTEMPT]);
+		const attempt = attempts.get(operation);
 		const record = operation?.data?.[0];
 		if (event !== "modifyDocument" || request?.action !== "create" || request.type !== "Item"
 			|| !attempt || operation.parentUuid !== attempt.parentUuid || operation.keepId !== true
@@ -31,7 +29,7 @@ export function installWoundDatabaseTransport(SocketInterface) {
 				if (response.error.stack) error.stack = response.error.stack;
 				// Exact expected parent, collection and revision ID. Permission,
 				// validation and unrelated duplicate-ID errors remain visible.
-				if (error.message !== attempt.collision) ui.notifications.error(error.message);
+				if (error.message !== attempt.collision) globalThis.ui?.notifications?.error(error.message);
 				reject(error);
 			});
 		});
@@ -42,17 +40,19 @@ export function installWoundDatabaseTransport(SocketInterface) {
 export async function createWoundRevision(actor, record) {
 	installWoundDatabaseTransport(foundry.helpers.SocketInterface);
 	const parent = actor.parent?.delta ?? actor;
-	const token = woundRequestId();
-	attempts.set(token, {
+	// Foundry 13.351/14.365 preserve this operation object through dispatch.
+	// Keep correlation out of serializable options and other modules' hooks.
+	const operation = { keepId: true, renderSheet: false };
+	attempts.set(operation, {
 		id: record._id, requestId: record.flags.maelstrom.woundJournal.request.id, parentUuid: parent.uuid,
+		// Verified against both installed server versions; regression tests invoke
+		// core's duplicate rejection so a wording change cannot silently pass.
 		collision: `The _id [${record._id}] already exists within the parent collection: ${parent.documentName} [${parent.id}] items`
 	});
 	try {
-		const created = await actor.createEmbeddedDocuments("Item", [record], {
-			keepId: true, renderSheet: false, [ATTEMPT]: token
-		});
+		const created = await actor.createEmbeddedDocuments("Item", [record], operation);
 		return created.some((item) => item.id === record._id);
-	} finally { attempts.delete(token); }
+	} finally { attempts.delete(operation); }
 }
 
 /** Read the legacy baseline from storage, never from a delayed client broadcast. */

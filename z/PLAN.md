@@ -39,6 +39,12 @@ projection and real character cleaning in both supported versions. Server loggin
 is unchanged. Arbitrary legacy writes between the fresh read and revision creation
 are still an external-bypass boundary, not an atomic transaction claim.
 
+PR #4 round-2 polish: private attempt correlation now uses operation identity in a
+WeakMap, with no nonce in hook/socket options. Installed core duplicate rejection
+supplies the test error text; both versions' creation paths verify object identity.
+Missing notification UI no longer interrupts error rejection. Sheet context computes
+wound status once and shares it with the wound controls. Live-world QA remains open.
+
 Clean rewrite of the system against current Foundry idioms, using the old v9 codebase
 as the behavioral spec. System `id` stays `maelstrom` so existing worlds keep working.
 

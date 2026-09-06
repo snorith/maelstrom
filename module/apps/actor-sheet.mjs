@@ -160,16 +160,17 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		const context = await super._prepareContext(options);
 		const actor = this.actor;
 		const system = actor.system;
+		const status = woundStatus(actor);
 
 		context.actor = actor;
 		context.system = system;
 		context.fields = system.schema.fields;
 		context.editable = this.isEditable;
 		context.notEditable = !this.isEditable;
-		context.woundPending = woundStatus(actor) === "pending";
-		context.woundBlocked = woundStatus(actor) === "blocked";
-		context.woundUnavailable = !["ready", "pending", "blocked"].includes(woundStatus(actor));
-		context.woundStatusMessage = woundStatus(actor) === "unavailable" ? "MAELSTROM.wounds.journal.offline" : `MAELSTROM.wounds.coordinator.${woundStatus(actor)}`;
+		context.woundPending = status === "pending";
+		context.woundBlocked = status === "blocked";
+		context.woundUnavailable = !["ready", "pending", "blocked"].includes(status);
+		context.woundStatusMessage = status === "unavailable" ? "MAELSTROM.wounds.journal.offline" : `MAELSTROM.wounds.coordinator.${status}`;
 		Object.assign(context, await woundCoordinatorControls(actor));
 		context.tabs = this._prepareTabs("primary");
 
@@ -190,7 +191,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 			rollLabel: game.i18n.localize(`MAELSTROM.attribute.roll.${key}`)
 		}));
 
-		this.#prepareWounds(context, system);
+		this.#prepareWounds(context, system, status);
 		await this.#prepareItems(context, actor);
 
 		context.careers = ["c1", "c2", "c3", "c4", "c5", "c6"].map((key) => ({
@@ -218,7 +219,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		return context;
 	}
 
-	#prepareWounds(context, system) {
+	#prepareWounds(context, system, status) {
 		const wounds = system.wounds.wounds;
 		const last = wounds.length - 1;
 
@@ -236,8 +237,8 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		// > 0 (not ≠ 0) to match the action's own guard; also gated on editability
 		// so observers see disabled icons instead of no-op controls
 		context.canBleed =
-			this.isEditable && woundStatus(this.actor) === "ready" && Number.isFinite(system.wounds.bloodloss) && system.wounds.bloodloss > 0;
-		context.canHeal = this.isEditable && woundStatus(this.actor) === "ready" && system.hp.wounds > 0;
+			this.isEditable && status === "ready" && Number.isFinite(system.wounds.bloodloss) && system.wounds.bloodloss > 0;
+		context.canHeal = this.isEditable && status === "ready" && system.hp.wounds > 0;
 		context.isUnconscious = system.isUnconscious;
 		context.isDead = system.isDead;
 	}
