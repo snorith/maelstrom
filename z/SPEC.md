@@ -96,6 +96,31 @@ This is the contract for the rewrite. Phase 7 walks every checkbox.
 - [ ] **Bleeding damage** (plus icon on the bloodloss slot): adds `wounds.bloodloss`
       to slot 10 (creates it as the value if slot non-finite). Enabled only when
       `bloodloss` ≠ 0
+- [ ] Wound buttons and numeric edits append immutable actor-scoped revisions.
+      Competing GM clients claim the same next revision ID; core duplicate-ID
+      rejection serializes accepted operations without a persistent writer lease
+- [ ] Numeric edits include the displayed previous value; same-slot conflicts are
+      recorded terminal outcomes. Different-slot edits remain independent.
+      Ordinary forms strip numeric wounds; restored drafts submit once on blur
+- [ ] Socket sender identity is authenticated by core and OWNER permission is checked
+      before reading and again before creation. Revision records contain request ID,
+      operation, resulting state and outcome together; history is never evicted
+- [ ] GM reload/reconnect and replacement GM windows require no manual recovery.
+      Pending requests persist in the requesting tab before sending and retry the
+      same ID automatically. Unavailable database/GM leaves them pending, not replayed
+      under a new ID. Full tab closure can lose local unsent/pending request data
+- [ ] First journal edit snapshots legacy wounds. Thereafter derived wounds and HP
+      read journal state; numeric source fields stay as baseline. Direct numeric
+      updates are rejected once journal-backed. Unrelated updates retain semantics
+- [ ] Unlinked tokens snapshot an independent branch on first edit. Export/new-actor
+      import retains history and branches on first edit; raw-source-only tools and
+      destructive imports over an existing journal actor are not supported
+- [ ] Plain HTTP clients need no secure-context-only APIs. No custom server code
+- [ ] Journal corruption pauses editing. Normal item APIs cannot alter/delete
+      revision records; privileged tampering and external bypasses are out of scope
+- [ ] Deploying over the unpublished lease prototype requires closing all old
+      windows and restarting once. Old leases are inert; old unresolved lease
+      requests need one-time reconciliation, never automatic conversion
 - [ ] OLD: both mutated `actor.data` in memory + re-render only (not persisted until
       next form submit!). NEW: persist via `actor.update` — intentional improvement,
       note in changelog
@@ -121,9 +146,12 @@ This is the contract for the rewrite. Phase 7 walks every checkbox.
       weapon sheet header + reassign-on-render (0,5,10…). NEW (D6): core `sort` field
       + drag-drop rows on the actor sheet; order select removed; migrate old `order`
       → `sort` preserving relative order
-- [ ] `equipment` type: dropped (D5). migrateData: if an old world somehow contains
-      one, leave the document but it will be typeless — verify Foundry v13+ keeps
-      unknown-type items inert without crashing world load
+- [ ] Retain nullable legacy `order` in the schema until migration writes core
+      sort and clears it atomically. Already-stamped worlds have an explicit repair
+      command; do not automatically overwrite subsequent manual sorts
+- [ ] `equipment` is retained as a registered data model for legacy compatibility
+      and immutable wound-journal revisions. Excluded from actor item lists; the
+      core default sheet remains available through direct document APIs
 
 ### 2.3 Actor-sheet item lists
 
@@ -134,7 +162,8 @@ This is the contract for the rewrite. Phase 7 walks every checkbox.
       damage roll icon (or disabled), damage text, range, edit, delete, create;
       **sorted by sort/order**
 - [ ] Tooltip content (was tooltipster; NEW: Foundry `data-tooltip`): item img, name,
-      rank/benefit (ability) or as/ds/damage/range (weapon), then raw notes HTML
+      rank/benefit (ability) or as/ds/damage/range (weapon), then enriched notes HTML
+      with unrevealed Secret blocks hidden from non-owners
 - [ ] Delete asks for confirmation (was `window.confirm`; NEW: DialogV2.confirm)
 - [ ] Create: new item of type with localized default name, then (OLD behavior)
       no sheet auto-open — keep

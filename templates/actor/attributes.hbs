@@ -34,6 +34,14 @@
 			</table>
 
 			{{!-- Wounds --}}
+			{{#if woundPending}}
+				<p role="status">{{localize "MAELSTROM.wounds.journal.pending"}}
+					<button type="button" data-action="retryWounds">{{localize "MAELSTROM.wounds.coordinator.retry"}}</button>
+					{{#if canResolveLegacyWounds}}<button type="button" data-action="resolveWounds">{{localize "MAELSTROM.wounds.coordinator.resolve"}}</button>{{/if}}
+				</p>
+			{{else if woundUnavailable}}
+				<p role="status">{{localize woundStatusMessage}}</p>
+			{{/if}}
 			<table class="wounds">
 				<thead>
 				<tr>

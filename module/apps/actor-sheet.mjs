@@ -1,5 +1,9 @@
 import { ATTRIBUTES } from "../data/character-data.mjs";
 import { SYSTEM_ID } from "../constants.mjs";
+import {
+	woundStatus, retryWoundOperation, discardWoundRequest, woundCoordinatorControls,
+	pendingWoundOperation
+} from "../wound-service.mjs";
 
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
@@ -23,11 +27,110 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 			rollInitiative: MaelstromCharacterSheet.onRollInitiative,
 			healWounds: MaelstromCharacterSheet.onHealWounds,
 			bleedingDamage: MaelstromCharacterSheet.onBleedingDamage,
+			retryWounds: MaelstromCharacterSheet.onRetryWounds,
+			resolveWounds: MaelstromCharacterSheet.onResolveWounds,
 			createItem: MaelstromCharacterSheet.onCreateItem,
 			editItem: MaelstromCharacterSheet.onEditItem,
 			deleteItem: MaelstromCharacterSheet.onDeleteItem
 		}
 	};
+
+	#woundDrafts = new Map();
+	#woundStatusHook;
+	#woundResultHook;
+	#pendingWoundEdit;
+	#submittingDrafts = new WeakSet();
+
+	static woundField(name = "") {
+		if (name === "system.wounds.bloodloss") return { type: "setBleedingCount" };
+		const match = /^system\.wounds\.wounds\.(\d+)$/.exec(name);
+		return match ? { type: "setWound", slot: Number(match[1]) } : null;
+	}
+
+	async _onRender(context, options) {
+		await super._onRender(context, options);
+		this.#woundStatusHook ??= Hooks.on("maelstromWoundStatus", (actor) => {
+			if (!actor || actor.uuid === this.actor.uuid) this.render({ parts: ["attributes"] });
+		});
+		this.#woundResultHook ??= Hooks.on("maelstromWoundResult", (actor, operation, result) => {
+			const edit = this.#pendingWoundEdit;
+			if (actor.uuid !== this.actor.uuid || edit?.operation !== operation) return;
+			if (this.#woundDrafts.get(edit.field) === edit.draft) this.#woundDrafts.delete(edit.field);
+			this.#pendingWoundEdit = undefined;
+			if (result.error) ui.notifications.warn(game.i18n.localize(`MAELSTROM.wounds.coordinator.${result.error}`));
+		});
+		for (const input of this.element.querySelectorAll("input[name]")) {
+			if (!MaelstromCharacterSheet.woundField(input.name)) continue;
+			const baseline = input.value === "" ? null : Number(input.value);
+			const draft = this.#woundDrafts.get(input.name);
+			if (draft) input.value = draft.value;
+			input.oninput = () => {
+				const prior = this.#woundDrafts.get(input.name);
+				this.#woundDrafts.set(input.name, { expectedValue: prior ? prior.expectedValue : baseline, value: input.value });
+			};
+			// A restored .value need not produce a native change event on blur.
+			// Do not submit the detached input being replaced by a rerender.
+			input.onblur = () => {
+				if (input.isConnected && this.#woundDrafts.has(input.name) && woundStatus(this.actor) === "ready") {
+					return this._onChangeForm({}, { target: input });
+				}
+			};
+			input.disabled = !this.isEditable || woundStatus(this.actor) !== "ready";
+		}
+	}
+
+	async _onClose(options) {
+		if (this.#woundStatusHook !== undefined) Hooks.off("maelstromWoundStatus", this.#woundStatusHook);
+		this.#woundStatusHook = undefined;
+		if (this.#woundResultHook !== undefined) Hooks.off("maelstromWoundResult", this.#woundResultHook);
+		this.#woundResultHook = undefined;
+		return super._onClose(options);
+	}
+
+	_processFormData(event, form, formData) {
+		const data = super._processFormData(event, form, formData);
+		// A name/notes/etc. change must never submit a stale wound snapshot.
+		if (data.system?.wounds) {
+			delete data.system.wounds.wounds;
+			delete data.system.wounds.bloodloss;
+		}
+		return data;
+	}
+
+	_onChangeForm(formConfig, event) {
+		const input = event.target;
+		const operation = MaelstromCharacterSheet.woundField(input.name);
+		if (!operation) return super._onChangeForm(formConfig, event);
+		if (!this.isEditable) return;
+		const draft = this.#woundDrafts.get(input.name) ?? {
+			expectedValue: input.defaultValue === "" ? null : Number(input.defaultValue), value: input.value
+		};
+		if (this.#submittingDrafts.has(draft)) return;
+		this.#woundDrafts.set(input.name, draft);
+		operation.expectedValue = draft.expectedValue;
+		operation.value = input.value === "" ? null : Number(input.value);
+		this.#submittingDrafts.add(draft);
+		return this.#runWoundAction(() => this.actor.applyWoundOperation(operation), { field: input.name, draft, operation })
+			.finally(() => this.#submittingDrafts.delete(draft));
+	}
+
+	async #runWoundAction(action, edit) {
+		const clearDraft = () => {
+			if (edit && this.#woundDrafts.get(edit.field) === edit.draft) this.#woundDrafts.delete(edit.field);
+		};
+		try {
+			if (await action() === false) return;
+			clearDraft();
+		} catch (error) {
+			if (error.code === "conflict") clearDraft();
+			if (edit && pendingWoundOperation(this.actor) === edit.operation) this.#pendingWoundEdit = edit;
+			const key = error.code === "unavailable" ? "MAELSTROM.wounds.journal.offline" : `MAELSTROM.wounds.coordinator.${error.code ?? "retryableWrite"}`;
+			ui.notifications.warn(game.i18n.has(key) ? game.i18n.localize(key) : game.i18n.localize("MAELSTROM.wounds.coordinator.unavailable"));
+		} finally {
+			if (this.#pendingWoundEdit?.operation !== pendingWoundOperation(this.actor)) this.#pendingWoundEdit = undefined;
+			this.render({ parts: ["attributes"] });
+		}
+	}
 
 	static PARTS = {
 		header: { template: `systems/${SYSTEM_ID}/templates/actor/header.hbs` },
@@ -63,6 +166,10 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		context.fields = system.schema.fields;
 		context.editable = this.isEditable;
 		context.notEditable = !this.isEditable;
+		context.woundPending = woundStatus(actor) === "pending";
+		context.woundUnavailable = !["ready", "pending"].includes(woundStatus(actor));
+		context.woundStatusMessage = woundStatus(actor) === "unavailable" ? "MAELSTROM.wounds.journal.offline" : `MAELSTROM.wounds.coordinator.${woundStatus(actor)}`;
+		Object.assign(context, await woundCoordinatorControls(actor));
 		context.tabs = this._prepareTabs("primary");
 
 		// Game flavour (1 Domesday / 2 Gothic / 3 Rome): Gothic relabels Favour → Renown
@@ -83,7 +190,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		}));
 
 		this.#prepareWounds(context, system);
-		this.#prepareItems(context, actor);
+		await this.#prepareItems(context, actor);
 
 		context.careers = ["c1", "c2", "c3", "c4", "c5", "c6"].map((key) => ({
 			baseName: `system.events.careers.${key}`,
@@ -128,13 +235,20 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 		// > 0 (not ≠ 0) to match the action's own guard; also gated on editability
 		// so observers see disabled icons instead of no-op controls
 		context.canBleed =
-			this.isEditable && Number.isFinite(system.wounds.bloodloss) && system.wounds.bloodloss > 0;
-		context.canHeal = this.isEditable && system.hp.wounds > 0;
+			this.isEditable && woundStatus(this.actor) === "ready" && Number.isFinite(system.wounds.bloodloss) && system.wounds.bloodloss > 0;
+		context.canHeal = this.isEditable && woundStatus(this.actor) === "ready" && system.hp.wounds > 0;
 		context.isUnconscious = system.isUnconscious;
 		context.isDead = system.isDead;
 	}
 
-	#prepareItems(context, actor) {
+	async #prepareItems(context, actor) {
+		const visibleItems = actor.items.filter((item) => ["ability", "weapon"].includes(item.type));
+		const notes = new Map(await Promise.all(visibleItems.map(async (item) => [
+			item.id,
+			await foundry.applications.ux.TextEditor.enrichHTML(item.system.notes ?? "", {
+				relativeTo: item, rollData: actor.getRollData(), secrets: item.isOwner
+			})
+		])));
 		const abilities = actor.items
 			.filter((i) => i.type === "ability")
 			.sort((a, b) => a.name.localeCompare(b.name));
@@ -152,7 +266,7 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 			tooltip: this.#itemTooltip(item, [
 				["MAELSTROM.abilities.column.rank.title", item.system.rank],
 				["MAELSTROM.abilities.column.benefit.title", item.system.benefit]
-			])
+			], notes.get(item.id))
 		}));
 
 		context.weapons = weapons.map((item) => ({
@@ -172,19 +286,19 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 				["MAELSTROM.weapons.column.ds.title", item.system.ds],
 				["MAELSTROM.weapons.column.damage.title", item.system.damage],
 				["MAELSTROM.weapons.column.range.title", item.system.range]
-			])
+			], notes.get(item.id))
 		}));
 	}
 
-	/** Rich hover card (replaces tooltipster): header + field table + raw notes HTML. */
-	#itemTooltip(item, rows) {
+	/** Rich hover card with ownership-filtered, enriched notes. */
+	#itemTooltip(item, rows, enrichedNotes) {
 		const rowsHtml = rows
 			.map(
 				([labelKey, value]) =>
 					`<tr><td>${escapeHTML(game.i18n.localize(labelKey))}</td><td>${escapeHTML(String(value ?? ""))}</td></tr>`
 			)
 			.join("");
-		const notes = item.system.notes?.trim() ? `<hr>${item.system.notes}` : "";
+		const notes = enrichedNotes?.trim() ? `<hr>${enrichedNotes}` : "";
 		return `<div class="maelstrom-item-tooltip">
 			<img src="${escapeHTML(item.img)}" alt="${escapeHTML(item.name)}" height="50">
 			<h1>${escapeHTML(item.name)}</h1>
@@ -233,13 +347,23 @@ export class MaelstromCharacterSheet extends HandlebarsApplicationMixin(ActorShe
 	/** @this {MaelstromCharacterSheet} */
 	static onHealWounds() {
 		if (!this.isEditable) return;
-		return this.actor.healAllWoundsByOne();
+		return this.#runWoundAction(() => this.actor.healAllWoundsByOne());
 	}
 
 	/** @this {MaelstromCharacterSheet} */
 	static onBleedingDamage() {
 		if (!this.isEditable) return;
-		return this.actor.sufferBleedingDamage();
+		return this.#runWoundAction(() => this.actor.sufferBleedingDamage());
+	}
+
+	static onRetryWounds() {
+		if (!this.isEditable) return;
+		return this.#runWoundAction(() => retryWoundOperation(this.actor), this.#pendingWoundEdit);
+	}
+
+	static onResolveWounds() {
+		if (!this.isEditable) return;
+		return this.#runWoundAction(() => discardWoundRequest(this.actor), this.#pendingWoundEdit);
 	}
 
 	/** @this {MaelstromCharacterSheet} */

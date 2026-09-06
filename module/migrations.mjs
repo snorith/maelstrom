@@ -21,9 +21,11 @@ export function registerMigrationSetting() {
  * models' migrateData; this handles what migrateData cannot touch — core document
  * fields like Item#sort.
  */
-export async function migrateWorld() {
+export async function migrateWorld({ repairLegacyOrder = false } = {}) {
 	if (!game.user.isGM) return;
-	const current = game.settings.get(SYSTEM_ID, "systemMigrationVersion");
+	// Explicit recovery only: old v2 worlds may have been manually re-sorted
+	// since the failed migration. Never silently overwrite those choices.
+	const current = repairLegacyOrder ? 0 : game.settings.get(SYSTEM_ID, "systemMigrationVersion");
 	if (current >= MIGRATION_VERSION) return;
 
 	console.log(`Maelstrom | Running world migration ${current} → ${MIGRATION_VERSION}`);
@@ -48,7 +50,7 @@ function legacyOrderToSort(item, { onlyUnsorted }) {
 	const legacyOrder = foundry.utils.getProperty(item, "_source.system.order");
 	if (!Number.isFinite(legacyOrder) || legacyOrder < 0) return null;
 	if (onlyUnsorted && item.sort) return null;
-	return { _id: item.id, sort: (legacyOrder + 1) * 1000 };
+	return { _id: item.id, sort: (legacyOrder + 1) * 1000, "system.order": null };
 }
 
 /**
@@ -125,7 +127,7 @@ async function migrateWeaponOrderStep2(entryVersion, step1FailedActorIds) {
 	try {
 		for (const item of game.items) {
 			const update = legacyOrderToSort(item, { onlyUnsorted: false });
-			if (update) await item.update({ sort: update.sort });
+			if (update) await item.update({ sort: update.sort, "system.order": null });
 		}
 	} catch (err) {
 		ok = false;
@@ -142,7 +144,7 @@ async function migrateWeaponOrderStep2(entryVersion, step1FailedActorIds) {
 				if (record?.type !== "weapon") continue;
 				const legacyOrder = record?.system?.order;
 				if (Number.isFinite(legacyOrder) && legacyOrder >= 0) {
-					updates.push({ _id: record._id, sort: (legacyOrder + 1) * 1000 });
+					updates.push({ _id: record._id, sort: (legacyOrder + 1) * 1000, "system.order": null });
 				}
 			}
 			if (updates.length === 0) continue;

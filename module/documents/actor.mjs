@@ -5,16 +5,56 @@ import { INITIATIVE_FORMULA } from "../constants.mjs";
 
 const { escapeHTML } = foundry.utils;
 
+function mergeIndexedWounds(data, current) {
+	if (!Array.isArray(current)) return data;
+	// Detect every nested/dotted spelling without cloning unrelated updates.
+	const hasPath = (object, prefix = "") => object && typeof object === "object" && !Array.isArray(object)
+		&& Object.entries(object).some(([key, value]) => {
+			const path = prefix ? `${prefix}.${key}` : key;
+			return path === "system.wounds.wounds" || path.startsWith("system.wounds.wounds.")
+				|| ("system.wounds.wounds".startsWith(`${path}.`) && hasPath(value, path));
+		});
+	if (!hasPath(data)) return data;
+	data = foundry.utils.expandObject(foundry.utils.deepClone(data));
+	const partial = data.system?.wounds?.wounds;
+	if (partial && Object.getPrototypeOf(partial) === Object.prototype) {
+		const merged = [...current];
+		for (const [key, value] of Object.entries(partial)) {
+			if (/^(?:[0-9]|10)$/.test(key)) merged[Number(key)] = value;
+		}
+		data.system.wounds.wounds = merged;
+	}
+	return data;
+}
+
 export class MaelstromActor extends Actor {
+	/** v13 migrates update data even before cleaning; preserve raw instance edits. */
+	async update(data = {}, operation = {}) {
+		return super.update(mergeIndexedWounds(data, this._source?.system?.wounds?.wounds), operation);
+	}
+
+	/** Merge indexed wound edits before v14 invokes the system migration. */
+	static cleanData(data = {}, options = {}, state = {}) {
+		const source = state.source ?? state.model?._source ?? options.source;
+		const current = source?.system?.wounds?.wounds;
+		if (options.partial) data = mergeIndexedWounds(data, current);
+		return super.cleanData(data, options, state);
+	}
+
 	/**
 	 * Foundry ArrayField deltas REPLACE the stored array, so a partial update
 	 * like `actor.update({"system.wounds.wounds.3": 5})` from a macro would
 	 * zero-fill the other slots. Merge partial wound objects onto the current
 	 * array before the replacement happens. Full-form submits (all 11 keys)
 	 * and full-array writes pass through unchanged.
-	 * (Review round 3, devin — see z/PLAN.md ledger.)
+	 * Compatibility fallback for cores which still pass objects here. On v14
+	 * cleaning precedes this hook; cleanData above handles that path instead.
 	 */
 	async _preUpdate(changes, options, user) {
+		if (Array.from(this.items ?? []).some((item) => item.getFlag?.("maelstrom", "woundJournal"))
+			&& (changes.system?.wounds?.wounds !== undefined || changes.system?.wounds?.bloodloss !== undefined)) {
+			throw new Error("Journal-backed wounds must be changed through actor.applyWoundOperation().");
+		}
 		const partial = changes?.system?.wounds?.wounds;
 		if (partial && typeof partial === "object" && !Array.isArray(partial)) {
 			const current = this.system?.wounds?.wounds ?? [];
@@ -138,9 +178,7 @@ export class MaelstromActor extends Actor {
 	 * persists via update instead of mutating in-memory data.
 	 */
 	async healAllWoundsByOne() {
-		const wounds = this.system.wounds.wounds;
-		const healed = wounds.map((v) => (Number.isFinite(v) && v > 0 ? v - 1 : 0));
-		await this.update({ "system.wounds.wounds": healed });
+		return this.applyWoundOperation({ type: "healAll" });
 	}
 
 	/**
@@ -148,13 +186,20 @@ export class MaelstromActor extends Actor {
 	 * damage slot (last slot) (SPEC §1.6). Persists via update.
 	 */
 	async sufferBleedingDamage() {
-		const bleeding = this.system.wounds.bloodloss;
-		if (!Number.isFinite(bleeding) || bleeding <= 0) return;
+		return this.applyWoundOperation({ type: "applyBleeding" });
+	}
 
-		const wounds = [...this.system.wounds.wounds];
-		if (wounds.length < 1) return;
-		const last = wounds.length - 1;
-		wounds[last] = (Number.isFinite(wounds[last]) ? wounds[last] : 0) + bleeding;
-		await this.update({ "system.wounds.wounds": wounds });
+	/** Public macro API. GM clients append immutable authoritative revisions. */
+	async applyWoundOperation(operation) {
+		return this.#queueWoundOperation(() => game.maelstrom.wounds.submit(this, operation));
+	}
+
+	// Preserve invocation order locally; the GM queue serializes all clients.
+	#woundOperations = Promise.resolve();
+
+	#queueWoundOperation(operation) {
+		const result = this.#woundOperations.then(operation);
+		this.#woundOperations = result.catch(() => {});
+		return result;
 	}
 }

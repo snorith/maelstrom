@@ -16,6 +16,7 @@ import { CharacterData } from "./data/character-data.mjs";
 import { AbilityData } from "./data/ability-data.mjs";
 import { WeaponData } from "./data/weapon-data.mjs";
 import { EquipmentData } from "./data/equipment-data.mjs";
+import { registerWoundService } from "./wound-service.mjs";
 import { registerMigrationSetting, migrateWorld } from "./migrations.mjs";
 import { MaelstromActor } from "./documents/actor.mjs";
 import { MaelstromItem } from "./documents/item.mjs";
@@ -99,4 +100,7 @@ function registerSystemSettings() {
 /* ------------------------------------ */
 /* Ready                                */
 /* ------------------------------------ */
-Hooks.once("ready", () => migrateWorld());
+Hooks.once("ready", () => {
+	registerWoundService();
+	return migrateWorld();
+});

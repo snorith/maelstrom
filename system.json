@@ -45,7 +45,7 @@
 		}
 	},
 	"packs": [],
-	"socket": false,
+	"socket": true,
 	"flags": {
 		"hotReload": {
 			"paths": ["styles", "templates", "lang"],

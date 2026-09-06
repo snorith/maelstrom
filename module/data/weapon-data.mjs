@@ -5,6 +5,9 @@ const { fields } = foundry.data;
 export class WeaponData extends foundry.abstract.TypeDataModel {
 	static defineSchema() {
 		return {
+			// Retain until world migration reads it: v14 prunes unknown source keys.
+			// Null distinguishes newly-created weapons from legacy order zero.
+			order: new fields.NumberField({ required: true, nullable: true, initial: null }),
 			as: new fields.NumberField({ required: true, nullable: true, initial: null }),
 			ds: new fields.NumberField({ required: true, nullable: true, initial: null }),
 			damage: new fields.StringField({ initial: "" }),
@@ -30,6 +33,11 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
 	static migrateData(source) {
 		normalizeBlank(source, "as");
 		normalizeBlank(source, "ds");
+		normalizeBlank(source, "order");
+		if ("order" in source && source.order !== null) {
+			const order = Number(source.order);
+			source.order = Number.isFinite(order) && order >= 0 ? order : null;
+		}
 		// Normalize ONLY present keys; anything not a known attribute id (blank,
 		// non-string, hand-edited garbage) becomes the field default.
 		if (source.attributes && typeof source.attributes === "object") {
@@ -40,9 +48,7 @@ export class WeaponData extends foundry.abstract.TypeDataModel {
 				source.attributes.defence = "defence";
 			}
 		}
-		// Legacy `order`/`lastOrder` are handled by the one-time world migration
-		// (module/migrations.mjs) because core `sort` is a document-level field;
-		// the schema simply strips them from system data.
+		// Legacy order is retained for world migration; lastOrder is unused.
 		return super.migrateData(source);
 	}
 }

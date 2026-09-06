@@ -21,7 +21,10 @@ node --check module/**/*.mjs      # the only "compile" check that exists
 mise install                      # node 24 — needed only for release tooling/scripts
 ```
 
-There is no test framework. Verification is: `node --check`, the static audit pattern in
+Regressions use Node's built-in test runner with installed Foundry v13/v14 fields
+and custom-socket forwarding: `FOUNDRY_APP_PATH=/path/to/resources/app node --test tests/*.mjs`.
+Worker clients and database transport/sheet enrichment fixtures do not
+replace live-world verification. Further verification is: `node --check`, the static audit pattern in
 `z/phase-7-plan.md` (actions ↔ handlers, lang keys, field paths, PARTS paths), and the
 manual checklist `z/phase-7-checklist.md` run inside Foundry.
 
@@ -44,8 +47,32 @@ settings. `migrateWorld()` runs on `ready` (GM only).
   inputs submitting `{0:…,10:…}` objects get coerced to arrays). One-time world-level
   fixes in `module/migrations.mjs` gated by the hidden `systemMigrationVersion` world
   setting (e.g. legacy weapon `system.order` → core `sort`, read from `_source`).
+  WeaponData deliberately retains nullable `order`: v14 prunes undeclared source
+  keys before ready. Successful sort writes atomically clear it to null so retries
+  cannot undo subsequent manual sorting. Already-stamped worlds require explicit
+  recovery (README_DEV.md), not an automatic migration-version reset.
   `migrateData` must stay idempotent; blank-string numerics must become `null` BEFORE
   NumberField cleaning (`Number("") === 0` would turn "no value" into a 0 override).
+  On v14 `cleanData` runs BEFORE `_preUpdate`: Actor.cleanData merges partial wound
+  objects using the cleaning source before system migration converts them to arrays.
+  v13 migrates even before cleaning, so the instance Actor.update override preserves
+  raw indexed edits as well. `_preUpdate` is only a compatibility fallback.
+  On v14 synthetic actor.update also runs Actor.cleanData before the outgoing
+  request is rewritten to ActorDelta. Live synthetic-token persistence still needs QA.
+- **Wound coordination**: `wound-journal.mjs` owns immutable revision streams and
+  request deduplication; `wound-service.mjs` supplies authenticated GM socket transport,
+  server-backed reads, and durable in-tab requests with automatic retry.
+  A fixed embedded equipment-item ID claims each next actor-scoped revision.
+  Core serialized duplicate-ID rejection arbitrates competing/late writers.
+  Never persist an asynchronously computed wound snapshot back to Actor.system:
+  journal history is authoritative, projected by CharacterData.prepareDerivedData.
+  First edit snapshots the old numeric baseline; unlinked tokens and imported clones
+  branch from inherited history. Keep all revisions, including conflict outcomes:
+  deleting old receipts would make delayed requests unsafe. No automatic compaction.
+  No leases/release/recovery for journal operations. Reload/reconnect resumes pending
+  requests with unchanged IDs. Old unpublished lease data is inert; deployment must
+  close old clients and restart once. README_DEV.md describes the legacy-pending
+  exception, raw-source/export compatibility, and privileged API bypass boundary.
 - **Documents**: `module/documents/actor.mjs` owns the roll flows; the pure rules
   (d100 outcome banding, modifier stacking with floor-at-0) are in `module/rolls.mjs`
   with no Foundry imports — keep them pure, they're node-testable. Roll banding:
@@ -56,6 +83,8 @@ settings. `migrateWorld()` runs on `ready` (GM only).
   the sheet's actions (the Phase 7 audit checks this). ALL display logic (zero-blank
   numbers, flavour label swap, tooltip HTML, sorted item lists) is computed in
   `_prepareContext` — there are deliberately NO custom Handlebars helpers.
+  Item tooltip notes must pass through TextEditor.enrichHTML with the item's
+  ownership setting; HTML sanitization alone does not remove secret sections.
 - **Drag-sort**: weapon rows rely on ActorSheetV2's built-in drag/drop — `class="draggable"`
   + `data-item-id` is the entire wiring. Don't add manual DragDrop.
 - **Dialogs**: `DialogV2` only (`module/apps/modifiers-dialog.mjs` uses

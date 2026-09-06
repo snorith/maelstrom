@@ -1,5 +1,29 @@
 # Maelstrom v2 — Foundry v13/v14 rewrite (Option C)
 
+## September 2026 correction to earlier review conclusions
+
+Direct inspection of installed Foundry 14.365 disproved two assumptions below:
+cleaning and system migration run before `_preUpdate`, and undeclared source keys
+are pruned before ready. The current fixes merge indexed wound updates in
+Actor.cleanData (plus the raw instance-update boundary for v13) and retain nullable
+WeaponData.order until migration consumes it. Tooltip notes use ownership-filtered
+enrichment. Wound editing now uses the cross-client protocol documented in
+`WOUND-COORDINATION.md`. Regressions use the actual v13/v14 data fields and custom
+socket forwarding handler; document transport and tooltip enrichment are simulated.
+The older review ledger is historical evidence, not verification of these APIs.
+Live v13/v14 checklist verification remains outstanding. See README_DEV.md for
+explicit recovery of worlds already stamped by the faulty order migration and
+the supported wound-operation API and recovery procedure.
+
+Latest user-approved redesign supersedes the persistent-lease implementation: wound
+operations now append immutable revisions with durable request IDs and outcomes.
+Core duplicate-ID rejection arbitrates concurrent and late writers; no GM release or
+recovery step is needed for journal requests. Pending requests auto-retry on reconnect
+and same-tab reload. Existing numeric fields are snapshotted on first edit; journal
+projection drives wounds and HP thereafter. Equipment is the internal revision type.
+See WOUND-COORDINATION.md for storage/import compatibility, one-time deployment over
+old prototype code, retained-history cost, tests, and remaining live verification.
+
 Clean rewrite of the system against current Foundry idioms, using the old v9 codebase
 as the behavioral spec. System `id` stays `maelstrom` so existing worlds keep working.
 
@@ -11,7 +35,7 @@ as the behavioral spec. System `id` stays `maelstrom` so existing worlds keep wo
 | D2 | Plain CSS with native nesting, no SCSS | Everything the SCSS does is native CSS now; zero build steps |
 | D3 | `compatibility: {minimum: 13, verified: 14}` | AppV2/TypeDataModel/DialogV2 identical on both |
 | D4 | Repo root = system root (no src/dist split) | Nothing to compile; clone/symlink into `Data/systems/maelstrom` |
-| D5 | Drop the `equipment` item type | Declared in template.json but no class/sheet/UI ever existed; old code throws on it |
+| D5 | Retain internal `equipment` type (supersedes original drop decision) | Legacy compatibility and immutable wound revisions; no actor item-list UI |
 | D6 | Weapon ordering via core `sort` + drag-drop | Replaces custom `order`/`lastOrder` fields and the order `<select>` on the weapon sheet; migrate `order` → `sort` |
 | D7 | Old `src/` tree stays in place as reference until Phase 7, then deleted | It is the spec; new system lives at repo root alongside it |
 | D8 | Fix, don't port: the `c` bug (MaelstromActor.ts:226), the `languages:` colon-typo key | Known defects |
